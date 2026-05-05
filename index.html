@@ -165,7 +165,7 @@ hr{border:none;border-top:1px solid var(--border);margin:40px 0}
 .section:nth-child(7){animation-delay:.3s}.section:nth-child(8){animation-delay:.35s}
 .section:nth-child(9){animation-delay:.4s}
 
-.settings-btn{background:transparent;border:none;color:var(--muted);cursor:pointer;padding:6px;border-radius:4px;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.settings-btn{background:transparent;border:1px solid var(--border);color:var(--muted);cursor:pointer;padding:6px;border-radius:4px;transition:all .2s;display:flex;align-items:center;justify-content:center}
 .settings-btn:hover{background:var(--border);color:var(--ink)}
 
 .settings-popover{position:absolute;top:100%;right:0;margin-top:8px;background:var(--white);border:1px solid var(--border);border-radius:6px;padding:16px;width:200px;z-index:100;box-shadow:0 10px 30px rgba(0,0,0,0.8);display:none;flex-direction:column;gap:8px}
@@ -237,6 +237,13 @@ span.flatpickr-weekday { color: var(--muted) !important; font-family: 'DM Mono',
       <div class="section-line"></div>
     </div>
     <div class="field-grid">
+      <div class="field-group full">
+        <label>Store URL</label>
+        <div style="display:flex;gap:8px">
+          <input type="text" id="store-url" placeholder="e.g. https://brand.com">
+          <button class="btn btn-ghost" id="analyze-btn" onclick="window.analyzeStoreWithAI()" style="flex:none; white-space:nowrap;">✨ Auto-fill</button>
+        </div>
+      </div>
       <div class="field-group">
         <label>Brand name</label>
         <input type="text" id="brand" placeholder="e.g. Luxe Supplements" oninput="calc()">
@@ -597,7 +604,6 @@ span.flatpickr-weekday { color: var(--muted) !important; font-family: 'DM Mono',
       <p class="placeholder-text">Fill in the inputs on the left to generate your personalised proposal.</p>
     </div>
     <div class="btn-row">
-      <button class="btn btn-primary" onclick="copyProposal()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Proposal</button>
       <button class="btn btn-primary" onclick="copyROI()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> ROI</button>
       <button class="btn btn-primary" onclick="savePdf()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> PDF</button>
       <button class="btn btn-primary" onclick="emailProposal()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> Email</button>
@@ -615,21 +621,21 @@ var tiers={
   3:{name:'Pro',price:6500,features:'all Growth deliverables plus post-purchase upsell sequences, winback campaigns, a dedicated Slack channel, and a quarterly roadmap'}
 };
 var nicheData={
-  supplements:{atc:8,abandon:72,aovBase:75,hint:'Avg AOV $60–110. Subscriptions common — LTV is high even when AOV looks lower. Urgency and social proof drive best recovery rates.'},
-  fashion:    {atc:6,abandon:76,aovBase:90,hint:'Avg AOV $70–130. Highest browse abandonment of any niche. Size/fit hesitation is the #1 drop-off reason — address it in recovery copy.'},
-  beauty:     {atc:7,abandon:74,aovBase:65,hint:'Avg AOV $50–90. Multi-product bundles common. Loyalty perks and free samples are strongest recovery hooks.'},
-  homegood:   {atc:5,abandon:70,aovBase:110,hint:'Avg AOV $80–180. Longer decision cycle — lead with reviews and easy returns, not urgency.'},
-  electronics:{atc:4,abandon:68,aovBase:180,hint:'Avg AOV $120–350. High-research category. Social proof, comparisons, and warranty details outperform discount offers.'},
-  pet:        {atc:9,abandon:71,aovBase:60, hint:'Avg AOV $45–90. Subscription-friendly. Emotional appeal and pet-specific personalisation work very well.'},
-  custom:     {atc:7,abandon:72,aovBase:80, hint:'No benchmark defaults. Fill in your own values for an accurate projection.'}
+  supplements:{atc:8,abandon:72,aovBase:75,hint:'Avg AOV $60–110. Subscriptions common — LTV is high even when AOV looks lower. Urgency and social proof drive best recovery rates.', proposalMsg: 'In the supplements space, consistency and trust are everything. We\'ll implement a recovery strategy highlighting social proof, reviews, and easy subscription options.'},
+  fashion:    {atc:6,abandon:76,aovBase:90,hint:'Avg AOV $70–130. Highest browse abandonment of any niche. Size/fit hesitation is the #1 drop-off reason — address it in recovery copy.', proposalMsg: 'For apparel brands, sizing uncertainty is the #1 reason for cart abandonment. Our sequences proactively address fit and return policies to save those lost sales.'},
+  beauty:     {atc:7,abandon:74,aovBase:65,hint:'Avg AOV $50–90. Multi-product bundles common. Loyalty perks and free samples are strongest recovery hooks.', proposalMsg: 'Beauty consumers respond particularly well to education and sampling. Our recovery strategy focuses on application tips and loyalty framing to drive conversions.'},
+  homegood:   {atc:5,abandon:70,aovBase:110,hint:'Avg AOV $80–180. Longer decision cycle — lead with reviews and easy returns, not urgency.', proposalMsg: 'Home and furniture purchases carry longer consideration cycles. We\'ll deploy a multi-touch sequence leading with lifestyle imagery, financing options, and detailed social proof.'},
+  electronics:{atc:4,abandon:68,aovBase:180,hint:'Avg AOV $120–350. High-research category. Social proof, comparisons, and warranty details outperform discount offers.', proposalMsg: 'Tech buyers do heavy research. Instead of rushing a discount, our tech recovery strategy focuses on competitive differentiation, spec comparisons, and warranty assurances.'},
+  pet:        {atc:9,abandon:71,aovBase:60, hint:'Avg AOV $45–90. Subscription-friendly. Emotional appeal and pet-specific personalisation work very well.', proposalMsg: 'Pet owners buy on emotion. We\'ll structure your abandoned cart paths with highly personalised, pet-centric messaging to recapture their attention.'},
+  custom:     {atc:7,abandon:72,aovBase:80, hint:'No benchmark defaults. Fill in your own values for an accurate projection.', proposalMsg: ''}
 };
 var espData={
-  klaviyo: {cls:'green',msg:'Perfect fit. Klaviyo is the gold standard for Shopify cart recovery — deep native integration, predictive analytics, best deliverability. Easiest to build on.'},
-  mailchimp:{cls:'amber',msg:'Workable but limited. Mailchimp\'s Shopify cart data sync is unreliable. Worth migrating them to Klaviyo as part of your onboarding.'},
-  omnisend: {cls:'green',msg:'Good platform. Solid Shopify integration with built-in SMS. Slightly less powerful than Klaviyo for segmentation but totally viable.'},
-  drip:     {cls:'amber',msg:'Drip is declining — limited Shopify support. Consider pitching a Klaviyo migration alongside your recovery service.'},
-  none:     {cls:'red',msg:'No ESP — maximum opportunity. They\'re recovering zero revenue right now. Any result you deliver is infinite ROI vs their current baseline.'},
-  other:    {cls:'amber',msg:'Unknown tool — confirm on the discovery call. The platform determines what\'s buildable and how fast you can launch.'}
+  klaviyo: {cls:'green',msg:'Perfect fit. Klaviyo is the gold standard for Shopify cart recovery — deep native integration, predictive analytics, best deliverability. Easiest to build on.', proposalMsg: 'Since you\'re already on Klaviyo, we can immediately leverage its deep integration to build high-converting flows without migrating your stack.'},
+  mailchimp:{cls:'amber',msg:'Workable but limited. Mailchimp\'s Shopify cart data sync is unreliable. Worth migrating them to Klaviyo as part of your onboarding.', proposalMsg: 'We can optimize your current Mailchimp setup, but for maximum ROI, we may recommend moving your cart flows to a dedicated e-commerce engine.'},
+  omnisend: {cls:'green',msg:'Good platform. Solid Shopify integration with built-in SMS. Slightly less powerful than Klaviyo for segmentation but totally viable.', proposalMsg: 'Using Omnisend allows us to seamlessly layer SMS into your email recovery flows, capturing buyers on their preferred channel.'},
+  drip:     {cls:'amber',msg:'Drip is declining — limited Shopify support. Consider pitching a Klaviyo migration alongside your recovery service.', proposalMsg: 'We can work within Drip initially, but as we build out your recovery engine, we can evaluate a move to a more integrated platform.'},
+  none:     {cls:'red',msg:'No ESP — maximum opportunity. They\'re recovering zero revenue right now. Any result you deliver is infinite ROI vs their current baseline.', proposalMsg: 'Since you don\'t have a dedicated email platform yet, we will set up the foundational infrastructure from scratch to ensure you stop leaking revenue day one.'},
+  other:    {cls:'amber',msg:'Unknown tool — confirm on the discovery call. The platform determines what\'s buildable and how fast you can launch.', proposalMsg: 'We will audit your existing email platform to build the most effective recovery flows it supports.'}
 };
 var peakData={
   bfcm:      {label:'BFCM approaching',color:'gold',msg:'Black Friday / Cyber Monday is coming — this is your single strongest close angle. Every day without a recovery system is money they won\'t get back during their biggest revenue month.'},
@@ -933,6 +939,15 @@ function calc(){
     ?peakInfo.msg
     :'';
 
+  var niche=document.getElementById('niche').value;
+  var nicheLine=(niche&&nicheData[niche]&&nicheData[niche].proposalMsg)
+    ?nicheData[niche].proposalMsg
+    :'';
+
+  var espLine=(esp&&espData[esp]&&espData[esp].proposalMsg)
+    ?espData[esp].proposalMsg
+    :'';
+
   var testLine=testimonial.trim()
     ?'"'+testimonial.replace(/^[""\s]+|[""\s]+$/g,'').split('—')[0].trim()+'"'
     :'';
@@ -941,6 +956,8 @@ function calc(){
 
   var html='<p class="p-lead">Hey '+(contact!=='[Contact]'?contact:'<span class="placeholder-text">[Contact]</span>')+',</p>';
   if(flowLine) html+='<p>'+flowLine+'</p>';
+  if(nicheLine) html+='<p>'+nicheLine+'</p>';
+  if(espLine) html+='<p>'+espLine+'</p>';
   html+='<p>'+roiLine+'</p>';
   if(deltaLine) html+='<p>'+deltaLine+'</p>';
   if(peakLine) html+='<p>'+peakLine+'</p>';
@@ -1012,22 +1029,42 @@ function savePdf() {
   var btnRow = document.querySelector('.btn-row');
   var feedback = document.getElementById('copy-feedback');
   
-  // Temporarily hide buttons
+  // Temporarily modify styles for full capture
   if (btnRow) btnRow.style.display = 'none';
   if (feedback) feedback.style.display = 'none';
+  
+  var origHeight = element.style.height;
+  var origOverflow = element.style.overflowY;
+  var origPosition = element.style.position;
+  var origColor = element.style.color;
+  var origScroll = window.scrollY || document.documentElement.scrollTop;
+  
+  window.scrollTo(0, 0);
+  
+  element.style.height = 'auto';
+  element.style.overflowY = 'visible';
+  element.style.position = 'static';
+  element.style.color = '#fafafa'; /* force white text to avoid html2canvas css-var bugs */
 
   var opt = {
     margin:       [10, 10, 10, 10],
     filename:     'Recovery-Proposal.pdf',
     image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2, backgroundColor: '#111113' },
+    html2canvas:  { scale: 2, backgroundColor: '#111113', useCORS: true },
     jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
   };
 
   html2pdf().set(opt).from(element).save().then(function() {
-    // Restore buttons
+    // Restore styles
     if (btnRow) btnRow.style.display = 'flex';
     if (feedback) feedback.style.display = 'block';
+    
+    element.style.height = origHeight;
+    element.style.overflowY = origOverflow;
+    element.style.position = origPosition;
+    element.style.color = origColor;
+    
+    window.scrollTo(0, origScroll);
   });
 }
 
@@ -1060,6 +1097,68 @@ function savePdf() {
 })();
 
 calc();
+</script>
+<script type="module">
+  import { GoogleGenAI } from "@google/genai";
+  
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  
+  window.analyzeStoreWithAI = async function() {
+    const url = document.getElementById('store-url').value.trim();
+    if (!url) {
+      alert("Please enter a Store URL.");
+      return;
+    }
+    
+    const btn = document.getElementById('analyze-btn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = 'Analyzing...';
+    btn.disabled = true;
+    
+    try {
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: `Analyze this e-commerce store URL: ${url}
+        Based on your knowledge of the brand, typical industry benchmarks for this specific brand, or the URL itself, provide realistic estimates for their cart recovery calculator.
+        
+        Return ONLY a JSON object with the following keys, no markdown wrapping, no explanation:
+        - "brand": string (brand name, extract from URL or your knowledge)
+        - "contactName": string (The founder, owner, or CEO's first name, if publicly known. Try your best to find this via web search. If you still don't know, return an empty string "")
+        - "clientEmail": string (The founder, owner, CEO's email, or a general contact/support email. Try your best to find this via web search. If you still don't know, return an empty string "")
+        - "niche": string (one of: supplements, fashion, beauty, homegood, electronics, pet, or custom)
+        - "visitors": number (Accurate monthly visitors for this brand. Use search to find SimilarWeb or Semrush data for this domain. Make a realistic estimate if not found.)
+        - "aovKnown": number (estimated Average Order Value in USD, just the number, e.g. 85. If you cannot guess, return 0)
+        - "esp": string (one of: klaviyo, mailchimp, omnisend, drip, none, other. Guess klaviyo if you don't know, as it's the most common for Shopify)
+        - "existingFlow": string (one of: 'no', 'basic', 'partial', 'yes', or 'unknown'. Estimate if they have a cart recovery flow based on brand size or search results. Guess 'unknown' if unsure)
+        `,
+        tools: [{ googleSearch: {} }]
+      });
+      
+      let text = response.text;
+      text = text.replace(/```json/gi, '').replace(/```/gi, '').trim();
+      const data = JSON.parse(text);
+      if (data.brand) document.getElementById('brand').value = data.brand;
+      if (data.contactName) document.getElementById('contact').value = data.contactName;
+      if (data.clientEmail) document.getElementById('client-email').value = data.clientEmail;
+      if (data.niche) {
+        document.getElementById('niche').value = data.niche;
+        window.applyNiche();
+      }
+      if (data.visitors) document.getElementById('visitors').value = data.visitors;
+      if (data.aovKnown) document.getElementById('aov-known').value = data.aovKnown;
+      if (data.esp) document.getElementById('esp').value = data.esp;
+      if (data.existingFlow && data.existingFlow !== 'unknown') document.getElementById('existing-flow').value = data.existingFlow;
+      
+      window.calc();
+      
+    } catch (err) {
+      console.error(err);
+      alert("Error analyzing store. Please try again or fill the details manually.");
+    } finally {
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }
+  };
 </script>
 </body>
 </html>
