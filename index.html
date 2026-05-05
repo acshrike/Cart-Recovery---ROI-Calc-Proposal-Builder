@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cart Recovery ROI Calculator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: dark;
+  --white:#09090b;--cream:#18181b;--ink:#fafafa;--muted:#a1a1aa;
+  --border:#27272a;--accent:#10b981;--accent-light:rgba(16,185,129,0.15);--accent-mid:#059669;
+  --gold:#fbbf24;--warn:#fb923c;--warn-light:rgba(251,146,60,0.15);--red:#ef4444;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--white);color:var(--ink);font-family:'Syne',sans-serif;font-size:14px;line-height:1.6;min-height:100vh}
+.app{display:grid;grid-template-columns:1fr 430px;min-height:100vh}
+.left{padding:48px 52px;border-right:1px solid var(--border);overflow-y:auto}
+.right{background:#111113;color:var(--ink);padding:40px 36px;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:48px}
+.logo-mark{width:28px;height:28px;border:1.5px solid var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center}
+.logo-mark span{width:8px;height:8px;background:var(--accent);border-radius:50%}
+.logo-text{font-family:'Syne',sans-serif;font-size:16px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink)}
+
+.section{margin-bottom:40px}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.section-num{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.1em}
+.section-title{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink)}
+.section-line{flex:1;height:1px;background:var(--border)}
+
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.field-grid.three{grid-template-columns:1fr 1fr 1fr}
+.field-group{display:flex;flex-direction:column;gap:6px}
+.field-group.full{grid-column:1/-1}
+label{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+input[type=text],input[type=number],input[type=date],select{
+  width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:4px;
+  background:var(--cream);color:var(--ink);font-family:'Syne',sans-serif;font-size:13px;
+  transition:border-color .2s,background .2s;appearance:none;-webkit-appearance:none}
+select { background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fafafa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 14px center; background-size: 14px; padding-right: 36px; }
+select option { background: var(--cream); color: var(--ink); }
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+input[type=number] {
+  -moz-appearance: textfield;
+}
+input[type=date] { cursor: pointer; position: relative; }
+input[type=date]::-webkit-calendar-picker-indicator { position: absolute; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+input:focus,select:focus{outline:none;border-color:var(--accent);background:rgba(255,255,255,0.05)}
+.field-hint{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace}
+
+.info-box{font-size:11px;padding:8px 10px;border-radius:4px;border-left:2px solid;line-height:1.5;display:none}
+.info-box.visible{display:block}
+.info-box.green{color:var(--accent);background:var(--accent-light);border-color:var(--accent)}
+.info-box.amber{color:var(--warn);background:var(--warn-light);border-color:var(--gold)}
+.info-box.red{color:var(--red);background:rgba(239, 68, 68, 0.1);border-color:var(--red)}
+
+.rev-check{font-size:11px;font-family:'DM Mono',monospace;padding:7px 10px;border-radius:4px;margin-top:4px;display:none;line-height:1.5}
+.rev-check.ok{background:var(--accent-light);color:var(--accent);display:block}
+.rev-check.warn{background:var(--warn-light);color:var(--warn);display:block}
+
+.slider-wrap{margin-top:4px}
+.slider-labels{display:flex;justify-content:space-between;margin-bottom:6px}
+.slider-labels span{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)}
+input[type=range]{width:100%;height:3px;background:var(--border);border-radius:2px;outline:none;cursor:pointer;appearance:none;-webkit-appearance:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);border:2px solid var(--white);box-shadow:0 0 0 1px var(--accent);cursor:pointer}
+.slider-val{font-family:'DM Serif Display',serif;font-size:28px;color:var(--accent);margin-top:8px}
+
+.tier-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.tier-card{border:1px solid var(--border);border-radius:6px;padding:16px;cursor:pointer;transition:all .2s;background:var(--cream);position:relative}
+.tier-card:hover{border-color:var(--accent-mid)}
+.tier-card.active{border-color:var(--accent);background:var(--accent-light)}
+.tier-card.active::after{content:'';position:absolute;top:10px;right:10px;width:8px;height:8px;background:var(--accent);border-radius:50%}
+.tier-badge{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;background:var(--gold);color:var(--white);padding:2px 7px;border-radius:2px;display:inline-block;margin-bottom:8px}
+.tier-name{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.tier-price{font-family:'DM Serif Display',serif;font-size:26px;color:var(--ink);line-height:1}
+.tier-price sub{font-family:'Syne',sans-serif;font-size:12px;font-weight:400;color:var(--muted);vertical-align:baseline}
+.tier-features{margin-top:10px;display:flex;flex-direction:column;gap:5px}
+.tier-feature{font-size:11px;color:var(--muted);display:flex;gap:6px;align-items:flex-start}
+.tier-feature::before{content:'—';color:var(--accent);flex-shrink:0;font-size:10px;margin-top:1px}
+
+.testimonial-preview{background:rgba(251, 191, 36, 0.05);border:1px solid rgba(251, 191, 36, 0.2);border-radius:6px;padding:14px 16px;margin-top:12px;display:none}
+.testimonial-preview.visible{display:block}
+.t-quote{font-size:12px;color:var(--ink);font-style:italic;line-height:1.65;margin-bottom:6px}
+.t-author{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+
+hr{border:none;border-top:1px solid var(--border);margin:40px 0}
+
+/* Modern Scrollbar */
+::-webkit-scrollbar {width:5px;height:5px;}
+::-webkit-scrollbar-track {background:transparent;}
+::-webkit-scrollbar-thumb {background-color:rgba(107, 107, 102, 0.3);border-radius:10px;}
+::-webkit-scrollbar-thumb:hover {background-color:rgba(107, 107, 102, 0.5);}
+.right::-webkit-scrollbar-thumb {background-color:rgba(255, 255, 255, 0.15);}
+.right::-webkit-scrollbar-thumb:hover {background-color:rgba(255, 255, 255, 0.25);}
+.proposal-text::-webkit-scrollbar {width:4px;}
+.proposal-text::-webkit-scrollbar-thumb {background-color:rgba(255, 255, 255, 0.2);}
+
+/* Right */
+.right-logo{font-family:'Syne',sans-serif;font-weight:600;font-size:16px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);margin-bottom:32px}
+.roi-hero{margin-bottom:22px;padding-bottom:22px;border-bottom:1px solid rgba(255,255,255,.1)}
+.roi-label{font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:rgba(245,242,237,.4);margin-bottom:8px}
+.roi-main{font-family:'DM Serif Display',serif;font-size:46px;color:#6fcf97;line-height:1;margin-bottom:4px;transition:all .3s}
+.roi-main.empty{color:rgba(245,242,237,.18)}
+.roi-sub{font-size:10px;color:rgba(245,242,237,.45);font-family:'DM Mono',monospace;line-height:1.5}
+
+.metric-list{display:flex;flex-direction:column;margin-bottom:16px}
+.metric-row{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.metric-key{font-size:10.5px;color:rgba(245,242,237,.45)}
+.metric-val{font-family:'DM Mono',monospace;font-size:11.5px;color:var(--ink);font-weight:500;text-align:right;max-width:55%}
+.metric-val.green{color:#6fcf97}
+.metric-val.gold{color:#f2c94c}
+.metric-val.red{color:#ff7070}
+.metric-val.muted{color:rgba(245,242,237,.22)}
+
+.aov-confidence{padding:9px 11px;border-radius:4px;border:1px solid rgba(255,255,255,.09);margin-bottom:14px;font-size:10px;color:rgba(245,242,237,.5);line-height:1.55;font-family:'DM Mono',monospace;display:none}
+
+.proposal-section{flex:1;display:flex;flex-direction:column;min-height:0}
+.proposal-label{font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:rgba(245,242,237,.35);margin-bottom:11px}
+.proposal-text{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:6px;padding:16px;flex:1;margin-bottom:13px;overflow-y:auto;min-height:140px}
+.proposal-text p{font-size:11.5px;color:rgba(245,242,237,.82);line-height:1.75;margin-bottom:10px}
+.proposal-text p:last-child{margin-bottom:0}
+.p-lead{font-weight:600;color:var(--ink)!important;font-size:12.5px!important}
+.p-price{font-family:'DM Serif Display',serif!important;font-size:17px!important;color:#f2c94c!important}
+.p-expiry{font-size:10px!important;color:rgba(245,242,237,.35)!important;font-family:'DM Mono',monospace!important}
+.p-sig{font-size:10px!important;color:rgba(245,242,237,.3)!important}
+.p-testimonial{font-style:italic;color:rgba(245,242,237,.6)!important;border-left:2px solid rgba(242,201,76,.3);padding-left:10px!important}
+.placeholder-text{color:rgba(245,242,237,.18)!important;font-style:italic}
+
+.btn-row{display:flex;gap:8px}
+.btn{flex:1;padding:10px 14px;border-radius:4px;font-family:'Syne',sans-serif;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .15s;text-align:center;border:none;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-primary{background:var(--ink);color:var(--white)}
+.btn-primary:hover{background:var(--muted)}
+.btn-ghost{background:transparent;color:rgba(245,242,237,.55);border:1px solid rgba(255,255,255,.12)!important}
+.btn-ghost:hover{color:var(--ink);border-color:rgba(255,255,255,.28)!important}
+.copy-feedback{font-size:10px;color:#6fcf97;font-family:'DM Mono',monospace;letter-spacing:.1em;text-align:center;margin-top:7px;height:14px;transition:opacity .3s}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.section{animation:fadeIn .35s ease both}
+.section:nth-child(1){animation-delay:0s}.section:nth-child(2){animation-delay:.05s}
+.section:nth-child(3){animation-delay:.1s}.section:nth-child(4){animation-delay:.15s}
+.section:nth-child(5){animation-delay:.2s}.section:nth-child(6){animation-delay:.25s}
+.section:nth-child(7){animation-delay:.3s}.section:nth-child(8){animation-delay:.35s}
+.section:nth-child(9){animation-delay:.4s}
+
+@media(max-width:960px){
+  .app{grid-template-columns:1fr}
+  .right{position:static;height:auto}
+  .left,.right{padding:32px 24px}
+  .tier-grid,.field-grid.three{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ═══ LEFT ═══ -->
+<div class="left">
+  <div class="logo">
+    <div class="logo-mark"><span></span></div>
+    <span class="logo-text">Cart Recovery · ROI & Proposal Builder</span>
+  </div>
+
+  <!-- 01 CLIENT -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <span class="section-title">Client details</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="field-grid">
+      <div class="field-group">
+        <label>Brand name</label>
+        <input type="text" id="brand" placeholder="e.g. Luxe Supplements" oninput="calc()">
+      </div>
+      <div class="field-group">
+        <label>Contact name</label>
+        <input type="text" id="contact" placeholder="e.g. Sarah" oninput="calc()">
+      </div>
+      <div class="field-group full">
+        <label>Niche / category</label>
+        <select id="niche" onchange="applyNiche()">
+          <option value="">Select niche — auto-fills benchmarks</option>
+          <option value="supplements">Supplements & health</option>
+          <option value="fashion">Fashion & apparel</option>
+          <option value="beauty">Beauty & skincare</option>
+          <option value="homegood">Home goods & furniture</option>
+          <option value="electronics">Electronics & tech</option>
+          <option value="pet">Pet products</option>
+          <option value="custom">Custom / other</option>
+        </select>
+        <div class="info-box green" id="niche-hint"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 02 EXISTING SETUP -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <span class="section-title">Existing setup</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="field-grid">
+      <div class="field-group">
+        <label>Current ESP / email tool</label>
+        <select id="esp" onchange="calc()">
+          <option value="">Unknown / ask on call</option>
+          <option value="klaviyo">Klaviyo</option>
+          <option value="mailchimp">Mailchimp</option>
+          <option value="omnisend">Omnisend</option>
+          <option value="drip">Drip</option>
+          <option value="none">None — nothing set up</option>
+          <option value="other">Other</option>
+        </select>
+        <div class="info-box" id="esp-hint"></div>
+      </div>
+      <div class="field-group">
+        <label>Cart recovery flow running?</label>
+        <select id="existing-flow" onchange="calc()">
+          <option value="no">No — zero set up</option>
+          <option value="basic">Basic (1–2 emails only)</option>
+          <option value="partial">Partial (no SMS / no AI)</option>
+          <option value="yes">Yes — full flow running</option>
+        </select>
+        <div class="field-hint">Frames the improvement delta in your pitch</div>
+      </div>
+      <div class="field-group" id="current-rate-wrap" style="display:none">
+        <label>Their current recovery rate %</label>
+        <input type="number" id="current-rate" placeholder="e.g. 4" min="0" max="30" oninput="calc()">
+        <div class="field-hint">Baseline — your pitch is the delta above this</div>
+      </div>
+      <div class="field-group">
+        <label>Recent promo / sale?</label>
+        <select id="recent-promo" onchange="calc()">
+          <option value="no">No</option>
+          <option value="within2w">Within last 2 weeks</option>
+          <option value="within1m">Within last month</option>
+        </select>
+        <div class="field-hint">Recent promo suppresses recovery rates 20–30%</div>
+      </div>
+    </div>
+    <div class="info-box amber" id="setup-hint" style="margin-top:10px"></div>
+  </div>
+
+  <!-- 03 TRAFFIC -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <span class="section-title">Traffic & conversion</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="field-grid three">
+      <div class="field-group">
+        <label>Monthly visitors</label>
+        <input type="number" id="visitors" placeholder="50,000" oninput="calc()">
+        <div class="field-hint">Unique sessions / mo</div>
+      </div>
+      <div class="field-group">
+        <label>Add-to-cart rate %</label>
+        <input type="number" id="atc" placeholder="7" min="1" max="30" oninput="calc()">
+        <div class="field-hint">Avg: 5–10%</div>
+      </div>
+      <div class="field-group">
+        <label>Abandonment rate %</label>
+        <input type="number" id="abandon" placeholder="72" min="1" max="99" oninput="calc()">
+        <div class="field-hint">Avg: 65–80%</div>
+      </div>
+      <div class="field-group">
+        <label>Mobile traffic share %</label>
+        <input type="number" id="mobile-pct" placeholder="e.g. 65" min="0" max="100" oninput="calc()">
+        <div class="field-hint">Mobile abandons at ~88% vs ~65% desktop</div>
+      </div>
+      <div class="field-group">
+        <label>Paid traffic share %</label>
+        <input type="number" id="paid-pct" placeholder="e.g. 40" min="0" max="100" oninput="calc()">
+        <div class="field-hint">Paid recovers better — higher intent</div>
+      </div>
+      <div class="field-group">
+        <label>Store conversion rate %</label>
+        <input type="number" id="conv-rate" placeholder="e.g. 2.5" step="0.1" oninput="calc()">
+        <div class="field-hint">From GA4 or Shopify dashboard</div>
+      </div>
+    </div>
+    <div class="info-box amber" id="traffic-hint" style="margin-top:10px"></div>
+  </div>
+
+  <!-- 04 REVENUE CROSS-CHECK -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <span class="section-title">Revenue cross-check</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="field-grid">
+      <div class="field-group full">
+        <label>Reported monthly revenue ($)</label>
+        <input type="number" id="rev-reported" placeholder="What they tell you — e.g. 150000" oninput="calc()">
+        <div class="field-hint">Cross-checks against traffic × AOV × conv rate — flags discrepancies</div>
+        <div class="rev-check" id="rev-check"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 05 AOV SIGNALS -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <span class="section-title">AOV signals</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="field-grid">
+      <div class="field-group">
+        <label>Known AOV ($)</label>
+        <input type="number" id="aov-known" placeholder="Leave blank to estimate" oninput="calc()">
+        <div class="field-hint">Overrides all estimates below</div>
+      </div>
+      <div class="field-group">
+        <label>Catalog price range ($)</label>
+        <input type="text" id="price-range" placeholder="e.g. 40–120" oninput="calc()">
+        <div class="field-hint">Low to high end</div>
+      </div>
+      <div class="field-group">
+        <label>Avg items per order</label>
+        <input type="number" id="items" placeholder="2" min="1" max="20" step="0.5" oninput="calc()">
+        <div class="field-hint">From Shopify analytics</div>
+      </div>
+      <div class="field-group">
+        <label>Free shipping threshold ($)</label>
+        <input type="number" id="freeship" placeholder="e.g. 75" oninput="calc()">
+        <div class="field-hint">Anchors AOV near this number</div>
+      </div>
+      <div class="field-group">
+        <label>Subscription model?</label>
+        <select id="subscription" onchange="calc()">
+          <option value="no">No</option>
+          <option value="some">Some (mixed)</option>
+          <option value="yes">Yes — primary model</option>
+        </select>
+        <div class="field-hint">Subs lower AOV, raise LTV</div>
+      </div>
+      <div class="field-group">
+        <label>Bundles / upsells at checkout?</label>
+        <select id="bundles" onchange="calc()">
+          <option value="no">No</option>
+          <option value="yes">Yes</option>
+        </select>
+        <div class="field-hint">Pushes AOV up 20–40%</div>
+      </div>
+    </div>
+    <div class="aov-confidence" id="aov-confidence"></div>
+  </div>
+
+  <!-- 06 LTV SIGNALS -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <span class="section-title">LTV signals</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="field-grid three">
+      <div class="field-group">
+        <label>Repeat purchase rate %</label>
+        <input type="number" id="repeat-rate" placeholder="e.g. 35" min="0" max="100" oninput="calc()">
+        <div class="field-hint">Higher = each recovered cart worth more in lifetime value</div>
+      </div>
+      <div class="field-group">
+        <label>Refund / return rate %</label>
+        <input type="number" id="refund-rate" placeholder="e.g. 8" min="0" max="100" oninput="calc()">
+        <div class="field-hint">Deflates actual recovered revenue — shown in net calc</div>
+      </div>
+      <div class="field-group">
+        <label>Peak season timing</label>
+        <select id="peak-season" onchange="calc()">
+          <option value="none">No major peak</option>
+          <option value="bfcm">Black Friday / Cyber Monday</option>
+          <option value="holiday">Holiday / Christmas</option>
+          <option value="summer">Summer</option>
+          <option value="valentines">Valentine's Day</option>
+          <option value="other">Other peak coming</option>
+        </select>
+        <div class="field-hint">Peak urgency amplifies your close</div>
+      </div>
+    </div>
+    <div class="info-box amber" id="ltv-hint" style="margin-top:10px"></div>
+  </div>
+
+  <!-- 07 RECOVERY METRICS & COSTS -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">07</span>
+      <span class="section-title">Recovery strategy & costs</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="slider-wrap" style="margin-bottom:24px">
+      <div class="slider-labels">
+        <span>Conservative (8%)</span>
+        <span>Strong (12–15%)</span>
+        <span>Best case (20%)</span>
+      </div>
+      <input type="range" id="recovery" min="3" max="20" value="8" step="1" oninput="calc()">
+      <div class="slider-val" id="recovery-out">8%</div>
+    </div>
+    <div class="field-grid two">
+      <div class="field-group">
+        <label>Average discount offered %</label>
+        <input type="number" id="discount-offered" placeholder="e.g. 10" min="0" max="100" oninput="calc()">
+        <div class="field-hint">In recovery emails — lowers recouped revenue</div>
+      </div>
+      <div class="field-group">
+        <label>Software / ESP costs ($/mo)</label>
+        <input type="number" id="software-cost" placeholder="e.g. 150" min="0" oninput="calc()">
+        <div class="field-hint">Klaviyo/Mailchimp fees — factored into Net ROI</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 08 TIER -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">08</span>
+      <span class="section-title">Select retainer tier</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="tier-grid">
+      <div class="tier-card" id="t1" onclick="selectTier(1)">
+        <div class="tier-name">Starter</div>
+        <div class="tier-price">$1,500<sub>/mo</sub></div>
+        <div class="tier-features">
+          <div class="tier-feature">3-email cart sequence</div>
+          <div class="tier-feature">1 SMS recovery touch</div>
+          <div class="tier-feature">Monthly performance report</div>
+        </div>
+      </div>
+      <div class="tier-card active" id="t2" onclick="selectTier(2)">
+        <div class="tier-badge">Most popular</div>
+        <div class="tier-name">Growth</div>
+        <div class="tier-price">$3,000<sub>/mo</sub></div>
+        <div class="tier-features">
+          <div class="tier-feature">Cart + browse flows</div>
+          <div class="tier-feature">AI A/B testing</div>
+          <div class="tier-feature">Monthly strategy call</div>
+        </div>
+      </div>
+      <div class="tier-card" id="t3" onclick="selectTier(3)">
+        <div class="tier-name">Pro</div>
+        <div class="tier-price">$6,500<sub>/mo</sub></div>
+        <div class="tier-features">
+          <div class="tier-feature">All Growth features</div>
+          <div class="tier-feature">Post-purchase + winback</div>
+          <div class="tier-feature">Dedicated Slack + roadmap</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 09 PROPOSAL SETTINGS -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">09</span>
+      <span class="section-title">Proposal settings</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="field-grid">
+      <div class="field-group">
+        <label>Your name / agency</label>
+        <input type="text" id="your-name" placeholder="e.g. Nimrod / RecoverAI" oninput="calc()">
+      </div>
+      <div class="field-group">
+        <label>Offer expiry date</label>
+        <input type="date" id="expiry" oninput="calc()" onclick="try{this.showPicker();}catch(e){}">
+        <div class="field-hint">Creates urgency — auto-set to 7 days</div>
+      </div>
+      <div class="field-group full">
+        <label>Case study / testimonial (optional)</label>
+        <input type="text" id="testimonial" placeholder='"We recovered $18K in 60 days." — Jake, FitFuel' oninput="calc()">
+        <div class="field-hint">Paste a short quote — embeds automatically in the proposal</div>
+      </div>
+    </div>
+    <div class="testimonial-preview" id="testimonial-preview">
+      <div class="t-quote" id="t-quote"></div>
+      <div class="t-author" id="t-author"></div>
+    </div>
+  </div>
+
+</div><!-- /left -->
+
+<!-- ═══ RIGHT ═══ -->
+<div class="right">
+  <div class="right-logo">Recovery Intelligence</div>
+
+  <div class="roi-hero">
+    <div class="roi-label">Recoverable revenue / month</div>
+    <div class="roi-main empty" id="roi-hero">—</div>
+    <div class="roi-sub" id="roi-sub">Fill in the inputs to see your projection</div>
+  </div>
+
+  <div class="metric-list">
+    <div class="metric-row"><span class="metric-key">Abandoned carts / mo</span><span class="metric-val muted" id="m-carts">—</span></div>
+    <div class="metric-row"><span class="metric-key">Effective abandonment rate</span><span class="metric-val muted" id="m-eff-abandon">—</span></div>
+    <div class="metric-row"><span class="metric-key">Estimated AOV</span><span class="metric-val muted" id="m-aov">—</span></div>
+    <div class="metric-row"><span class="metric-key">Gross revenue left on table</span><span class="metric-val muted" id="m-lost">—</span></div>
+    <div class="metric-row"><span class="metric-key">Net after refunds</span><span class="metric-val muted" id="m-net">—</span></div>
+    <div class="metric-row"><span class="metric-key">Recoverable / mo (net)</span><span class="metric-val green" id="m-recover">—</span></div>
+    <div class="metric-row"><span class="metric-key">Delta vs. current flow</span><span class="metric-val muted" id="m-delta">—</span></div>
+    <div class="metric-row"><span class="metric-key">LTV-adjusted value / cart</span><span class="metric-val muted" id="m-ltv">—</span></div>
+    <div class="metric-row"><span class="metric-key" id="m-roi-label">ROI on retainer</span><span class="metric-val gold" id="m-roi">—</span></div>
+    <div class="metric-row"><span class="metric-key">Payback period</span><span class="metric-val muted" id="m-payback">—</span></div>
+    <div class="metric-row"><span class="metric-key">Revenue cross-check</span><span class="metric-val muted" id="m-crosscheck">—</span></div>
+    <div class="metric-row"><span class="metric-key">Peak season urgency</span><span class="metric-val muted" id="m-peak">—</span></div>
+  </div>
+
+  <div class="aov-confidence" id="aov-confidence-right"></div>
+
+  <div class="proposal-section">
+    <div class="proposal-label">Proposal preview</div>
+    <div class="proposal-text" id="proposal-text">
+      <p class="p-lead placeholder-text">Hey [Contact],</p>
+      <p class="placeholder-text">Fill in the inputs on the left to generate your personalised proposal.</p>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="copyProposal()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Proposal</button>
+      <button class="btn btn-ghost" onclick="copyROI()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> ROI sheet</button>
+      <button class="btn btn-ghost" onclick="savePdf()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> PDF</button>
+    </div>
+    <div class="copy-feedback" id="copy-feedback"></div>
+  </div>
+</div>
+
+</div><!-- /app -->
+<script>
+var tier=2;
+var tiers={
+  1:{name:'Starter',price:1500,features:'a 3-email abandoned cart sequence, 1 SMS recovery touch, and a monthly performance report'},
+  2:{name:'Growth',price:3000,features:'full cart and browse abandonment flows, AI-generated A/B test variants, and a monthly strategy call'},
+  3:{name:'Pro',price:6500,features:'all Growth deliverables plus post-purchase upsell sequences, winback campaigns, a dedicated Slack channel, and a quarterly roadmap'}
+};
+var nicheData={
+  supplements:{atc:8,abandon:72,aovBase:75,hint:'Avg AOV $60–110. Subscriptions common — LTV is high even when AOV looks lower. Urgency and social proof drive best recovery rates.'},
+  fashion:    {atc:6,abandon:76,aovBase:90,hint:'Avg AOV $70–130. Highest browse abandonment of any niche. Size/fit hesitation is the #1 drop-off reason — address it in recovery copy.'},
+  beauty:     {atc:7,abandon:74,aovBase:65,hint:'Avg AOV $50–90. Multi-product bundles common. Loyalty perks and free samples are strongest recovery hooks.'},
+  homegood:   {atc:5,abandon:70,aovBase:110,hint:'Avg AOV $80–180. Longer decision cycle — lead with reviews and easy returns, not urgency.'},
+  electronics:{atc:4,abandon:68,aovBase:180,hint:'Avg AOV $120–350. High-research category. Social proof, comparisons, and warranty details outperform discount offers.'},
+  pet:        {atc:9,abandon:71,aovBase:60, hint:'Avg AOV $45–90. Subscription-friendly. Emotional appeal and pet-specific personalisation work very well.'},
+  custom:     {atc:7,abandon:72,aovBase:80, hint:'No benchmark defaults. Fill in your own values for an accurate projection.'}
+};
+var espData={
+  klaviyo: {cls:'green',msg:'Perfect fit. Klaviyo is the gold standard for Shopify cart recovery — deep native integration, predictive analytics, best deliverability. Easiest to build on.'},
+  mailchimp:{cls:'amber',msg:'Workable but limited. Mailchimp\'s Shopify cart data sync is unreliable. Worth migrating them to Klaviyo as part of your onboarding.'},
+  omnisend: {cls:'green',msg:'Good platform. Solid Shopify integration with built-in SMS. Slightly less powerful than Klaviyo for segmentation but totally viable.'},
+  drip:     {cls:'amber',msg:'Drip is declining — limited Shopify support. Consider pitching a Klaviyo migration alongside your recovery service.'},
+  none:     {cls:'red',msg:'No ESP — maximum opportunity. They\'re recovering zero revenue right now. Any result you deliver is infinite ROI vs their current baseline.'},
+  other:    {cls:'amber',msg:'Unknown tool — confirm on the discovery call. The platform determines what\'s buildable and how fast you can launch.'}
+};
+var peakData={
+  bfcm:      {label:'BFCM approaching',color:'gold',msg:'Black Friday / Cyber Monday is coming — this is your single strongest close angle. Every day without a recovery system is money they won\'t get back during their biggest revenue month.'},
+  holiday:   {label:'Holiday season',color:'gold',msg:'Holiday season amplifies every cart. Pitch now — flows take 2 weeks to build and optimize, and the window closes fast.'},
+  summer:    {label:'Summer peak',color:'green',msg:'Summer peak ahead — good urgency to get flows live before traffic spikes.'},
+  valentines:{label:'Valentine\'s coming',color:'gold',msg:'Valentine\'s Day is a high-AOV moment — couples gifting pushes cart values up. Recovery flows during this window are especially high-yield.'},
+  other:     {label:'Peak season ahead',color:'gold',msg:'Peak season approaching — urgency to get set up before traffic spikes is a strong close angle.'},
+  none:      {label:'No major peak',color:'',msg:''}
+};
+
+function applyNiche(){
+  var n=document.getElementById('niche').value;
+  var hint=document.getElementById('niche-hint');
+  if(!n||!nicheData[n]){hint.classList.remove('visible');return;}
+  var d=nicheData[n];
+  if(!document.getElementById('atc').value) document.getElementById('atc').value=d.atc;
+  if(!document.getElementById('abandon').value) document.getElementById('abandon').value=d.abandon;
+  hint.textContent=d.hint; hint.className='info-box green visible';
+  calc();
+}
+
+function estimateAOV(){
+  var known=parseFloat(document.getElementById('aov-known').value);
+  if(known>0) return{val:known,source:'known',confidence:''};
+  var niche=document.getElementById('niche').value;
+  var base=niche&&nicheData[niche]?nicheData[niche].aovBase:80;
+  var items=parseFloat(document.getElementById('items').value)||1;
+  var sub=document.getElementById('subscription').value;
+  var bundles=document.getElementById('bundles').value;
+  var freeship=parseFloat(document.getElementById('freeship').value)||0;
+  var pr=document.getElementById('price-range').value;
+  var midPrice=base;
+  if(pr){
+    var parts=pr.replace(/[^0-9.\-]/g,' ').trim().split(/[\s\-]+/).filter(function(x){return x&&!isNaN(x);});
+    if(parts.length>=2) midPrice=(parseFloat(parts[0])+parseFloat(parts[parts.length-1]))/2;
+    else if(parts.length===1) midPrice=parseFloat(parts[0]);
+  }
+  var signals=[]; var aov=midPrice*Math.max(items,1);
+  if(sub==='yes'){aov*=0.85;signals.push('subscription model (−15%)');}
+  else if(sub==='some'){aov*=0.93;signals.push('partial subscription (−7%)');}
+  if(bundles==='yes'){aov*=1.25;signals.push('bundles/upsells (+25%)');}
+  if(freeship>0&&aov<freeship*1.05){aov=freeship*1.05;signals.push('free shipping anchor ($'+Math.round(freeship*1.05)+')');}
+  var used=0;
+  if(pr)used++;if(items>1)used++;if(sub!=='no')used++;if(bundles==='yes')used++;if(freeship>0)used++;
+  var confLabel=used>=4?'High confidence estimate':used>=2?'Medium confidence estimate':'Low confidence — add price range, items/order & shipping threshold';
+  var confText=signals.length?confLabel+'. Adjusted for: '+signals.join(', ')+'.':confLabel+'.';
+  return{val:Math.round(aov),source:'estimated',confidence:confText};
+}
+
+function fmt(n){return'$'+Math.round(n).toLocaleString();}
+function fmtDate(d){
+  if(!d)return'';
+  var p=d.split('-');if(p.length<3)return d;
+  var m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return m[parseInt(p[1])-1]+' '+parseInt(p[2])+', '+p[0];
+}
+
+function calc(){
+  var visitors=parseFloat(document.getElementById('visitors').value)||0;
+  var atcRaw=parseFloat(document.getElementById('atc').value)||0;
+  var abandonRaw=parseFloat(document.getElementById('abandon').value)||0;
+  var recovery=parseFloat(document.getElementById('recovery').value)||8;
+  document.getElementById('recovery-out').textContent=recovery+'%';
+
+  var mobilePct=parseFloat(document.getElementById('mobile-pct').value)||0;
+  var paidPct=parseFloat(document.getElementById('paid-pct').value)||0;
+  var convRate=parseFloat(document.getElementById('conv-rate').value)||0;
+  var refundRate=parseFloat(document.getElementById('refund-rate').value)||0;
+  var repeatRate=parseFloat(document.getElementById('repeat-rate').value)||0;
+  var currentRateVal=parseFloat(document.getElementById('current-rate').value)||0;
+  var recentPromo=document.getElementById('recent-promo').value;
+  var existingFlow=document.getElementById('existing-flow').value;
+  var peakSeason=document.getElementById('peak-season').value;
+  var esp=document.getElementById('esp').value;
+
+  // Show current-rate field if relevant
+  var showCurRate=existingFlow==='basic'||existingFlow==='partial'||existingFlow==='yes';
+  document.getElementById('current-rate-wrap').style.display=showCurRate?'flex':'none';
+
+  // ESP hint
+  var espHint=document.getElementById('esp-hint');
+  if(esp&&espData[esp]){
+    espHint.textContent=espData[esp].msg;
+    espHint.className='info-box '+espData[esp].cls+' visible';
+  } else espHint.className='info-box';
+
+  // Setup hint
+  var setupHint=document.getElementById('setup-hint');
+  var setupMsgs=[];
+  if(existingFlow==='no') setupMsgs.push('No recovery flow — zero baseline. Any result you deliver is pure upside. This is your easiest pitch.');
+  if(recentPromo==='within2w') setupMsgs.push('Promo within 2 weeks — list is fatigued. Recovery projections adjusted down 25% for fatigue.');
+  else if(recentPromo==='within1m') setupMsgs.push('Promo last month — mild fatigue. Projections adjusted down 12%.');
+  if(setupMsgs.length){setupHint.textContent=setupMsgs.join(' ');setupHint.className='info-box amber visible';}
+  else setupHint.className='info-box amber';
+
+  // Effective abandonment (mobile-adjusted)
+  var effectiveAbandon=abandonRaw;
+  if(mobilePct>0){
+    var mobileAbandon=Math.min(abandonRaw*1.2,95);
+    var desktopAbandon=Math.max(abandonRaw*0.85,45);
+    effectiveAbandon=(mobilePct/100)*mobileAbandon+((100-mobilePct)/100)*desktopAbandon;
+  }
+
+  // Traffic hint
+  var trafficHint=document.getElementById('traffic-hint');
+  var tMsgs=[];
+  if(mobilePct>60) tMsgs.push('High mobile share ('+Math.round(mobilePct)+'%) raises effective abandonment to ~'+Math.round(effectiveAbandon)+'%');
+  if(paidPct>50) tMsgs.push('Majority paid traffic — recovery rates tend to run 2–3pp above organic baselines due to higher purchase intent');
+  if(tMsgs.length){trafficHint.textContent=tMsgs.join('. ')+'.';trafficHint.className='info-box amber visible';}
+  else trafficHint.className='info-box amber';
+
+  // Promo adjustment & Discount Offered
+  var promoAdj=recentPromo==='within2w'?0.75:recentPromo==='within1m'?0.88:1;
+  var discountOffered=parseFloat(document.getElementById('discount-offered').value)||0;
+  var softwareCost=parseFloat(document.getElementById('software-cost').value)||0;
+
+  // Paid recovery uplift: paid traffic recovers ~15% better
+  var recoveryAdjusted=recovery;
+  if(paidPct>0) recoveryAdjusted=recovery*(1+(paidPct/100)*0.15);
+
+  // AOV
+  var aovResult=estimateAOV();
+  var aov=aovResult.val;
+  var confEl=document.getElementById('aov-confidence-right');
+  if(aovResult.source==='estimated'&&aovResult.confidence){confEl.textContent=aovResult.confidence;confEl.style.display='block';}
+  else confEl.style.display='none';
+  // Also show in left panel
+  var confElLeft=document.getElementById('aov-confidence');
+  if(aovResult.source==='estimated'&&aovResult.confidence){confElLeft.textContent=aovResult.confidence;confElLeft.style.display='block';}
+  else confElLeft.style.display='none';
+
+  var brand=document.getElementById('brand').value||'[Brand]';
+  var contact=document.getElementById('contact').value||'[Contact]';
+  var yourName=document.getElementById('your-name').value||'';
+  var expiry=document.getElementById('expiry').value;
+  var testimonial=document.getElementById('testimonial').value||'';
+  var t=tiers[tier];
+
+  // Testimonial preview
+  var tBox=document.getElementById('testimonial-preview');
+  if(testimonial.trim()){
+    var tParts=testimonial.split('—');
+    document.getElementById('t-quote').textContent='"'+tParts[0].replace(/^[""\s]+|[""\s]+$/g,'').trim()+'"';
+    document.getElementById('t-author').textContent='— '+(tParts[1]?tParts[1].trim():'Client');
+    tBox.className='testimonial-preview visible';
+  } else tBox.className='testimonial-preview';
+
+  var hasInputs=visitors>0&&atcRaw>0&&abandonRaw>0;
+
+  // Core math
+  var abandonedCarts=visitors*(atcRaw/100)*(effectiveAbandon/100);
+  var grossLost=abandonedCarts*aov;
+  var netLost=grossLost*(1-(refundRate/100));
+  var recoveredRaw=netLost*(recoveryAdjusted/100)*promoAdj;
+  var recovered=recoveredRaw*(1-(discountOffered/100));
+  var currentRecoveredRaw=showCurRate&&currentRateVal>0?netLost*(currentRateVal/100)*promoAdj:0;
+  var currentRecovered=currentRecoveredRaw*(1-(discountOffered/100));
+  var delta=recovered-currentRecovered;
+  var ltvMultiplier=repeatRate>0?1+(repeatRate/100*0.8):1;
+  var ltvPerCart=aov*ltvMultiplier*(1-(refundRate/100))*(1-(discountOffered/100));
+  var totalCost=t.price+softwareCost;
+  var roi=(totalCost>0&&recovered>0)?Math.round(recovered/totalCost*10)/10:0;
+  var paybackDays=recovered>0?Math.round(totalCost/recovered*30):0;
+
+  // Revenue cross-check
+  var revReported=parseFloat(document.getElementById('rev-reported').value)||0;
+  var revCheck=document.getElementById('rev-check');
+  if(hasInputs){
+    var impliedRevenue=visitors*(convRate>0?convRate/100:(atcRaw/100)*(1-effectiveAbandon/100))*aov;
+    if(revReported>0){
+      var diffPct=Math.abs(impliedRevenue-revReported)/revReported*100;
+      if(diffPct<20){revCheck.textContent='✓ Match — implied '+fmt(impliedRevenue)+' is within range of reported '+fmt(revReported)+'.' ;revCheck.className='rev-check ok';}
+      else{revCheck.textContent='⚠ Gap — implied '+fmt(impliedRevenue)+' vs reported '+fmt(revReported)+' ('+Math.round(diffPct)+'% off). Check traffic, AOV, or conv. rate inputs.';revCheck.className='rev-check warn';}
+    } else revCheck.className='rev-check';
+  } else revCheck.className='rev-check';
+
+  // LTV hint
+  var ltvHint=document.getElementById('ltv-hint');
+  var lMsgs=[];
+  if(refundRate>15) lMsgs.push('High return rate ('+Math.round(refundRate)+'%) — actual recovered revenue will be meaningfully lower than gross projections');
+  if(repeatRate>40) lMsgs.push('Strong repeat rate ('+Math.round(repeatRate)+'%) — each recovered cart is worth significantly more in lifetime value');
+  if(lMsgs.length){ltvHint.textContent=lMsgs.join('. ')+'.';ltvHint.className='info-box amber visible';}
+  else ltvHint.className='info-box amber';
+
+  // Peak season metric
+  var peakInfo=peakData[peakSeason]||peakData['none'];
+  document.getElementById('m-peak').textContent=peakSeason==='none'||!peakSeason?'—':peakInfo.label;
+  document.getElementById('m-peak').className='metric-val '+(peakInfo.color||'muted');
+
+  if(hasInputs){
+    document.getElementById('roi-hero').textContent=fmt(recovered);
+    document.getElementById('roi-hero').classList.remove('empty');
+    var roiSubParts=[roi+'x '+(softwareCost>0?'net ':'')+'return','payback in '+paybackDays+' days'];
+    if(promoAdj<1) roiSubParts.push('promo-adjusted');
+    if(paidPct>0) roiSubParts.push('traffic-mix adjusted');
+    if(discountOffered>0) roiSubParts.push(discountOffered+'% discount adj');
+    document.getElementById('roi-sub').textContent=roiSubParts.join(' · ');
+
+    document.getElementById('m-carts').textContent=Math.round(abandonedCarts).toLocaleString();
+    document.getElementById('m-carts').className='metric-val';
+    document.getElementById('m-eff-abandon').textContent=Math.round(effectiveAbandon)+'%'+(mobilePct>0?' (mobile-adjusted)':'');
+    document.getElementById('m-eff-abandon').className='metric-val';
+    document.getElementById('m-aov').textContent=fmt(aov)+(aovResult.source==='estimated'?' (est.)':'');
+    document.getElementById('m-aov').className='metric-val';
+    document.getElementById('m-lost').textContent=fmt(grossLost);
+    document.getElementById('m-lost').className='metric-val';
+    
+    var netText=refundRate>0?fmt(netLost)+' (after '+Math.round(refundRate)+'% returns)':fmt(netLost);
+    document.getElementById('m-net').textContent=netText;
+    document.getElementById('m-net').className='metric-val';
+    
+    var recText=fmt(recovered);
+    if(discountOffered>0) recText += ' (net of '+discountOffered+'% disc)';
+    document.getElementById('m-recover').textContent=recText;
+    document.getElementById('m-recover').className='metric-val green';
+
+    if(existingFlow==='no'){
+      document.getElementById('m-delta').textContent='No baseline — 100% upside';
+      document.getElementById('m-delta').className='metric-val green';
+    } else if(showCurRate&&currentRateVal>0){
+      document.getElementById('m-delta').textContent='+'+fmt(delta)+'/mo above current';
+      document.getElementById('m-delta').className='metric-val green';
+    } else {
+      document.getElementById('m-delta').textContent='Enter current rate to calculate';
+      document.getElementById('m-delta').className='metric-val muted';
+    }
+
+    document.getElementById('m-ltv').textContent=fmt(ltvPerCart)+(repeatRate>0?' ('+Math.round(repeatRate)+'% repeat adj.)':'');
+    document.getElementById('m-ltv').className='metric-val';
+    var roiLabel = softwareCost>0 ? 'Net ROI (Strategy + ESP)' : 'ROI on retainer';
+    document.getElementById('m-roi-label').textContent = roiLabel;
+    document.getElementById('m-roi').textContent=roi+'x';
+    document.getElementById('m-roi').className=roi>=3?'metric-val gold':roi>=1?'metric-val':'metric-val red';
+    document.getElementById('m-payback').textContent=paybackDays+' days';
+    document.getElementById('m-payback').className='metric-val';
+
+    if(revReported>0){
+      var impliedR=visitors*(convRate>0?convRate/100:(atcRaw/100)*(1-effectiveAbandon/100))*aov;
+      var dp=Math.abs(impliedR-revReported)/revReported*100;
+      document.getElementById('m-crosscheck').textContent=dp<20?'Match (within '+Math.round(dp)+'%)':'Off by '+Math.round(dp)+'% — check inputs';
+      document.getElementById('m-crosscheck').className=dp<20?'metric-val green':'metric-val red';
+    } else {
+      document.getElementById('m-crosscheck').textContent='Enter reported revenue above';
+      document.getElementById('m-crosscheck').className='metric-val muted';
+    }
+  } else {
+    document.getElementById('roi-hero').textContent='—';
+    document.getElementById('roi-hero').classList.add('empty');
+    document.getElementById('roi-sub').textContent='Fill in the inputs to see your projection';
+    ['m-carts','m-eff-abandon','m-aov','m-lost','m-net','m-recover','m-delta','m-ltv','m-roi','m-payback','m-crosscheck'].forEach(function(id){
+      document.getElementById(id).textContent='—';
+      document.getElementById(id).className='metric-val muted';
+    });
+  }
+
+  // Build proposal
+  var higherTier=tier===1?tiers[2]:tier===2?tiers[3]:null;
+  var flowLine='';
+  if(existingFlow==='no') flowLine='You have no cart recovery running today — meaning every abandoned cart is 100% lost revenue. That\'s the lowest-hanging fruit in e-commerce.';
+  else if(existingFlow==='basic') flowLine='Your 1–2 email sequence is a start, but it\'s leaving the majority of recoverable revenue on the table. AI-powered flows with SMS and behavioural triggers typically 3–4x the recovery rate.';
+  else if(existingFlow==='partial') flowLine='You have foundations in place — what\'s missing is the AI layer: dynamic copy, send-time optimisation, and SMS. That gap is the difference between a good flow and a great one.';
+
+  var roiMetricsLine='';
+  if(discountOffered>0&&softwareCost>0) roiMetricsLine=' (net of '+discountOffered+'% discount and '+fmt(softwareCost)+' ESP cost)';
+  else if(discountOffered>0) roiMetricsLine=' (net of '+discountOffered+'% discount)';
+  else if(softwareCost>0) roiMetricsLine=' (net of '+fmt(softwareCost)+' ESP cost)';
+
+  var roiLine=hasInputs
+    ?'Based on your store — '+Math.round(atcRaw)+'% add-to-cart, ~'+Math.round(effectiveAbandon)+'% effective abandonment, and an AOV of '+fmt(aov)+' — I estimate '+fmt(netLost)+'/month is recoverable (net of returns). At a '+Math.round(recoveryAdjusted)+'% recovery rate, that\'s '+fmt(recovered)+'/month we bring back'+roiMetricsLine+'. '+roi+'x ROI. Payback in '+paybackDays+' days.'
+    :'Based on your traffic and conversion data, I can show you exactly how much revenue is walking out the door each month — and what the ROI looks like before you commit to anything.';
+
+  var deltaLine=(showCurRate&&currentRateVal>0&&delta>0)
+    ?'Your current flow is recovering around '+fmt(currentRecovered)+'/month. We\'d target '+fmt(recovered)+' — a net improvement of '+fmt(delta)+'/month.'
+    :'';
+
+  var peakLine=(peakSeason&&peakSeason!=='none')
+    ?peakInfo.msg
+    :'';
+
+  var testLine=testimonial.trim()
+    ?'"'+testimonial.replace(/^[""\s]+|[""\s]+$/g,'').split('—')[0].trim()+'"'
+    :'';
+
+  var expiryLine=expiry?'This proposal is valid until '+fmtDate(expiry)+'.':'';
+
+  var html='<p class="p-lead">Hey '+(contact!=='[Contact]'?contact:'<span class="placeholder-text">[Contact]</span>')+',</p>';
+  if(flowLine) html+='<p>'+flowLine+'</p>';
+  html+='<p>'+roiLine+'</p>';
+  if(deltaLine) html+='<p>'+deltaLine+'</p>';
+  if(peakLine) html+='<p>'+peakLine+'</p>';
+  if(testLine) html+='<p class="p-testimonial">'+testLine+'</p>';
+  html+='<p>On the <strong>'+t.name+'</strong> plan, you\'ll get '+t.features+'.';
+  if(higherTier) html+=' If you want the full stack — post-purchase flows, winbacks, and dedicated support — the <strong>'+higherTier.name+'</strong> plan at '+fmt(higherTier.price)+'/mo covers all of that.';
+  html+='</p>';
+  html+='<p class="p-price">Investment: '+fmt(t.price)+'/month.</p>';
+  if(expiryLine) html+='<p class="p-expiry">'+expiryLine+'</p>';
+  html+='<p class="p-lead">Reply YES and I\'ll send the agreement today. One client spot available this month.</p>';
+  if(yourName) html+='<p class="p-sig">— '+yourName+'</p>';
+  document.getElementById('proposal-text').innerHTML=html;
+}
+
+function selectTier(n){
+  tier=n;
+  [1,2,3].forEach(function(i){document.getElementById('t'+i).classList.toggle('active',i===n);});
+  calc();
+}
+
+function getProposalText(){
+  var els=document.querySelectorAll('#proposal-text p');
+  var lines=[];
+  els.forEach(function(p){var tx=(p.innerText||p.textContent).trim();if(tx)lines.push(tx);});
+  return lines.join('\n\n');
+}
+
+function copyProposal(){
+  navigator.clipboard.writeText(getProposalText()).then(function(){showFeedback('Proposal copied to clipboard');});
+}
+
+function copyROI(){
+  var brand=document.getElementById('brand').value||'Brand';
+  var t=tiers[tier];
+  var rows=[
+    '=== ROI Projection: '+brand+' ===',
+    'Abandoned carts/mo:         '+document.getElementById('m-carts').textContent,
+    'Effective abandonment:      '+document.getElementById('m-eff-abandon').textContent,
+    'Estimated AOV:              '+document.getElementById('m-aov').textContent,
+    'Gross revenue left on table:'+document.getElementById('m-lost').textContent,
+    'Net after refunds:          '+document.getElementById('m-net').textContent,
+    'Recoverable/mo (net):       '+document.getElementById('m-recover').textContent,
+    'Delta vs current flow:      '+document.getElementById('m-delta').textContent,
+    'LTV-adjusted value/cart:    '+document.getElementById('m-ltv').textContent,
+    'ROI on '+t.name+' ('+fmt(t.price)+'/mo): '+document.getElementById('m-roi').textContent,
+    'Payback period:             '+document.getElementById('m-payback').textContent,
+    'Revenue cross-check:        '+document.getElementById('m-crosscheck').textContent,
+    'Peak season:                '+document.getElementById('m-peak').textContent
+  ];
+  navigator.clipboard.writeText(rows.join('\n')).then(function(){showFeedback('ROI sheet copied');});
+}
+
+function showFeedback(msg){
+  var el=document.getElementById('copy-feedback');
+  el.textContent=msg;el.style.opacity='1';
+  setTimeout(function(){el.style.opacity='0';},2500);
+}
+
+function savePdf() {
+  var element = document.querySelector('.right');
+  var btnRow = document.querySelector('.btn-row');
+  var feedback = document.getElementById('copy-feedback');
+  
+  // Temporarily hide buttons
+  if (btnRow) btnRow.style.display = 'none';
+  if (feedback) feedback.style.display = 'none';
+
+  var opt = {
+    margin:       [10, 10, 10, 10],
+    filename:     'Recovery-Proposal.pdf',
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2, backgroundColor: '#111113' },
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+
+  html2pdf().set(opt).from(element).save().then(function() {
+    // Restore buttons
+    if (btnRow) btnRow.style.display = 'flex';
+    if (feedback) feedback.style.display = 'block';
+  });
+}
+
+// Default expiry = 7 days from today
+(function(){
+  var d=new Date();d.setDate(d.getDate()+7);
+  document.getElementById('expiry').value=d.toISOString().split('T')[0];
+})();
+
+calc();
+</script>
+</body>
+</html>
