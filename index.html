@@ -50,7 +50,7 @@ body{background:var(--white);color:var(--ink);font-family:'Syne',sans-serif;font
 .field-group{display:flex;flex-direction:column;gap:6px}
 .field-group.full{grid-column:1/-1}
 label{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-input[type=text],input[type=number],input[type=date],select{
+input[type=text],input[type=email],input[type=number],input[type=date],select{
   width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:4px;
   background:var(--cream);color:var(--ink);font-family:'Syne',sans-serif;font-size:13px;
   transition:border-color .2s,background .2s;appearance:none;-webkit-appearance:none}
@@ -165,6 +165,12 @@ hr{border:none;border-top:1px solid var(--border);margin:40px 0}
 .section:nth-child(7){animation-delay:.3s}.section:nth-child(8){animation-delay:.35s}
 .section:nth-child(9){animation-delay:.4s}
 
+.settings-btn{background:transparent;border:none;color:var(--muted);cursor:pointer;padding:6px;border-radius:4px;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.settings-btn:hover{background:var(--border);color:var(--ink)}
+
+.settings-popover{position:absolute;top:100%;right:0;margin-top:8px;background:var(--white);border:1px solid var(--border);border-radius:6px;padding:16px;width:200px;z-index:100;box-shadow:0 10px 30px rgba(0,0,0,0.8);display:none;flex-direction:column;gap:8px}
+.settings-popover.visible{display:flex}
+
 /* Flatpickr Custom Theme */
 .flatpickr-calendar { background: var(--cream) !important; border: 1px solid var(--border) !important; box-shadow: 0 8px 24px rgba(0,0,0,0.5) !important; font-family: 'Syne', sans-serif !important; border-radius: 8px !important; width: 280px !important; padding-bottom: 4px !important; }
 .flatpickr-calendar.arrowTop:before { border-bottom-color: var(--border) !important; }
@@ -199,8 +205,28 @@ span.flatpickr-weekday { color: var(--muted) !important; font-family: 'DM Mono',
 <!-- ═══ LEFT ═══ -->
 <div class="left">
   <div class="logo">
-    <div class="logo-mark"><span></span></div>
-    <span class="logo-text">Cart Recovery · ROI Calc & Proposal Builder</span>
+    <div style="display:flex;align-items:center;gap:10px;flex:1">
+      <div class="logo-mark"><span></span></div>
+      <span class="logo-text">Cart Recovery · ROI Calc & Proposal Builder</span>
+    </div>
+    <div style="position:relative">
+      <button class="settings-btn" id="settings-btn" title="Settings" onclick="document.getElementById('settings-popover').classList.toggle('visible')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      </button>
+      <div id="settings-popover" class="settings-popover">
+        <div class="field-group">
+          <label>Currency</label>
+          <select id="currency" onchange="calc();">
+            <option value="$">USD ($)</option>
+            <option value="£">GBP (£)</option>
+            <option value="€">EUR (€)</option>
+            <option value="A$">AUD (A$)</option>
+            <option value="C$">CAD (C$)</option>
+            <option value="₹">INR (₹)</option>
+          </select>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- 01 CLIENT -->
@@ -220,16 +246,10 @@ span.flatpickr-weekday { color: var(--muted) !important; font-family: 'DM Mono',
         <input type="text" id="contact" placeholder="e.g. Sarah" oninput="calc()">
       </div>
       <div class="field-group">
-        <label>Currency</label>
-        <select id="currency" onchange="calc()">
-          <option value="$">USD ($)</option>
-          <option value="£">GBP (£)</option>
-          <option value="€">EUR (€)</option>
-          <option value="A$">AUD (A$)</option>
-          <option value="C$">CAD (C$)</option>
-          <option value="₹">INR (₹)</option>
-        </select>
+        <label>Client email</label>
+        <input type="email" id="client-email" placeholder="e.g. sarah@brand.com">
       </div>
+
       <div class="field-group">
         <label>Niche / category</label>
         <select id="niche" onchange="applyNiche()">
@@ -580,6 +600,7 @@ span.flatpickr-weekday { color: var(--muted) !important; font-family: 'DM Mono',
       <button class="btn btn-primary" onclick="copyProposal()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Proposal</button>
       <button class="btn btn-primary" onclick="copyROI()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> ROI</button>
       <button class="btn btn-primary" onclick="savePdf()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> PDF</button>
+      <button class="btn btn-primary" onclick="emailProposal()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> Email</button>
     </div>
     <div class="copy-feedback" id="copy-feedback"></div>
   </div>
@@ -972,6 +993,14 @@ function copyROI(){
   navigator.clipboard.writeText(rows.join('\n')).then(function(){showFeedback('ROI sheet copied');});
 }
 
+function emailProposal() {
+  var email = document.getElementById('client-email').value || '';
+  var brand = document.getElementById('brand').value || 'Brand';
+  var subject = encodeURIComponent('Cart Recovery Proposal: ' + brand);
+  var body = encodeURIComponent(getProposalText());
+  window.location.href = 'mailto:' + email + '?subject=' + subject + '&body=' + body;
+}
+
 function showFeedback(msg){
   var el=document.getElementById('copy-feedback');
   el.textContent=msg;el.style.opacity='1';
@@ -1017,6 +1046,15 @@ function savePdf() {
     disableMobile: true,
     onChange: function(selectedDates, dateStr, instance) {
       calc();
+    }
+  });
+
+  // Close settings popover when clicking outside
+  document.addEventListener('click', function(e) {
+    var pop = document.getElementById('settings-popover');
+    var btn = document.getElementById('settings-btn');
+    if (pop && pop.classList.contains('visible') && !pop.contains(e.target) && !btn.contains(e.target)) {
+      pop.classList.remove('visible');
     }
   });
 })();
