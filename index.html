@@ -93,8 +93,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .tier-card.active::after{content:'';position:absolute;top:10px;right:10px;width:8px;height:8px;background:var(--accent);border-radius:50%}
 .tier-badge{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;background:var(--gold);color:var(--white);padding:2px 7px;border-radius:2px;display:inline-block;margin-bottom:8px}
 .tier-name{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
-.tier-price{font-family:'DM Serif Display',serif;font-size:26px;color:var(--ink);line-height:1}
-.tier-price sub{font-family:'Syne',sans-serif;font-size:12px;font-weight:400;color:var(--muted);vertical-align:baseline}
+.tier-price{font-family:'DM Serif Display',serif;font-size:26px;color:var(--ink);line-height:1;display:flex;align-items:baseline;gap:2px;}
+.tier-price sub{font-family:'Syne',sans-serif;font-size:12px;font-weight:400;color:var(--muted);vertical-align:baseline;}
+.price-input{background:transparent;border:none;border-bottom:1px dashed var(--muted);color:var(--ink);font-family:inherit;font-size:inherit;width:80px;text-align:left;padding:0;outline:none;border-radius:0;transition:all .2s;-moz-appearance:textfield;}
+.price-input::-webkit-outer-spin-button,.price-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.price-input:focus,.price-input:hover{border-bottom-color:var(--accent);}
 .tier-features{margin-top:10px;display:flex;flex-direction:column;gap:5px}
 .tier-feature{font-size:11px;color:var(--muted);display:flex;gap:6px;align-items:flex-start}
 .tier-feature::before{content:'—';color:var(--accent);flex-shrink:0;font-size:10px;margin-top:1px}
@@ -505,7 +508,7 @@ span.flatpickr-weekday { color: var(--muted) !important; font-family: 'DM Mono',
     <div class="tier-grid">
       <div class="tier-card" id="t1" onclick="selectTier(1)">
         <div class="tier-name">Starter</div>
-        <div class="tier-price" id="t1-price">$1,500<sub>/mo</sub></div>
+        <div class="tier-price"><span class="cur-sym">$</span><input type="number" id="t1-price-input" value="1500" class="price-input" onclick="event.stopPropagation()" oninput="updateTierPrice(1, this.value)"><sub>/mo</sub></div>
         <div class="tier-features">
           <div class="tier-feature">3-email cart sequence</div>
           <div class="tier-feature">1 SMS recovery touch</div>
@@ -513,9 +516,8 @@ span.flatpickr-weekday { color: var(--muted) !important; font-family: 'DM Mono',
         </div>
       </div>
       <div class="tier-card active" id="t2" onclick="selectTier(2)">
-        <div class="tier-badge">Most popular</div>
         <div class="tier-name">Growth</div>
-        <div class="tier-price" id="t2-price">$3,000<sub>/mo</sub></div>
+        <div class="tier-price"><span class="cur-sym">$</span><input type="number" id="t2-price-input" value="3000" class="price-input" onclick="event.stopPropagation()" oninput="updateTierPrice(2, this.value)"><sub>/mo</sub></div>
         <div class="tier-features">
           <div class="tier-feature">Cart + browse flows</div>
           <div class="tier-feature">AI A/B testing</div>
@@ -524,7 +526,7 @@ span.flatpickr-weekday { color: var(--muted) !important; font-family: 'DM Mono',
       </div>
       <div class="tier-card" id="t3" onclick="selectTier(3)">
         <div class="tier-name">Pro</div>
-        <div class="tier-price" id="t3-price">$6,500<sub>/mo</sub></div>
+        <div class="tier-price"><span class="cur-sym">$</span><input type="number" id="t3-price-input" value="6500" class="price-input" onclick="event.stopPropagation()" oninput="updateTierPrice(3, this.value)"><sub>/mo</sub></div>
         <div class="tier-features">
           <div class="tier-feature">All Growth features</div>
           <div class="tier-feature">Post-purchase + winback</div>
@@ -709,14 +711,19 @@ function fmtDate(d){
   return m[parseInt(p[1])-1]+' '+parseInt(p[2])+', '+p[0];
 }
 
+function updateTierPrice(id, val) {
+  var price = parseFloat(val);
+  if (!isNaN(price) && price >= 0) {
+    tiers[id].price = price;
+    calc();
+  }
+}
+
 function calc(){
   var cur = getCurrency();
   document.querySelectorAll('.cur-sym').forEach(function(el) {
     el.textContent = cur;
   });
-  document.getElementById('t1-price').innerHTML = fmt(tiers[1].price) + '<sub>/mo</sub>';
-  document.getElementById('t2-price').innerHTML = fmt(tiers[2].price) + '<sub>/mo</sub>';
-  document.getElementById('t3-price').innerHTML = fmt(tiers[3].price) + '<sub>/mo</sub>';
 
   var visitors=parseFloat(document.getElementById('visitors').value)||0;
   var atcRaw=parseFloat(document.getElementById('atc').value)||0;
