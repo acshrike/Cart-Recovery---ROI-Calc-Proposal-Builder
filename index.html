@@ -17,6 +17,9 @@
   })();
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -133,8 +136,10 @@ hr{border:none;border-top:1px solid var(--border);margin:40px 0}
 .aov-confidence{padding:9px 11px;border-radius:4px;border:1px solid rgba(255,255,255,.09);margin-bottom:14px;font-size:10px;color:rgba(245,242,237,.5);line-height:1.55;font-family:'DM Mono',monospace;display:none}
 
 .proposal-section{flex:1;display:flex;flex-direction:column;min-height:0}
-.proposal-label{font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:rgba(245,242,237,.35);margin-bottom:11px}
-.proposal-text{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:6px;padding:16px;flex:1;margin-bottom:13px;overflow-y:auto;min-height:140px}
+.proposal-label{font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:rgba(245,242,237,.35);margin-bottom:11px;display:flex;justify-content:space-between;align-items:center}
+.proposal-label-hint{font-size:9px;color:rgba(245,242,237,.3);font-family:'DM Mono',monospace;text-transform:none;letter-spacing:normal}
+.proposal-text{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:6px;padding:16px;flex:1;margin-bottom:13px;overflow-y:auto;min-height:140px;outline:none;transition:border-color .2s,background .2s}
+.proposal-text:focus{border-color:var(--accent);background:rgba(255,255,255,.06)}
 .proposal-text p{font-size:11.5px;color:rgba(245,242,237,.82);line-height:1.75;margin-bottom:10px}
 .proposal-text p:last-child{margin-bottom:0}
 .p-lead{font-weight:600;color:var(--ink)!important;font-size:12.5px!important}
@@ -159,6 +164,26 @@ hr{border:none;border-top:1px solid var(--border);margin:40px 0}
 .section:nth-child(5){animation-delay:.2s}.section:nth-child(6){animation-delay:.25s}
 .section:nth-child(7){animation-delay:.3s}.section:nth-child(8){animation-delay:.35s}
 .section:nth-child(9){animation-delay:.4s}
+
+/* Flatpickr Custom Theme */
+.flatpickr-calendar { background: var(--cream) !important; border: 1px solid var(--border) !important; box-shadow: 0 8px 24px rgba(0,0,0,0.5) !important; font-family: 'Syne', sans-serif !important; border-radius: 8px !important; width: 280px !important; padding-bottom: 4px !important; }
+.flatpickr-calendar.arrowTop:before { border-bottom-color: var(--border) !important; }
+.flatpickr-calendar.arrowTop:after { border-bottom-color: var(--cream) !important; }
+.flatpickr-calendar.arrowBottom:before { border-top-color: var(--border) !important; }
+.flatpickr-calendar.arrowBottom:after { border-top-color: var(--cream) !important; }
+.flatpickr-month, .flatpickr-weekdays, span.flatpickr-weekday { background: var(--cream) !important; height: 28px !important; }
+span.flatpickr-weekday { color: var(--muted) !important; font-family: 'DM Mono', monospace !important; font-size: 10px !important; letter-spacing: 0.1em !important; text-transform: uppercase; }
+.flatpickr-days { width: 280px !important; }
+.dayContainer { width: 280px !important; min-width: 280px !important; max-width: 280px !important; justify-content: space-around !important; }
+.flatpickr-day { color: var(--ink) !important; border-radius: 4px !important; max-width: 34px !important; height: 34px !important; line-height: 34px !important; margin-top: 2px !important; }
+.flatpickr-day.prevMonthDay, .flatpickr-day.nextMonthDay { visibility: hidden !important; pointer-events: none !important; }
+.flatpickr-day.inRange, .flatpickr-day.prevMonthDay.inRange, .flatpickr-day.nextMonthDay.inRange, .flatpickr-day.today.inRange, .flatpickr-day.prevMonthDay.today.inRange, .flatpickr-day.nextMonthDay.today.inRange, .flatpickr-day:hover, .flatpickr-day.prevMonthDay:hover, .flatpickr-day.nextMonthDay:hover, .flatpickr-day:focus, .flatpickr-day.prevMonthDay:focus, .flatpickr-day.nextMonthDay:focus { background: var(--accent-light) !important; border-color: var(--accent) !important; }
+.flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange, .flatpickr-day.selected.inRange, .flatpickr-day.startRange.inRange, .flatpickr-day.endRange.inRange, .flatpickr-day.selected:focus, .flatpickr-day.startRange:focus, .flatpickr-day.endRange:focus, .flatpickr-day.selected:hover, .flatpickr-day.startRange:hover, .flatpickr-day.endRange:hover, .flatpickr-day.selected.prevMonthDay, .flatpickr-day.startRange.prevMonthDay, .flatpickr-day.endRange.prevMonthDay, .flatpickr-day.selected.nextMonthDay, .flatpickr-day.startRange.nextMonthDay, .flatpickr-day.endRange.nextMonthDay { background: var(--accent) !important; border-color: var(--accent) !important; color: var(--white) !important; }
+.flatpickr-day.flatpickr-disabled, .flatpickr-day.flatpickr-disabled:hover { color: rgba(161, 161, 170, 0.3) !important; }
+.flatpickr-current-month { font-size: 100% !important; }
+.flatpickr-current-month .flatpickr-monthDropdown-months, .flatpickr-current-month input.cur-year { font-weight: 600 !important; }
+.flatpickr-current-month .flatpickr-monthDropdown-months .flatpickr-monthDropdown-month { background-color: var(--cream) !important; }
+.flatpickr-time { border-top: 1px solid var(--border) !important; }
 
 @media(max-width:960px){
   .app{grid-template-columns:1fr}
@@ -492,12 +517,12 @@ hr{border:none;border-top:1px solid var(--border);margin:40px 0}
     <div class="field-grid">
       <div class="field-group">
         <label>Your name / agency</label>
-        <input type="text" id="your-name" placeholder="e.g. Nimrod / RecoverAI" oninput="calc()">
+        <input type="text" id="your-name" placeholder="e.g. Nimrod / ZylobotAI" oninput="calc()">
       </div>
-      <div class="field-group" onclick="try{document.getElementById('expiry').showPicker();}catch(e){}" style="cursor:pointer">
-        <label style="cursor:pointer; pointer-events:none;">Offer expiry date</label>
-        <input type="date" id="expiry" oninput="calc()" onclick="try{this.showPicker();}catch(e){}">
-        <div class="field-hint" style="pointer-events:none;">Creates urgency — auto-set to 7 days</div>
+      <div class="field-group">
+        <label>Offer expiry date</label>
+        <input type="text" id="expiry">
+        <div class="field-hint">Creates urgency — auto-set to 7 days</div>
       </div>
       <div class="field-group full">
         <label>Case study / testimonial (optional)</label>
@@ -541,15 +566,20 @@ hr{border:none;border-top:1px solid var(--border);margin:40px 0}
   <div class="aov-confidence" id="aov-confidence-right"></div>
 
   <div class="proposal-section">
-    <div class="proposal-label">Proposal preview</div>
-    <div class="proposal-text" id="proposal-text">
+    <div class="proposal-label">
+      <span>Proposal preview</span>
+      <span class="proposal-label-hint" id="edit-hint" style="display:none; color:var(--warn)">
+        Manual edits active (<a href="#" onclick="resetProposal(); return false;" style="color:inherit">Reset</a>)
+      </span>
+    </div>
+    <div class="proposal-text" id="proposal-text" contenteditable="true" spellcheck="false" oninput="handleProposalEdit()">
       <p class="p-lead placeholder-text">Hey [Contact],</p>
       <p class="placeholder-text">Fill in the inputs on the left to generate your personalised proposal.</p>
     </div>
     <div class="btn-row">
       <button class="btn btn-primary" onclick="copyProposal()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Proposal</button>
-      <button class="btn btn-ghost" onclick="copyROI()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> ROI sheet</button>
-      <button class="btn btn-ghost" onclick="savePdf()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> PDF</button>
+      <button class="btn btn-primary" onclick="copyROI()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> ROI</button>
+      <button class="btn btn-primary" onclick="savePdf()"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> PDF</button>
     </div>
     <div class="copy-feedback" id="copy-feedback"></div>
   </div>
@@ -626,6 +656,18 @@ function estimateAOV(){
   var confLabel=used>=4?'High confidence estimate':used>=2?'Medium confidence estimate':'Low confidence — add price range, items/order & shipping threshold';
   var confText=signals.length?confLabel+'. Adjusted for: '+signals.join(', ')+'.':confLabel+'.';
   return{val:Math.round(aov),source:'estimated',confidence:confText};
+}
+
+var proposalManuallyEdited=false;
+function handleProposalEdit() {
+  proposalManuallyEdited = true;
+  document.getElementById('edit-hint').style.display = 'inline';
+}
+
+function resetProposal() {
+  proposalManuallyEdited = false;
+  document.getElementById('edit-hint').style.display = 'none';
+  calc();
 }
 
 function getCurrency() {
@@ -889,7 +931,9 @@ function calc(){
   if(expiryLine) html+='<p class="p-expiry">'+expiryLine+'</p>';
   html+='<p class="p-lead">Reply YES and I\'ll send the agreement today. One client spot available this month.</p>';
   if(yourName) html+='<p class="p-sig">— '+yourName+'</p>';
-  document.getElementById('proposal-text').innerHTML=html;
+  if(!proposalManuallyEdited){
+    document.getElementById('proposal-text').innerHTML=html;
+  }
 }
 
 function selectTier(n){
@@ -899,10 +943,8 @@ function selectTier(n){
 }
 
 function getProposalText(){
-  var els=document.querySelectorAll('#proposal-text p');
-  var lines=[];
-  els.forEach(function(p){var tx=(p.innerText||p.textContent).trim();if(tx)lines.push(tx);});
-  return lines.join('\n\n');
+  var box = document.getElementById('proposal-text');
+  return (box.innerText || box.textContent).trim();
 }
 
 function copyProposal(){
@@ -963,7 +1005,20 @@ function savePdf() {
 // Default expiry = 7 days from today
 (function(){
   var d=new Date();d.setDate(d.getDate()+7);
-  document.getElementById('expiry').value=d.toISOString().split('T')[0];
+  var defaultDate = d.toISOString().split('T')[0];
+  document.getElementById('expiry').value = defaultDate;
+
+  flatpickr("#expiry", {
+    altInput: true,
+    altFormat: "M j, Y",
+    dateFormat: "Y-m-d",
+    minDate: "today",
+    defaultDate: defaultDate,
+    disableMobile: true,
+    onChange: function(selectedDates, dateStr, instance) {
+      calc();
+    }
+  });
 })();
 
 calc();
