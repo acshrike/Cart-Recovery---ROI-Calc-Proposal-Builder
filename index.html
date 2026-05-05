@@ -216,7 +216,13 @@ span.flatpickr-weekday { color: var(--muted) !important; font-family: 'DM Mono',
       <div class="logo-mark"><span></span></div>
       <span class="logo-text">Cart Recovery · ROI Calc & Proposal Builder</span>
     </div>
-    <div style="position:relative">
+    <div style="position:relative; display:flex; gap:8px;">
+      <button class="settings-btn" title="Save State" onclick="saveState()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+      </button>
+      <button class="settings-btn" title="Load State" onclick="loadState()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+      </button>
       <button class="settings-btn" id="settings-btn" title="Settings" onclick="document.getElementById('settings-popover').classList.toggle('visible')">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
       </button>
@@ -247,9 +253,13 @@ span.flatpickr-weekday { color: var(--muted) !important; font-family: 'DM Mono',
       <div class="field-group full">
         <label>Store URL</label>
         <div style="display:flex;gap:8px">
-          <input type="text" id="store-url" placeholder="e.g. https://brand.com">
+          <input type="text" id="store-url" placeholder="e.g. https://brand.com" onkeydown="if(event.key === 'Enter') { window.analyzeStoreWithAI(); this.blur(); }">
           <button class="btn btn-ghost" id="analyze-btn" onclick="window.analyzeStoreWithAI()" style="flex:none; white-space:nowrap;">✨ Auto-fill</button>
         </div>
+      </div>
+      <div class="field-group full">
+        <label>Store Leads / Extracted Data (Optional)</label>
+        <textarea id="store-data-context" placeholder="Paste data copied from Store Leads extension or other tools to improve accuracy..." rows="2" style="width: 100%; border: 1px solid var(--border); border-radius: 6px; padding: 10px; font-family: inherit; font-size: 14px; background: var(--bg-card); color: var(--text); resize: vertical; box-sizing: border-box;"></textarea>
       </div>
       <div class="field-group">
         <label>Brand name</label>
@@ -262,6 +272,7 @@ span.flatpickr-weekday { color: var(--muted) !important; font-family: 'DM Mono',
       <div class="field-group">
         <label>Client email</label>
         <input type="email" id="client-email" placeholder="e.g. sarah@brand.com">
+        <div class="field-hint">Primary contact email for sending the proposal.</div>
       </div>
 
       <div class="field-group">
@@ -291,7 +302,7 @@ span.flatpickr-weekday { color: var(--muted) !important; font-family: 'DM Mono',
     <div class="field-grid">
       <div class="field-group">
         <label>Current ESP / email tool</label>
-        <select id="esp" onchange="calc()">
+        <select id="esp" onchange="toggleCustomESP(); calc()">
           <option value="">Unknown / ask on call</option>
           <option value="klaviyo">Klaviyo</option>
           <option value="mailchimp">Mailchimp</option>
@@ -301,6 +312,10 @@ span.flatpickr-weekday { color: var(--muted) !important; font-family: 'DM Mono',
           <option value="other">Other</option>
         </select>
         <div class="info-box" id="esp-hint"></div>
+      </div>
+      <div class="field-group" id="custom-esp-wrap" style="display:none;">
+        <label>Custom ESP Name</label>
+        <input type="text" id="custom-esp-name" placeholder="Name of ESP" oninput="saveState()">
       </div>
       <div class="field-group">
         <label>Cart recovery flow running?</label>
@@ -987,7 +1002,7 @@ function calc(){
   html+='</p>';
   html+='<p class="p-price">Investment: '+fmt(t.price)+'/month.</p>';
   if(expiryLine) html+='<p class="p-expiry">'+expiryLine+'</p>';
-  html+='<p class="p-lead">Reply YES and I\'ll send the agreement today. One client spot available this month.</p>';
+  html+='<p class="p-lead">Reply YES and I\'ll send the agreement today. Limited spots available this month.</p>';
   if(yourName) html+='<p class="p-sig">— '+yourName+'</p>';
   if(!proposalManuallyEdited){
     document.getElementById('proposal-text').innerHTML=html;
@@ -1003,6 +1018,11 @@ function selectTier(n){
 function getProposalText(){
   var box = document.getElementById('proposal-text');
   return (box.innerText || box.textContent).trim();
+}
+
+function toggleCustomESP() {
+  const isOther = document.getElementById('esp').value === 'other';
+  document.getElementById('custom-esp-wrap').style.display = isOther ? 'flex' : 'none';
 }
 
 function copyProposal(){
@@ -1130,6 +1150,8 @@ calc();
       return;
     }
     
+    const storeDataContext = document.getElementById('store-data-context').value.trim();
+    
     const btn = document.getElementById('analyze-btn');
     const originalText = btn.innerHTML;
     btn.innerHTML = 'Analyzing...';
@@ -1138,18 +1160,25 @@ calc();
     try {
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
-        contents: `Analyze this e-commerce store URL: ${url}
-        Based on your knowledge of the brand, typical industry benchmarks for this specific brand, or the URL itself, provide realistic estimates for their cart recovery calculator.
+        contents: `Analyze this URL: ${url}
+        ${storeDataContext ? 'Additionally, here is some extracted data about the store (from Store Leads or similar):\\n' + storeDataContext : ''}
+        First, determine if this is an e-commerce store (where users can purchase physical or digital products online). 
+        If it is NOT an e-commerce store, return ONLY a JSON object with a single key "error" set to "This URL does not appear to be an e-commerce store." and nothing else.
         
-        Return ONLY a JSON object with the following keys, no markdown wrapping, no explanation:
-        - "brand": string (brand name, extract from URL or your knowledge)
-        - "contactName": string (The founder, owner, or CEO's first name, if publicly known. Try your best to find this via web search. If you still don't know, return an empty string "")
-        - "clientEmail": string (The founder, owner, CEO's email, or a general contact/support email. Try your best to find this via web search. If you still don't know, return an empty string "")
-        - "niche": string (one of: supplements, fashion, beauty, homegood, electronics, pet, or custom)
-        - "visitors": number (Accurate monthly visitors for this brand. Use search to find SimilarWeb or Semrush data for this domain. Make a realistic estimate if not found.)
-        - "aovKnown": number (estimated Average Order Value in USD, just the number, e.g. 85. If you cannot guess, return 0)
-        - "esp": string (one of: klaviyo, mailchimp, omnisend, drip, none, other. Guess klaviyo if you don't know, as it's the most common for Shopify)
-        - "existingFlow": string (one of: 'no', 'basic', 'partial', 'yes', or 'unknown'. Estimate if they have a cart recovery flow based on brand size or search results. Guess 'unknown' if unsure)
+        If it IS an e-commerce store, perform a comprehensive web search to gather accurate data for a cart recovery projection. Prioritize data from sources like Store Leads, SimilarWeb, Semrush, and BuiltWith.
+        If extracted data was provided above, use it as your primary source of truth.
+        
+        Return ONLY a JSON object with the exact following keys, no markdown wrapping, no explanation:
+        - "brand": string (The exact brand or company name. Extract from the URL, title, or your knowledge.)
+        - "contactName": string (The founder, owner, or CEO's first name. Perform a targeted web search for "founder OR CEO OR owner [brand name]". If no individual is found, return an empty string "".)
+        - "clientEmail": string (The founder, owner, CEO's email, or a general contact/support email for the brand. Search for "[brand name] contact email". If not found, return an empty string "".)
+        - "niche": string (Categorize the brand into exactly one of these: 'supplements', 'fashion', 'beauty', 'homegood', 'electronics', 'pet', or 'custom'. If unsure, choose 'custom'.)
+        - "visitors": number (Accurate monthly visitors. Search for "[domain] monthly visitors Similarweb Store Leads". If exact data is unavailable, provide a realistic numeric estimate based on brand popularity. Do not return 0 unless you are absolutely sure.)
+        - "aovKnown": number (Estimated Average Order Value in USD. Base this on the price range of products sold on their site. Provide just the numeric value, e.g., 85. If completely unable to guess, return 0.)
+        - "esp": string (Their Email Service Provider. Search for "what ESP does [domain] use" or check tech stack data. Choose exactly one of: 'klaviyo', 'mailchimp', 'omnisend', 'drip', 'none', or 'other'. Default to 'klaviyo' for Shopify stores if unconfirmed.)
+        - "existingFlow": string (Estimate of their current cart recovery flow quality. Choose exactly one of: 'no', 'basic', 'partial', 'yes', or 'unknown'. Base this on brand maturity or specific search results. Default to 'unknown' if unsure.)
+        - "items": number (Estimated average items per order based on the types of products they sell. Provide a realistic number like 1.5, 2, etc. If unsure, return 1.)
+        - "freeship": number (Free shipping threshold in USD. Find this via search or estimate if standard in their niche. If unknown or not offered, return 0.)
         `,
         tools: [{ googleSearch: {} }]
       });
@@ -1157,6 +1186,10 @@ calc();
       let text = response.text;
       text = text.replace(/```json/gi, '').replace(/```/gi, '').trim();
       const data = JSON.parse(text);
+      if (data.error) {
+        alert(data.error);
+        return;
+      }
       if (data.brand) document.getElementById('brand').value = data.brand;
       if (data.contactName) document.getElementById('contact').value = data.contactName;
       if (data.clientEmail) document.getElementById('client-email').value = data.clientEmail;
@@ -1166,6 +1199,8 @@ calc();
       }
       if (data.visitors) document.getElementById('visitors').value = data.visitors;
       if (data.aovKnown) document.getElementById('aov-known').value = data.aovKnown;
+      if (data.items !== undefined) document.getElementById('items').value = data.items;
+      if (data.freeship !== undefined) document.getElementById('freeship').value = data.freeship;
       if (data.esp) document.getElementById('esp').value = data.esp;
       if (data.existingFlow && data.existingFlow !== 'unknown') document.getElementById('existing-flow').value = data.existingFlow;
       
@@ -1186,6 +1221,81 @@ calc();
       e.target.blur();
     }
   });
+
+  function saveState() {
+    var state = {
+      'store-url': document.getElementById('store-url').value,
+      'store-data-context': document.getElementById('store-data-context').value,
+      'brand': document.getElementById('brand').value,
+      'contact': document.getElementById('contact').value,
+      'client-email': document.getElementById('client-email').value,
+      'visitors': document.getElementById('visitors').value,
+      'aov-known': document.getElementById('aov-known').value,
+      'items': document.getElementById('items').value,
+      'freeship': document.getElementById('freeship').value,
+      'price-range': document.getElementById('price-range').value,
+      'niche': document.getElementById('niche').value,
+      'subscription': document.getElementById('subscription').value,
+      'bundles': document.getElementById('bundles').value,
+      'esp': document.getElementById('esp').value,
+      'custom-esp-name': document.getElementById('custom-esp-name').value,
+      'existing-flow': document.getElementById('existing-flow').value,
+      'currency': document.getElementById('currency').value,
+      'your-name': document.getElementById('your-name').value,
+      'expiry': document.getElementById('expiry').value,
+      'tier': tier,
+      't1-price-input': document.getElementById('t1-price-input').value,
+      't2-price-input': document.getElementById('t2-price-input').value,
+      't3-price-input': document.getElementById('t3-price-input').value,
+      't1-price': tiers[1].price,
+      't2-price': tiers[2].price,
+      't3-price': tiers[3].price,
+      // Handle the proposal editing
+      'proposal-text': document.getElementById('proposal-text').innerHTML,
+      'proposalManuallyEdited': proposalManuallyEdited
+    };
+    localStorage.setItem('cartRecoveryCalcState', JSON.stringify(state));
+    showFeedback('State saved to browser');
+  }
+
+  function loadState() {
+    var saved = localStorage.getItem('cartRecoveryCalcState');
+    if (!saved) {
+      alert("No saved state found.");
+      return;
+    }
+    try {
+      var state = JSON.parse(saved);
+      ['store-url', 'store-data-context', 'brand', 'contact', 'client-email', 'visitors', 'aov-known', 'items', 'freeship', 
+       'price-range', 'niche', 'subscription', 'bundles', 'esp', 'custom-esp-name', 'existing-flow', 'currency', 'your-name', 'expiry',
+       't1-price-input', 't2-price-input', 't3-price-input'].forEach(function(id) {
+         if (state[id] !== undefined) {
+           document.getElementById(id).value = state[id];
+         }
+      });
+
+      if (state['t1-price'] !== undefined) tiers[1].price = state['t1-price'];
+      if (state['t2-price'] !== undefined) tiers[2].price = state['t2-price'];
+      if (state['t3-price'] !== undefined) tiers[3].price = state['t3-price'];
+
+      if (state.proposalManuallyEdited !== undefined) proposalManuallyEdited = state.proposalManuallyEdited;
+
+      applyNiche();
+      toggleCustomESP();
+      
+      if (state.tier) selectTier(state.tier);
+      else calc();
+
+      if (state['proposal-text'] !== undefined && proposalManuallyEdited) {
+         document.getElementById('proposal-text').innerHTML = state['proposal-text'];
+      }
+
+      showFeedback('State loaded');
+    } catch(e) {
+      console.error(e);
+      alert('Error loading state.');
+    }
+  }
 </script>
 </body>
 </html>
