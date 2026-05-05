@@ -3,7 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cart Recovery ROI Calculator</title>
+<title>Cart Recovery · ROI Calc & Proposal Builder</title>
+<!-- Patch to prevent html2pdf fetch overwrite error -->
+<script>
+  (function(){
+    var origFetch = window.fetch;
+    Object.defineProperty(window, 'fetch', {
+      configurable: true,
+      enumerable: true,
+      get: function() { return origFetch; },
+      set: function() { /* ignore overwrite attempt */ }
+    });
+  })();
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -163,7 +175,7 @@ hr{border:none;border-top:1px solid var(--border);margin:40px 0}
 <div class="left">
   <div class="logo">
     <div class="logo-mark"><span></span></div>
-    <span class="logo-text">Cart Recovery · ROI & Proposal Builder</span>
+    <span class="logo-text">Cart Recovery · ROI Calc & Proposal Builder</span>
   </div>
 
   <!-- 01 CLIENT -->
@@ -182,7 +194,18 @@ hr{border:none;border-top:1px solid var(--border);margin:40px 0}
         <label>Contact name</label>
         <input type="text" id="contact" placeholder="e.g. Sarah" oninput="calc()">
       </div>
-      <div class="field-group full">
+      <div class="field-group">
+        <label>Currency</label>
+        <select id="currency" onchange="calc()">
+          <option value="$">USD ($)</option>
+          <option value="£">GBP (£)</option>
+          <option value="€">EUR (€)</option>
+          <option value="A$">AUD (A$)</option>
+          <option value="C$">CAD (C$)</option>
+          <option value="₹">INR (₹)</option>
+        </select>
+      </div>
+      <div class="field-group">
         <label>Niche / category</label>
         <select id="niche" onchange="applyNiche()">
           <option value="">Select niche — auto-fills benchmarks</option>
@@ -299,7 +322,7 @@ hr{border:none;border-top:1px solid var(--border);margin:40px 0}
     </div>
     <div class="field-grid">
       <div class="field-group full">
-        <label>Reported monthly revenue ($)</label>
+        <label>Reported monthly revenue (<span class="cur-sym">$</span>)</label>
         <input type="number" id="rev-reported" placeholder="What they tell you — e.g. 150000" oninput="calc()">
         <div class="field-hint">Cross-checks against traffic × AOV × conv rate — flags discrepancies</div>
         <div class="rev-check" id="rev-check"></div>
@@ -316,12 +339,12 @@ hr{border:none;border-top:1px solid var(--border);margin:40px 0}
     </div>
     <div class="field-grid">
       <div class="field-group">
-        <label>Known AOV ($)</label>
+        <label>Known AOV (<span class="cur-sym">$</span>)</label>
         <input type="number" id="aov-known" placeholder="Leave blank to estimate" oninput="calc()">
         <div class="field-hint">Overrides all estimates below</div>
       </div>
       <div class="field-group">
-        <label>Catalog price range ($)</label>
+        <label>Catalog price range (<span class="cur-sym">$</span>)</label>
         <input type="text" id="price-range" placeholder="e.g. 40–120" oninput="calc()">
         <div class="field-hint">Low to high end</div>
       </div>
@@ -331,7 +354,7 @@ hr{border:none;border-top:1px solid var(--border);margin:40px 0}
         <div class="field-hint">From Shopify analytics</div>
       </div>
       <div class="field-group">
-        <label>Free shipping threshold ($)</label>
+        <label>Free shipping threshold (<span class="cur-sym">$</span>)</label>
         <input type="number" id="freeship" placeholder="e.g. 75" oninput="calc()">
         <div class="field-hint">Anchors AOV near this number</div>
       </div>
@@ -413,7 +436,7 @@ hr{border:none;border-top:1px solid var(--border);margin:40px 0}
         <div class="field-hint">In recovery emails — lowers recouped revenue</div>
       </div>
       <div class="field-group">
-        <label>Software / ESP costs ($/mo)</label>
+        <label>Software / ESP costs (<span class="cur-sym">$</span>/mo)</label>
         <input type="number" id="software-cost" placeholder="e.g. 150" min="0" oninput="calc()">
         <div class="field-hint">Klaviyo/Mailchimp fees — factored into Net ROI</div>
       </div>
@@ -430,7 +453,7 @@ hr{border:none;border-top:1px solid var(--border);margin:40px 0}
     <div class="tier-grid">
       <div class="tier-card" id="t1" onclick="selectTier(1)">
         <div class="tier-name">Starter</div>
-        <div class="tier-price">$1,500<sub>/mo</sub></div>
+        <div class="tier-price" id="t1-price">$1,500<sub>/mo</sub></div>
         <div class="tier-features">
           <div class="tier-feature">3-email cart sequence</div>
           <div class="tier-feature">1 SMS recovery touch</div>
@@ -440,7 +463,7 @@ hr{border:none;border-top:1px solid var(--border);margin:40px 0}
       <div class="tier-card active" id="t2" onclick="selectTier(2)">
         <div class="tier-badge">Most popular</div>
         <div class="tier-name">Growth</div>
-        <div class="tier-price">$3,000<sub>/mo</sub></div>
+        <div class="tier-price" id="t2-price">$3,000<sub>/mo</sub></div>
         <div class="tier-features">
           <div class="tier-feature">Cart + browse flows</div>
           <div class="tier-feature">AI A/B testing</div>
@@ -449,7 +472,7 @@ hr{border:none;border-top:1px solid var(--border);margin:40px 0}
       </div>
       <div class="tier-card" id="t3" onclick="selectTier(3)">
         <div class="tier-name">Pro</div>
-        <div class="tier-price">$6,500<sub>/mo</sub></div>
+        <div class="tier-price" id="t3-price">$6,500<sub>/mo</sub></div>
         <div class="tier-features">
           <div class="tier-feature">All Growth features</div>
           <div class="tier-feature">Post-purchase + winback</div>
@@ -471,10 +494,10 @@ hr{border:none;border-top:1px solid var(--border);margin:40px 0}
         <label>Your name / agency</label>
         <input type="text" id="your-name" placeholder="e.g. Nimrod / RecoverAI" oninput="calc()">
       </div>
-      <div class="field-group">
-        <label>Offer expiry date</label>
+      <div class="field-group" onclick="try{document.getElementById('expiry').showPicker();}catch(e){}" style="cursor:pointer">
+        <label style="cursor:pointer; pointer-events:none;">Offer expiry date</label>
         <input type="date" id="expiry" oninput="calc()" onclick="try{this.showPicker();}catch(e){}">
-        <div class="field-hint">Creates urgency — auto-set to 7 days</div>
+        <div class="field-hint" style="pointer-events:none;">Creates urgency — auto-set to 7 days</div>
       </div>
       <div class="field-group full">
         <label>Case study / testimonial (optional)</label>
@@ -573,7 +596,7 @@ function applyNiche(){
   var d=nicheData[n];
   if(!document.getElementById('atc').value) document.getElementById('atc').value=d.atc;
   if(!document.getElementById('abandon').value) document.getElementById('abandon').value=d.abandon;
-  hint.textContent=d.hint; hint.className='info-box green visible';
+  hint.textContent=d.hint.replace(/\$/g, getCurrency()); hint.className='info-box green visible';
   calc();
 }
 
@@ -597,7 +620,7 @@ function estimateAOV(){
   if(sub==='yes'){aov*=0.85;signals.push('subscription model (−15%)');}
   else if(sub==='some'){aov*=0.93;signals.push('partial subscription (−7%)');}
   if(bundles==='yes'){aov*=1.25;signals.push('bundles/upsells (+25%)');}
-  if(freeship>0&&aov<freeship*1.05){aov=freeship*1.05;signals.push('free shipping anchor ($'+Math.round(freeship*1.05)+')');}
+  if(freeship>0&&aov<freeship*1.05){aov=freeship*1.05;signals.push('free shipping anchor ('+getCurrency()+Math.round(freeship*1.05)+')');}
   var used=0;
   if(pr)used++;if(items>1)used++;if(sub!=='no')used++;if(bundles==='yes')used++;if(freeship>0)used++;
   var confLabel=used>=4?'High confidence estimate':used>=2?'Medium confidence estimate':'Low confidence — add price range, items/order & shipping threshold';
@@ -605,7 +628,11 @@ function estimateAOV(){
   return{val:Math.round(aov),source:'estimated',confidence:confText};
 }
 
-function fmt(n){return'$'+Math.round(n).toLocaleString();}
+function getCurrency() {
+  var el = document.getElementById('currency');
+  return el ? el.value : '$';
+}
+function fmt(n){return getCurrency()+Math.round(n).toLocaleString();}
 function fmtDate(d){
   if(!d)return'';
   var p=d.split('-');if(p.length<3)return d;
@@ -614,6 +641,14 @@ function fmtDate(d){
 }
 
 function calc(){
+  var cur = getCurrency();
+  document.querySelectorAll('.cur-sym').forEach(function(el) {
+    el.textContent = cur;
+  });
+  document.getElementById('t1-price').innerHTML = fmt(tiers[1].price) + '<sub>/mo</sub>';
+  document.getElementById('t2-price').innerHTML = fmt(tiers[2].price) + '<sub>/mo</sub>';
+  document.getElementById('t3-price').innerHTML = fmt(tiers[3].price) + '<sub>/mo</sub>';
+
   var visitors=parseFloat(document.getElementById('visitors').value)||0;
   var atcRaw=parseFloat(document.getElementById('atc').value)||0;
   var abandonRaw=parseFloat(document.getElementById('abandon').value)||0;
