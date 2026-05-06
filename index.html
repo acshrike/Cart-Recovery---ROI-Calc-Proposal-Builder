@@ -63,25 +63,158 @@
         font-family: "Syne", sans-serif;
         font-size: 14px;
         line-height: 1.6;
-        min-height: 100vh;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        overflow: hidden;
+      }
+      .topbar {
+        height: 64px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 32px;
+        background: var(--white);
+        flex-shrink: 0;
+        z-index: 20;
+      }
+      .topbar-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .main-layout {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+      }
+      .sidebar {
+        width: 240px;
+        background: var(--cream);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        padding: 24px 0;
+        flex-shrink: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        transition: width 0.3s ease;
+      }
+      .sidebar.collapsed {
+        width: 64px;
+      }
+      .sidebar-toggle-btn {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--muted);
+        padding: 4px;
+        border-radius: 6px;
+        transition: all 0.2s;
+        margin: 0 auto 24px 18px;
+        align-self: flex-start;
+      }
+      .sidebar-toggle-btn:hover {
+        background: rgba(0, 0, 0, 0.05);
+        color: var(--ink);
+      }
+      .sidebar.collapsed .sidebar-toggle-btn {
+        margin: 0 auto 24px 18px;
+      }
+      .sidebar.collapsed .icon-close {
+        display: none;
+      }
+      .sidebar.collapsed .icon-open {
+        display: block !important;
+      }
+      .icon-open {
+        display: none;
+      }
+      .sidebar-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .sidebar-link {
+        padding: 10px 18px;
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        white-space: nowrap;
+      }
+      .nav-num {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 24px;
+        font-weight: 600;
+        font-size: 11px;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        height: 24px;
+      }
+      .sidebar-link:hover .nav-num,
+      .sidebar-link.active .nav-num {
+        border-color: var(--ink);
+        background: var(--ink);
+        color: var(--cream);
+      }
+      .sidebar.collapsed .nav-text {
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s;
+      }
+      .sidebar-link:hover,
+      .sidebar-link.active {
+        color: var(--ink);
+        background: rgba(0, 0, 0, 0.03);
+      }
+      .sidebar-link.active::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: var(--ink);
       }
       .app {
+        flex: 1;
         display: grid;
         grid-template-columns: 1fr 430px;
-        min-height: 100vh;
+        height: 100%;
+        overflow: hidden;
       }
       .left {
+        min-width: 0;
         padding: 48px 52px;
         border-right: 1px solid var(--border);
+        height: 100%;
         overflow-y: auto;
+        overflow-x: hidden;
+        position: relative;
+        scroll-behavior: smooth;
       }
       .right {
         background: #111113;
-        color: var(--ink);
+        color: var(
+          --white
+        ); /* Updated color for dark theme right panel if necessary, previously was var(--ink) */
         padding: 40px 36px;
         position: sticky;
         top: 0;
-        height: 100vh;
+        height: 100%;
         overflow-y: auto;
         display: flex;
         flex-direction: column;
@@ -91,7 +224,7 @@
         display: flex;
         align-items: center;
         gap: 10px;
-        margin-bottom: 48px;
+        margin-bottom: 0; /* Reset margin for topbar */
       }
       .logo-mark {
         width: 28px;
@@ -170,6 +303,7 @@
       }
       input[type="text"],
       input[type="email"],
+      input[type="url"],
       input[type="number"],
       input[type="date"],
       select {
@@ -680,6 +814,18 @@
         font-style: italic;
       }
 
+      .actions-wrapper {
+        position: sticky;
+        bottom: 0;
+        background: var(--chalk, #111113);
+        padding: 16px 36px 40px 36px;
+        margin: 24px -36px -40px -36px;
+        border-top: 1px solid var(--border);
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+      }
+      
       .btn-row {
         display: flex;
         gap: 8px;
@@ -921,13 +1067,28 @@
         border-top: 1px solid var(--border) !important;
       }
 
+      .hide-on-mobile {
+        display: flex;
+      }
+      .show-on-mobile {
+        display: none !important;
+      }
+
       @media (max-width: 960px) {
         .app {
           grid-template-columns: 1fr;
+          overflow-y: auto;
+          display: flex;
+          flex-direction: column;
+        }
+        .left {
+          height: auto;
+          overflow: visible;
         }
         .right {
           position: static;
           height: auto;
+          overflow: visible;
         }
         .left,
         .right {
@@ -936,6 +1097,43 @@
         .tier-grid,
         .field-grid.three {
           grid-template-columns: 1fr 1fr;
+        }
+        .hide-on-mobile {
+          display: none !important;
+        }
+        .show-on-mobile {
+          display: flex !important;
+        }
+        .topbar {
+          padding: 0 16px;
+        }
+        .topbar-left {
+          gap: 12px;
+        }
+        .topbar .logo {
+          gap: 8px;
+        }
+        .logo-mark {
+          width: 24px;
+          height: 24px;
+        }
+        .logo-mark span {
+          width: 6px;
+          height: 6px;
+        }
+        .topbar-actions {
+          gap: 4px !important;
+        }
+        .actions-wrapper {
+          padding: 16px 24px 24px 24px;
+          margin: 24px -24px -24px -24px;
+        }
+        .logo-text {
+          font-size: 13px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: calc(100vw - 150px);
         }
       }
       @media (max-width: 600px) {
@@ -948,15 +1146,12 @@
         .right {
           padding: 20px 16px;
         }
-        .logo {
-          flex-wrap: wrap;
-          gap: 12px;
-          margin-bottom: 20px;
+        .actions-wrapper {
+          padding: 16px 16px 20px 16px;
+          margin: 24px -16px -20px -16px;
         }
         .logo-text {
-          font-size: 13px;
-          line-height: 1.4;
-          white-space: normal;
+          max-width: calc(100vw - 120px);
         }
         .slider-labels span {
           font-size: 9px;
@@ -976,6 +1171,7 @@
         }
         input[type="text"],
         input[type="email"],
+        input[type="url"],
         input[type="number"],
         input[type="date"],
         textarea {
@@ -1214,143 +1410,1150 @@
         visibility: visible;
         opacity: 1;
       }
+      details[open] summary .dropdown-chevron {
+        transform: rotate(180deg);
+      }
+      .dropdown-chevron {
+        transition: transform 0.2s ease;
+      }
+      details > summary {
+        list-style: none;
+      }
+      details > summary::-webkit-details-marker {
+        display: none;
+      }
     </style>
   </head>
   <body>
-    <div class="app">
-      <!-- ═══ LEFT ═══ -->
-      <div class="left">
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-left">
         <div class="logo">
-          <div style="display: flex; align-items: center; gap: 10px; flex: 1">
-            <div class="logo-mark"><span></span></div>
-            <span class="logo-text"
-              >Cart Recovery · ROI Calc & Proposal Builder</span
-            >
+          <div class="logo-mark"><span></span></div>
+          <span class="logo-text"
+            >Cart Recovery · ROI Calc & Proposal Builder</span
+          >
+        </div>
+      </div>
+      <div
+        class="topbar-actions"
+        style="position: relative; display: flex; gap: 8px"
+      >
+        <button
+          class="settings-btn"
+          id="settings-btn"
+          title="Settings"
+          onclick="
+            document
+              .getElementById('settings-popover')
+              .classList.toggle('visible')
+          "
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="3"></circle>
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+            ></path>
+          </svg>
+        </button>
+        <div id="settings-popover" class="settings-popover">
+          <div class="field-group">
+            <label>Currency</label>
+            <select id="currency" onchange="calc()">
+              <option value="$">USD ($)</option>
+              <option value="£">GBP (£)</option>
+              <option value="€">EUR (€)</option>
+              <option value="A$">AUD (A$)</option>
+              <option value="C$">CAD (C$)</option>
+              <option value="₹">INR (₹)</option>
+            </select>
           </div>
-          <div style="position: relative; display: flex; gap: 8px">
-            <button
-              class="settings-btn"
-              title="Save State"
-              onclick="saveState()"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path
-                  d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
-                ></path>
-                <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                <polyline points="7 3 7 8 15 8"></polyline>
-              </svg>
-            </button>
-            <button
-              class="settings-btn"
-              title="Load State"
-              onclick="loadState()"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="7 10 12 15 17 10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
-              </svg>
-            </button>
-            <button
-              class="settings-btn"
-              id="settings-btn"
-              title="Settings"
-              onclick="
-                document
-                  .getElementById('settings-popover')
-                  .classList.toggle('visible')
-              "
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <circle cx="12" cy="12" r="3"></circle>
-                <path
-                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
-                ></path>
-              </svg>
-            </button>
-            <div id="settings-popover" class="settings-popover">
+        </div>
+      </div>
+    </header>
+
+    <div class="main-layout">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <button
+          class="sidebar-toggle-btn"
+          onclick="toggleSidebar()"
+          title="Toggle Sidebar"
+        >
+          <svg
+            class="icon-close"
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect>
+            <line x1="9" y1="3" x2="9" y2="21"></line>
+            <path d="m16 15-3-3 3-3"></path>
+          </svg>
+          <svg
+            class="icon-open"
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect>
+            <line x1="9" y1="3" x2="9" y2="21"></line>
+            <path d="m14 9 3 3-3 3"></path>
+          </svg>
+        </button>
+        <nav class="sidebar-nav">
+          <a
+            href="#sec-01"
+            class="sidebar-link active"
+            onclick="navTo(event, 'sec-01')"
+            ><span class="nav-num">01</span
+            ><span class="nav-text">Store Details</span></a
+          >
+          <a
+            href="#sec-02"
+            class="sidebar-link"
+            onclick="navTo(event, 'sec-02')"
+            ><span class="nav-num">02</span
+            ><span class="nav-text">Traffic & conversion</span></a
+          >
+          <a
+            href="#sec-03"
+            class="sidebar-link"
+            onclick="navTo(event, 'sec-03')"
+            ><span class="nav-num">03</span
+            ><span class="nav-text">Revenue cross-check</span></a
+          >
+          <a
+            href="#sec-04"
+            class="sidebar-link"
+            onclick="navTo(event, 'sec-04')"
+            ><span class="nav-num">04</span
+            ><span class="nav-text">AOV signals</span></a
+          >
+          <a
+            href="#sec-05"
+            class="sidebar-link"
+            onclick="navTo(event, 'sec-05')"
+            ><span class="nav-num">05</span
+            ><span class="nav-text">Strategy & costs</span></a
+          >
+          <a
+            href="#sec-06"
+            class="sidebar-link"
+            onclick="navTo(event, 'sec-06')"
+            ><span class="nav-num">06</span
+            ><span class="nav-text">Retainer tier</span></a
+          >
+          <a
+            href="#sec-07"
+            class="sidebar-link"
+            onclick="navTo(event, 'sec-07')"
+            ><span class="nav-num">07</span
+            ><span class="nav-text">Proposal settings</span></a
+          >
+          <a
+            href="#sec-08"
+            class="sidebar-link"
+            onclick="navTo(event, 'sec-08')"
+            ><span class="nav-num">RI</span
+            ><span class="nav-text">Recovery Intelligence</span></a
+          >
+        </nav>
+      </aside>
+
+      <div class="app">
+        <!-- ═══ LEFT ═══ -->
+        <div class="left" id="left-pane" onscroll="updateActiveSection()">
+          <div style="margin-bottom: 40px;">
+            <h1 style="font-family: 'Syne', sans-serif; font-size: 30px; color: var(--ink); margin-bottom: 8px; font-weight: 600; letter-spacing: -0.02em;">Build your proposal</h1>
+            <p style="font-size: 14px; color: var(--muted); font-family: 'Syne', sans-serif;">Fill in the details below to generate a tailored revenue projection and proposal.</p>
+          </div>
+          <!-- 01 CLIENT -->
+          <div class="section" id="sec-01">
+            <div class="section-header">
+              <span class="section-num">01</span>
+              <span class="section-title">Store Details</span>
+              <div class="section-line"></div>
+            </div>
+            <div class="field-grid">
+              <div class="field-group full">
+                <label>Store URL</label>
+                <div style="display: flex; gap: 8px">
+                  <input
+                    type="text"
+                    id="store-url"
+                    placeholder="e.g. https://brand.com"
+                    onkeydown="
+                      if (event.key === 'Enter') {
+                        window.analyzeStoreWithAI();
+                        this.blur();
+                      }
+                    "
+                  />
+                  <button
+                    class="btn btn-ghost"
+                    id="analyze-btn"
+                    onclick="window.analyzeStoreWithAI()"
+                    style="flex: none; white-space: nowrap"
+                  >
+                    ✨ Auto-fill
+                  </button>
+                </div>
+                <button
+                  id="view-competitors-btn"
+                  class="btn btn-ghost"
+                  style="display: none; margin-top: 8px; width: fit-content"
+                  onclick="openCompetitorModal()"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    style="margin-right: 4px"
+                  >
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                  </svg>
+                  View Competitor Strategy Analysis
+                </button>
+              </div>
+              <div class="field-group full">
+                <label>Store Leads / Extracted Data (Optional)</label>
+                <textarea
+                  id="store-data-context"
+                  placeholder="Paste data copied from Store Leads extension or other tools to improve accuracy..."
+                  rows="2"
+                  style="
+                    width: 100%;
+                    border: 1px solid var(--border);
+                    border-radius: 6px;
+                    padding: 10px;
+                    font-family: inherit;
+                    font-size: 14px;
+                    background: var(--bg-card);
+                    color: var(--text);
+                    resize: vertical;
+                    box-sizing: border-box;
+                  "
+                ></textarea>
+              </div>
               <div class="field-group">
-                <label>Currency</label>
-                <select id="currency" onchange="calc()">
-                  <option value="$">USD ($)</option>
-                  <option value="£">GBP (£)</option>
-                  <option value="€">EUR (€)</option>
-                  <option value="A$">AUD (A$)</option>
-                  <option value="C$">CAD (C$)</option>
-                  <option value="₹">INR (₹)</option>
+                <label>Brand name</label>
+                <input
+                  type="text"
+                  id="brand"
+                  placeholder="e.g. Luxe Supplements"
+                  oninput="calc()"
+                />
+              </div>
+              <div class="field-group">
+                <label>Contact name</label>
+                <input
+                  type="text"
+                  id="contact"
+                  placeholder="e.g. Sarah"
+                  oninput="calc()"
+                />
+              </div>
+              <div class="field-group">
+                <label>Client email</label>
+                <input
+                  type="email"
+                  id="client-email"
+                  placeholder="e.g. sarah@brand.com"
+                />
+                <div class="field-hint">
+                  Primary contact email for sending the proposal.
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label>Client social / DM</label>
+                <input
+                  type="url"
+                  id="client-social"
+                  placeholder="https://linkedin.com/..."
+                />
+              </div>
+
+              <div class="field-group">
+                <label>Niche / category</label>
+                <select id="niche" onchange="applyNiche()">
+                  <option value="">Select niche — auto-fills benchmarks</option>
+                  <option value="supplements">Supplements & health</option>
+                  <option value="fashion">Fashion & apparel</option>
+                  <option value="beauty">Beauty & skincare</option>
+                  <option value="homegood">Home goods & furniture</option>
+                  <option value="electronics">Electronics & tech</option>
+                  <option value="pet">Pet products</option>
+                  <option value="custom">Custom / other</option>
                 </select>
+                <div class="info-box green" id="niche-hint"></div>
+              </div>
+            </div>
+
+            <!-- EXISTING SETUP MOVED INTO DROPDOWN -->
+            <details id="setup-details" style="margin-top: 24px; border: 1px solid var(--border); border-radius: 6px; padding: 16px; background: var(--bg-card);">
+              <summary style="font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; color: var(--ink); list-style: none; display: flex; align-items: center; justify-content: space-between; user-select: none;">
+                Additional details
+                <span class="dropdown-chevron" style="font-size: 10px; opacity: 0.5;">▼</span>
+              </summary>
+              <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
+                <div class="field-grid">
+              <div class="field-group">
+                <label>Current ESP / email tool</label>
+                <select
+                  id="esp"
+                  onchange="
+                    toggleCustomESP();
+                    calc();
+                  "
+                >
+                  <option value="">Unknown / ask on call</option>
+                  <option value="klaviyo">Klaviyo</option>
+                  <option value="mailchimp">Mailchimp</option>
+                  <option value="omnisend">Omnisend</option>
+                  <option value="drip">Drip</option>
+                  <option value="none">None — nothing set up</option>
+                  <option value="other">Other</option>
+                </select>
+                <div class="info-box" id="esp-hint"></div>
+              </div>
+              <div
+                class="field-group"
+                id="custom-esp-wrap"
+                style="display: none"
+              >
+                <label>Custom ESP Name</label>
+                <input
+                  type="text"
+                  id="custom-esp-name"
+                  placeholder="Name of ESP"
+                />
+              </div>
+              <div class="field-group">
+                <label>Cart recovery flow running?</label>
+                <select id="existing-flow" onchange="calc()">
+                  <option value="no">No — zero set up</option>
+                  <option value="basic">Basic (1–2 emails only)</option>
+                  <option value="partial">Partial (no SMS / no AI)</option>
+                  <option value="yes">Yes — full flow running</option>
+                </select>
+                <div class="field-hint">
+                  Frames the improvement delta in your pitch
+                </div>
+              </div>
+              <div
+                class="field-group"
+                id="current-rate-wrap"
+                style="display: none"
+              >
+                <label>Their current recovery rate %</label>
+                <input
+                  type="number"
+                  id="current-rate"
+                  placeholder="e.g. 4"
+                  min="0"
+                  max="30"
+                  oninput="calc()"
+                />
+                <div class="field-hint">
+                  Baseline — your pitch is the delta above this
+                </div>
+              </div>
+              <div class="field-group">
+                <label>Recent promo / sale?</label>
+                <select id="recent-promo" onchange="calc()">
+                  <option value="no">No</option>
+                  <option value="within2w">Within last 2 weeks</option>
+                  <option value="within1m">Within last month</option>
+                </select>
+                <div class="field-hint">
+                  Recent promo suppresses recovery rates 20–30%
+                </div>
+              </div>
+            </div>
+            <div
+              class="info-box amber"
+              id="setup-hint"
+              style="margin-top: 10px"
+            ></div>
+              </div>
+            </details>
+          </div>
+
+          <!-- 02 TRAFFIC -->
+          <div class="section" id="sec-02">
+            <div class="section-header">
+              <span class="section-num">02</span>
+              <span class="section-title">Traffic & conversion</span>
+              <div class="section-line"></div>
+            </div>
+            <div class="field-grid three">
+              <div class="field-group">
+                <label>Monthly visitors</label>
+                <input
+                  type="number"
+                  id="visitors"
+                  placeholder="50,000"
+                  oninput="calc()"
+                />
+                <div class="field-hint">Unique sessions / mo</div>
+              </div>
+              <div class="field-group">
+                <label>Add-to-cart rate %</label>
+                <input
+                  type="number"
+                  id="atc"
+                  placeholder="7"
+                  min="1"
+                  max="30"
+                  oninput="calc()"
+                />
+                <div class="field-hint">Avg: 5–10%</div>
+              </div>
+              <div class="field-group">
+                <label>Abandonment rate %</label>
+                <input
+                  type="number"
+                  id="abandon"
+                  placeholder="72"
+                  min="1"
+                  max="99"
+                  oninput="calc()"
+                />
+                <div class="field-hint">Avg: 65–80%</div>
+              </div>
+              <div class="field-group">
+                <label>Mobile traffic share %</label>
+                <input
+                  type="number"
+                  id="mobile-pct"
+                  placeholder="e.g. 65"
+                  min="0"
+                  max="100"
+                  oninput="calc()"
+                />
+                <div class="field-hint">
+                  Mobile abandons at ~88% vs ~65% desktop
+                </div>
+              </div>
+              <div class="field-group">
+                <label>Paid traffic share %</label>
+                <input
+                  type="number"
+                  id="paid-pct"
+                  placeholder="e.g. 40"
+                  min="0"
+                  max="100"
+                  oninput="calc()"
+                />
+                <div class="field-hint">
+                  Paid recovers better — higher intent
+                </div>
+              </div>
+              <div class="field-group">
+                <label>Store conversion rate %</label>
+                <input
+                  type="number"
+                  id="conv-rate"
+                  placeholder="e.g. 2.5"
+                  step="0.1"
+                  max="100"
+                  oninput="calc()"
+                />
+                <div class="field-hint">From GA4 or Shopify dashboard</div>
+              </div>
+            </div>
+            <div
+              class="info-box amber"
+              id="traffic-hint"
+              style="margin-top: 10px"
+            ></div>
+          </div>
+
+          <!-- 03 REVENUE CROSS-CHECK -->
+          <div class="section" id="sec-03">
+            <div class="section-header">
+              <span class="section-num">03</span>
+              <span class="section-title">Revenue cross-check</span>
+              <div class="section-line"></div>
+            </div>
+            <div class="field-grid">
+              <div class="field-group full">
+                <label
+                  >Reported monthly revenue (<span class="cur-sym">$</span
+                  >)</label
+                >
+                <input
+                  type="number"
+                  id="rev-reported"
+                  placeholder="What they tell you — e.g. 150000"
+                  oninput="calc()"
+                />
+                <div class="field-hint">
+                  Cross-checks against traffic × AOV × conv rate — flags
+                  discrepancies
+                </div>
+                <div class="rev-check" id="rev-check"></div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- 01 CLIENT -->
-        <div class="section">
-          <div class="section-header">
-            <span class="section-num">01</span>
-            <span class="section-title">Client details</span>
-            <div class="section-line"></div>
+          <!-- 04 AOV SIGNALS -->
+          <div class="section" id="sec-04">
+            <div class="section-header">
+              <span class="section-num">04</span>
+              <span class="section-title">AOV signals</span>
+              <div class="section-line"></div>
+            </div>
+            <div class="field-grid">
+              <div class="field-group">
+                <label>Known AOV (<span class="cur-sym">$</span>)</label>
+                <input
+                  type="number"
+                  id="aov-known"
+                  placeholder="Leave blank to estimate"
+                  oninput="calc()"
+                />
+                <div class="field-hint">Overrides all estimates below</div>
+              </div>
+              <div class="field-group">
+                <label
+                  >Catalog price range (<span class="cur-sym">$</span>)</label
+                >
+                <div style="display: flex; gap: 8px">
+                  <input
+                    type="number"
+                    id="price-range-low"
+                    placeholder="Low"
+                    min="0"
+                    oninput="updatePriceRange()"
+                  />
+                  <input
+                    type="number"
+                    id="price-range-high"
+                    placeholder="High"
+                    min="0"
+                    oninput="updatePriceRange()"
+                  />
+                </div>
+                <input type="hidden" id="price-range" value="" />
+                <div class="field-hint">Low to high end</div>
+              </div>
+              <div class="field-group">
+                <label>Avg items per order</label>
+                <input
+                  type="number"
+                  id="items"
+                  placeholder="2"
+                  min="1"
+                  max="20"
+                  step="0.5"
+                  oninput="calc()"
+                />
+                <div class="field-hint">From Shopify analytics</div>
+              </div>
+              <div class="field-group">
+                <label
+                  >Free shipping threshold (<span class="cur-sym">$</span
+                  >)</label
+                >
+                <input
+                  type="number"
+                  id="freeship"
+                  placeholder="e.g. 75"
+                  oninput="calc()"
+                />
+                <div class="field-hint">Anchors AOV near this number</div>
+              </div>
+              <div class="field-group">
+                <label>Subscription model?</label>
+                <select id="subscription" onchange="calc()">
+                  <option value="no">No</option>
+                  <option value="some">Some (mixed)</option>
+                  <option value="yes">Yes — primary model</option>
+                </select>
+                <div class="field-hint">Subs lower AOV, raise LTV</div>
+              </div>
+              <div class="field-group">
+                <label>Bundles / upsells at checkout?</label>
+                <select id="bundles" onchange="calc()">
+                  <option value="no">No</option>
+                  <option value="yes">Yes</option>
+                </select>
+                <div class="field-hint">Pushes AOV up 20–40%</div>
+              </div>
+            </div>
+            <div class="aov-confidence" id="aov-confidence" style="margin-bottom: 24px;"></div>
+            
+            <!-- LTV SIGNALS MOVED INTO DROPDOWN -->
+            <details id="ltv-details" style="border: 1px solid var(--border); border-radius: 6px; padding: 16px; background: var(--bg-card);">
+              <summary style="font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; color: var(--ink); display: flex; align-items: center; justify-content: space-between; user-select: none;">
+                Additional details
+                <span class="dropdown-chevron" style="font-size: 10px; opacity: 0.5;">▼</span>
+              </summary>
+              <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
+                <div class="field-grid three">
+                  <div class="field-group">
+                    <label>Repeat purchase rate %</label>
+                    <input
+                      type="number"
+                      id="repeat-rate"
+                      placeholder="e.g. 35"
+                      min="0"
+                      max="100"
+                      oninput="calc()"
+                    />
+                    <div class="field-hint">
+                      Higher = each recovered cart worth more in lifetime value
+                    </div>
+                  </div>
+                  <div class="field-group">
+                    <label>Refund / return rate %</label>
+                    <input
+                      type="number"
+                      id="refund-rate"
+                      placeholder="e.g. 8"
+                      min="0"
+                      max="100"
+                      oninput="calc()"
+                    />
+                    <div class="field-hint">
+                      Deflates actual recovered revenue — shown in net calc
+                    </div>
+                  </div>
+                  <div class="field-group">
+                    <label>Peak season timing</label>
+                    <select id="peak-season" onchange="calc()">
+                      <option value="none">No major peak</option>
+                      <option value="bfcm">Black Friday / Cyber Monday</option>
+                      <option value="holiday">Holiday / Christmas</option>
+                      <option value="summer">Summer</option>
+                      <option value="valentines">Valentine's Day</option>
+                      <option value="other">Other peak coming</option>
+                    </select>
+                    <div class="field-hint">Peak urgency amplifies your close</div>
+                  </div>
+                </div>
+                <div
+                  class="info-box amber"
+                  id="ltv-hint"
+                  style="margin-top: 10px"
+                ></div>
+              </div>
+            </details>
           </div>
-          <div class="field-grid">
-            <div class="field-group full">
-              <label>Store URL</label>
-              <div style="display: flex; gap: 8px">
+
+          <!-- 05 RECOVERY METRICS & COSTS -->
+          <div class="section" id="sec-05">
+            <div class="section-header">
+              <span class="section-num">05</span>
+              <span class="section-title">Recovery strategy & costs</span>
+              <div class="section-line"></div>
+            </div>
+            <div class="slider-wrap" style="margin-bottom: 24px">
+              <div class="slider-labels">
+                <span>Conservative (8%)</span>
+                <span>Strong (12–15%)</span>
+                <span>Best case (20%)</span>
+              </div>
+              <input
+                type="range"
+                id="recovery"
+                min="3"
+                max="20"
+                value="8"
+                step="1"
+                oninput="calc()"
+              />
+              <div class="slider-val" id="recovery-out">8%</div>
+            </div>
+            <div
+              class="field-grid three"
+              style="grid-template-columns: repeat(2, 1fr)"
+            >
+              <div class="field-group">
+                <label>Average discount offered %</label>
+                <input
+                  type="number"
+                  id="discount-offered"
+                  placeholder="e.g. 10"
+                  min="0"
+                  max="100"
+                  oninput="calc()"
+                />
+                <div class="field-hint">
+                  In recovery emails — lowers recouped revenue
+                </div>
+                <div id="discount-impact-indicator" class="info-box amber" style="margin-top: 10px; display: none; margin-bottom: -10px;"></div>
+              </div>
+              <div class="field-group">
+                <label>Discount Code</label>
                 <input
                   type="text"
-                  id="store-url"
-                  placeholder="e.g. https://brand.com"
-                  onkeydown="
-                    if (event.key === 'Enter') {
-                      window.analyzeStoreWithAI();
-                      this.blur();
-                    }
-                  "
+                  id="discount-code"
+                  placeholder="e.g. SAVE10"
+                  oninput="calc()"
                 />
-                <button
-                  class="btn btn-ghost"
-                  id="analyze-btn"
-                  onclick="window.analyzeStoreWithAI()"
-                  style="flex: none; white-space: nowrap"
-                >
-                  ✨ Auto-fill
-                </button>
+                <div class="field-hint">
+                  Number in code applied as % off if Average is 0
+                </div>
               </div>
+              <div class="field-group">
+                <label>SMS Recovery Enabled?</label>
+                <select id="sms-enabled" onchange="calc()">
+                  <option value="no">No</option>
+                  <option value="yes">Yes</option>
+                </select>
+                <div class="field-hint">SMS boosts recovery rates by 2–4%</div>
+              </div>
+              <div class="field-group">
+                <label
+                  >Software / ESP costs (<span class="cur-sym">$</span
+                  >/mo)</label
+                >
+                <input
+                  type="number"
+                  id="software-cost"
+                  placeholder="e.g. 150"
+                  min="0"
+                  oninput="calc()"
+                />
+                <div class="field-hint">
+                  Klaviyo/Mailchimp fees — factored into Net ROI
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 06 TIER -->
+          <div class="section" id="sec-06">
+            <div class="section-header">
+              <span class="section-num">06</span>
+              <span class="section-title">Select retainer tier</span>
+              <div class="section-line"></div>
+            </div>
+            <div class="tier-grid">
+              <div class="tier-card" id="t1" onclick="selectTier(1)">
+                <div
+                  class="tier-name"
+                  style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                  "
+                >
+                  Starter
+                  <span class="tooltip-wrap" onclick="event.stopPropagation()">
+                    <svg
+                      class="tooltip-icon"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="16" x2="12" y2="12"></line>
+                      <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    <span class="tooltip-content">
+                      Includes basic set up of a 3-part abandoned cart email
+                      sequence, 1 SMS recovery touchpoint, and a monthly
+                      performance report outlining recovered revenue.
+                    </span>
+                  </span>
+                </div>
+                <div class="tier-price">
+                  <span class="cur-sym">$</span
+                  ><input
+                    type="number"
+                    id="t1-price-input"
+                    value="1500"
+                    class="price-input"
+                    onclick="event.stopPropagation()"
+                    oninput="updateTierPrice(1, this.value)"
+                  /><sub>/mo</sub>
+                </div>
+                <div class="tier-features">
+                  <div class="tier-feature">3-email cart sequence</div>
+                  <div class="tier-feature">1 SMS recovery touch</div>
+                  <div class="tier-feature">Monthly performance report</div>
+                </div>
+              </div>
+              <div class="tier-card active" id="t2" onclick="selectTier(2)">
+                <div
+                  class="tier-name"
+                  style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                  "
+                >
+                  Growth
+                  <span class="tooltip-wrap" onclick="event.stopPropagation()">
+                    <svg
+                      class="tooltip-icon"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="16" x2="12" y2="12"></line>
+                      <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    <span class="tooltip-content">
+                      Includes advanced cart and browse abandonment flows,
+                      continuous AI-driven A/B testing on subject lines and
+                      content, and a 1-on-1 monthly strategy call.
+                    </span>
+                  </span>
+                </div>
+                <div class="tier-price">
+                  <span class="cur-sym">$</span
+                  ><input
+                    type="number"
+                    id="t2-price-input"
+                    value="3000"
+                    class="price-input"
+                    onclick="event.stopPropagation()"
+                    oninput="updateTierPrice(2, this.value)"
+                  /><sub>/mo</sub>
+                </div>
+                <div class="tier-features">
+                  <div class="tier-feature">Cart + browse flows</div>
+                  <div class="tier-feature">AI A/B testing</div>
+                  <div class="tier-feature">Monthly strategy call</div>
+                </div>
+              </div>
+              <div class="tier-card" id="t3" onclick="selectTier(3)">
+                <div
+                  class="tier-name"
+                  style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                  "
+                >
+                  Pro
+                  <span class="tooltip-wrap" onclick="event.stopPropagation()">
+                    <svg
+                      class="tooltip-icon"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="16" x2="12" y2="12"></line>
+                      <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    <span class="tooltip-content">
+                      Includes all Growth features, plus post-purchase and
+                      winback flows, dedicated Slack channel support, and custom
+                      roadmap planning.
+                    </span>
+                  </span>
+                </div>
+                <div class="tier-price">
+                  <span class="cur-sym">$</span
+                  ><input
+                    type="number"
+                    id="t3-price-input"
+                    value="6500"
+                    class="price-input"
+                    onclick="event.stopPropagation()"
+                    oninput="updateTierPrice(3, this.value)"
+                  /><sub>/mo</sub>
+                </div>
+                <div class="tier-features">
+                  <div class="tier-feature">All Growth features</div>
+                  <div class="tier-feature">Post-purchase + winback</div>
+                  <div class="tier-feature">Dedicated Slack + roadmap</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 07 PROPOSAL SETTINGS -->
+          <div class="section" id="sec-07">
+            <div class="section-header">
+              <span class="section-num">07</span>
+              <span class="section-title">Proposal settings</span>
+              <div class="section-line"></div>
+            </div>
+            <div class="field-grid">
+              <div class="field-group full">
+                <label>Proposal Template</label>
+                <select id="proposal-template" onchange="resetProposal()">
+                  <option value="standard">Standard Template</option>
+                  <option value="aggressive">Aggressive / Hard Sell</option>
+                  <option value="short">Short & Sweet</option>
+                  <option value="data_driven">Data-Driven Report</option>
+                  <option value="concise">Concise Summary</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label>Your name / agency</label>
+                <input
+                  type="text"
+                  id="your-name"
+                  placeholder="e.g. Nimrod / ZylobotAI"
+                  oninput="calc()"
+                />
+              </div>
+              <div class="field-group">
+                <label>Offer expiry date</label>
+                <input type="text" id="expiry" />
+                <div class="field-hint">
+                  Creates urgency — auto-set to 7 days
+                </div>
+              </div>
+              <div class="field-group full">
+                <label>Case study / testimonial (optional)</label>
+                <input
+                  type="text"
+                  id="testimonial"
+                  placeholder='"We recovered $18K in 60 days." — Jake, FitFuel'
+                  oninput="calc()"
+                />
+                <div class="field-hint">
+                  Paste a short quote — embeds automatically in the proposal
+                </div>
+              </div>
+            </div>
+            <div class="testimonial-preview" id="testimonial-preview">
+              <div class="t-quote" id="t-quote"></div>
+              <div class="t-author" id="t-author"></div>
+            </div>
+          </div>
+        </div>
+        <!-- /left -->
+
+        <!-- ═══ RIGHT ═══ -->
+        <div class="right" id="sec-08">
+          <div class="right-logo">Recovery Intelligence</div>
+
+          <div class="roi-hero">
+            <div class="roi-label">Recoverable revenue / month</div>
+            <div class="roi-main empty" id="roi-hero">—</div>
+            <div class="roi-sub" id="roi-sub">
+              Fill in the inputs to see your projection
+            </div>
+          </div>
+
+          <div class="metric-list">
+            <div class="metric-row">
+              <span class="metric-key">Abandoned carts / mo</span
+              ><span class="metric-val muted" id="m-carts">—</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-key">Effective abandonment rate</span
+              ><span class="metric-val muted" id="m-eff-abandon">—</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-key"
+                >Estimated AOV
+                <span
+                  id="m-aov-ind"
+                  class="aov-ind"
+                  style="display: none"
+                ></span></span
+              ><span class="metric-val muted" id="m-aov">—</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-key">Gross revenue left on table</span
+              ><span class="metric-val muted" id="m-lost">—</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-key">Net after refunds</span
+              ><span class="metric-val muted" id="m-net">—</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-key">Recoverable / mo (net)</span
+              ><span class="metric-val green" id="m-recover">—</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-key">Delta vs. current flow</span
+              ><span class="metric-val muted" id="m-delta">—</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-key">LTV-adjusted value / cart</span
+              ><span class="metric-val muted" id="m-ltv">—</span>
+            </div>
+            <div class="metric-row">
+              <span
+                class="metric-key"
+                style="display: flex; align-items: center"
+              >
+                <span id="m-roi-label">ROI on retainer</span>
+                <span class="tooltip-wrap">
+                  <svg
+                    class="tooltip-icon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                  </svg>
+                  <span class="tooltip-content" id="m-roi-tooltip">
+                    Calculated as: (Recovered Revenue - Retainer Costs -
+                    Software Costs - Discount Adjustments) / (Retainer +
+                    Software Costs). A net positive return after all expenses
+                    are factored in.
+                  </span>
+                </span> </span
+              ><span class="metric-val gold" id="m-roi">—</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-key">Payback period</span
+              ><span class="metric-val muted" id="m-payback">—</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-key">Revenue cross-check</span
+              ><span class="metric-val muted" id="m-crosscheck">—</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-key">Peak season urgency</span
+              ><span class="metric-val muted" id="m-peak">—</span>
+            </div>
+          </div>
+
+          <div class="aov-confidence" id="aov-confidence-right"></div>
+
+          <div class="proposal-section">
+            <div class="proposal-label">
+              <span>Proposal preview</span>
+            </div>
+            <div class="editor-toolbar">
+              <button type="button" onclick="formatDoc('undo')" title="Undo">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M3 7v6h6"></path>
+                  <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path>
+                </svg>
+              </button>
+              <button type="button" onclick="formatDoc('redo')" title="Redo">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M21 7v6h-6"></path>
+                  <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"></path>
+                </svg>
+              </button>
+              <span class="toolbar-divider"></span>
+              <button type="button" onclick="formatDoc('bold')" title="Bold">
+                <b>B</b>
+              </button>
               <button
-                id="view-competitors-btn"
-                class="btn btn-ghost"
-                style="display: none; margin-top: 8px; width: fit-content"
-                onclick="openCompetitorModal()"
+                type="button"
+                onclick="formatDoc('italic')"
+                title="Italic"
+              >
+                <i>I</i>
+              </button>
+              <button
+                type="button"
+                onclick="formatDoc('underline')"
+                title="Underline"
+              >
+                <u>U</u>
+              </button>
+              <button
+                type="button"
+                onclick="formatDoc('strikeThrough')"
+                title="Strikethrough"
+              >
+                <s>S</s>
+              </button>
+              <span class="toolbar-divider"></span>
+              <button
+                type="button"
+                onclick="formatDoc('formatBlock', 'H3')"
+                title="Heading"
+              >
+                <b>H3</b>
+              </button>
+              <button
+                type="button"
+                onclick="formatDoc('formatBlock', 'P')"
+                title="Paragraph"
+              >
+                <b>P</b>
+              </button>
+              <button
+                type="button"
+                onclick="formatDoc('insertOrderedList')"
+                title="Numbered List"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -1362,782 +2565,24 @@
                   stroke-width="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
-                  style="margin-right: 4px"
                 >
-                  <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                  <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                  <line x1="10" y1="6" x2="21" y2="6"></line>
+                  <line x1="10" y1="12" x2="21" y2="12"></line>
+                  <line x1="10" y1="18" x2="21" y2="18"></line>
+                  <path d="M4 6h1v4"></path>
+                  <path d="M4 10h2"></path>
+                  <path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"></path>
                 </svg>
-                View Competitor Strategy Analysis
               </button>
-            </div>
-            <div class="field-group full">
-              <label>Store Leads / Extracted Data (Optional)</label>
-              <textarea
-                id="store-data-context"
-                placeholder="Paste data copied from Store Leads extension or other tools to improve accuracy..."
-                rows="2"
-                style="
-                  width: 100%;
-                  border: 1px solid var(--border);
-                  border-radius: 6px;
-                  padding: 10px;
-                  font-family: inherit;
-                  font-size: 14px;
-                  background: var(--bg-card);
-                  color: var(--text);
-                  resize: vertical;
-                  box-sizing: border-box;
-                "
-              ></textarea>
-            </div>
-            <div class="field-group">
-              <label>Brand name</label>
-              <input
-                type="text"
-                id="brand"
-                placeholder="e.g. Luxe Supplements"
-                oninput="calc()"
-              />
-            </div>
-            <div class="field-group">
-              <label>Contact name</label>
-              <input
-                type="text"
-                id="contact"
-                placeholder="e.g. Sarah"
-                oninput="calc()"
-              />
-            </div>
-            <div class="field-group">
-              <label>Client email</label>
-              <input
-                type="email"
-                id="client-email"
-                placeholder="e.g. sarah@brand.com"
-              />
-              <div class="field-hint">
-                Primary contact email for sending the proposal.
-              </div>
-            </div>
-
-            <div class="field-group">
-              <label>Niche / category</label>
-              <select id="niche" onchange="applyNiche()">
-                <option value="">Select niche — auto-fills benchmarks</option>
-                <option value="supplements">Supplements & health</option>
-                <option value="fashion">Fashion & apparel</option>
-                <option value="beauty">Beauty & skincare</option>
-                <option value="homegood">Home goods & furniture</option>
-                <option value="electronics">Electronics & tech</option>
-                <option value="pet">Pet products</option>
-                <option value="custom">Custom / other</option>
-              </select>
-              <div class="info-box green" id="niche-hint"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 02 EXISTING SETUP -->
-        <div class="section">
-          <div class="section-header">
-            <span class="section-num">02</span>
-            <span class="section-title">Existing setup</span>
-            <div class="section-line"></div>
-          </div>
-          <div class="field-grid">
-            <div class="field-group">
-              <label>Current ESP / email tool</label>
-              <select
-                id="esp"
-                onchange="
-                  toggleCustomESP();
-                  calc();
-                "
+              <button
+                type="button"
+                onclick="formatDoc('formatBlock', 'BLOCKQUOTE')"
+                title="Quote"
               >
-                <option value="">Unknown / ask on call</option>
-                <option value="klaviyo">Klaviyo</option>
-                <option value="mailchimp">Mailchimp</option>
-                <option value="omnisend">Omnisend</option>
-                <option value="drip">Drip</option>
-                <option value="none">None — nothing set up</option>
-                <option value="other">Other</option>
-              </select>
-              <div class="info-box" id="esp-hint"></div>
-            </div>
-            <div class="field-group" id="custom-esp-wrap" style="display: none">
-              <label>Custom ESP Name</label>
-              <input
-                type="text"
-                id="custom-esp-name"
-                placeholder="Name of ESP"
-                oninput="saveState()"
-              />
-            </div>
-            <div class="field-group">
-              <label>Cart recovery flow running?</label>
-              <select id="existing-flow" onchange="calc()">
-                <option value="no">No — zero set up</option>
-                <option value="basic">Basic (1–2 emails only)</option>
-                <option value="partial">Partial (no SMS / no AI)</option>
-                <option value="yes">Yes — full flow running</option>
-              </select>
-              <div class="field-hint">
-                Frames the improvement delta in your pitch
-              </div>
-            </div>
-            <div
-              class="field-group"
-              id="current-rate-wrap"
-              style="display: none"
-            >
-              <label>Their current recovery rate %</label>
-              <input
-                type="number"
-                id="current-rate"
-                placeholder="e.g. 4"
-                min="0"
-                max="30"
-                oninput="calc()"
-              />
-              <div class="field-hint">
-                Baseline — your pitch is the delta above this
-              </div>
-            </div>
-            <div class="field-group">
-              <label>Recent promo / sale?</label>
-              <select id="recent-promo" onchange="calc()">
-                <option value="no">No</option>
-                <option value="within2w">Within last 2 weeks</option>
-                <option value="within1m">Within last month</option>
-              </select>
-              <div class="field-hint">
-                Recent promo suppresses recovery rates 20–30%
-              </div>
-            </div>
-          </div>
-          <div
-            class="info-box amber"
-            id="setup-hint"
-            style="margin-top: 10px"
-          ></div>
-        </div>
-
-        <!-- 03 TRAFFIC -->
-        <div class="section">
-          <div class="section-header">
-            <span class="section-num">03</span>
-            <span class="section-title">Traffic & conversion</span>
-            <div class="section-line"></div>
-          </div>
-          <div class="field-grid three">
-            <div class="field-group">
-              <label>Monthly visitors</label>
-              <input
-                type="number"
-                id="visitors"
-                placeholder="50,000"
-                oninput="calc()"
-              />
-              <div class="field-hint">Unique sessions / mo</div>
-            </div>
-            <div class="field-group">
-              <label>Add-to-cart rate %</label>
-              <input
-                type="number"
-                id="atc"
-                placeholder="7"
-                min="1"
-                max="30"
-                oninput="calc()"
-              />
-              <div class="field-hint">Avg: 5–10%</div>
-            </div>
-            <div class="field-group">
-              <label>Abandonment rate %</label>
-              <input
-                type="number"
-                id="abandon"
-                placeholder="72"
-                min="1"
-                max="99"
-                oninput="calc()"
-              />
-              <div class="field-hint">Avg: 65–80%</div>
-            </div>
-            <div class="field-group">
-              <label>Mobile traffic share %</label>
-              <input
-                type="number"
-                id="mobile-pct"
-                placeholder="e.g. 65"
-                min="0"
-                max="100"
-                oninput="calc()"
-              />
-              <div class="field-hint">
-                Mobile abandons at ~88% vs ~65% desktop
-              </div>
-            </div>
-            <div class="field-group">
-              <label>Paid traffic share %</label>
-              <input
-                type="number"
-                id="paid-pct"
-                placeholder="e.g. 40"
-                min="0"
-                max="100"
-                oninput="calc()"
-              />
-              <div class="field-hint">Paid recovers better — higher intent</div>
-            </div>
-            <div class="field-group">
-              <label>Store conversion rate %</label>
-              <input
-                type="number"
-                id="conv-rate"
-                placeholder="e.g. 2.5"
-                step="0.1"
-                max="100"
-                oninput="calc()"
-              />
-              <div class="field-hint">From GA4 or Shopify dashboard</div>
-            </div>
-          </div>
-          <div
-            class="info-box amber"
-            id="traffic-hint"
-            style="margin-top: 10px"
-          ></div>
-        </div>
-
-        <!-- 04 REVENUE CROSS-CHECK -->
-        <div class="section">
-          <div class="section-header">
-            <span class="section-num">04</span>
-            <span class="section-title">Revenue cross-check</span>
-            <div class="section-line"></div>
-          </div>
-          <div class="field-grid">
-            <div class="field-group full">
-              <label
-                >Reported monthly revenue (<span class="cur-sym">$</span
-                >)</label
-              >
-              <input
-                type="number"
-                id="rev-reported"
-                placeholder="What they tell you — e.g. 150000"
-                oninput="calc()"
-              />
-              <div class="field-hint">
-                Cross-checks against traffic × AOV × conv rate — flags
-                discrepancies
-              </div>
-              <div class="rev-check" id="rev-check"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 05 AOV SIGNALS -->
-        <div class="section">
-          <div class="section-header">
-            <span class="section-num">05</span>
-            <span class="section-title">AOV signals</span>
-            <div class="section-line"></div>
-          </div>
-          <div class="field-grid">
-            <div class="field-group">
-              <label>Known AOV (<span class="cur-sym">$</span>)</label>
-              <input
-                type="number"
-                id="aov-known"
-                placeholder="Leave blank to estimate"
-                oninput="calc()"
-              />
-              <div class="field-hint">Overrides all estimates below</div>
-            </div>
-            <div class="field-group">
-              <label
-                >Catalog price range (<span class="cur-sym">$</span>)</label
-              >
-              <div style="display: flex; gap: 8px">
-                <input
-                  type="number"
-                  id="price-range-low"
-                  placeholder="Low"
-                  min="0"
-                  oninput="updatePriceRange()"
-                />
-                <input
-                  type="number"
-                  id="price-range-high"
-                  placeholder="High"
-                  min="0"
-                  oninput="updatePriceRange()"
-                />
-              </div>
-              <input type="hidden" id="price-range" value="" />
-              <div class="field-hint">Low to high end</div>
-            </div>
-            <div class="field-group">
-              <label>Avg items per order</label>
-              <input
-                type="number"
-                id="items"
-                placeholder="2"
-                min="1"
-                max="20"
-                step="0.5"
-                oninput="calc()"
-              />
-              <div class="field-hint">From Shopify analytics</div>
-            </div>
-            <div class="field-group">
-              <label
-                >Free shipping threshold (<span class="cur-sym">$</span>)</label
-              >
-              <input
-                type="number"
-                id="freeship"
-                placeholder="e.g. 75"
-                oninput="calc()"
-              />
-              <div class="field-hint">Anchors AOV near this number</div>
-            </div>
-            <div class="field-group">
-              <label>Subscription model?</label>
-              <select id="subscription" onchange="calc()">
-                <option value="no">No</option>
-                <option value="some">Some (mixed)</option>
-                <option value="yes">Yes — primary model</option>
-              </select>
-              <div class="field-hint">Subs lower AOV, raise LTV</div>
-            </div>
-            <div class="field-group">
-              <label>Bundles / upsells at checkout?</label>
-              <select id="bundles" onchange="calc()">
-                <option value="no">No</option>
-                <option value="yes">Yes</option>
-              </select>
-              <div class="field-hint">Pushes AOV up 20–40%</div>
-            </div>
-          </div>
-          <div class="aov-confidence" id="aov-confidence"></div>
-        </div>
-
-        <!-- 06 LTV SIGNALS -->
-        <div class="section">
-          <div class="section-header">
-            <span class="section-num">06</span>
-            <span class="section-title">LTV signals</span>
-            <div class="section-line"></div>
-          </div>
-          <div class="field-grid three">
-            <div class="field-group">
-              <label>Repeat purchase rate %</label>
-              <input
-                type="number"
-                id="repeat-rate"
-                placeholder="e.g. 35"
-                min="0"
-                max="100"
-                oninput="calc()"
-              />
-              <div class="field-hint">
-                Higher = each recovered cart worth more in lifetime value
-              </div>
-            </div>
-            <div class="field-group">
-              <label>Refund / return rate %</label>
-              <input
-                type="number"
-                id="refund-rate"
-                placeholder="e.g. 8"
-                min="0"
-                max="100"
-                oninput="calc()"
-              />
-              <div class="field-hint">
-                Deflates actual recovered revenue — shown in net calc
-              </div>
-            </div>
-            <div class="field-group">
-              <label>Peak season timing</label>
-              <select id="peak-season" onchange="calc()">
-                <option value="none">No major peak</option>
-                <option value="bfcm">Black Friday / Cyber Monday</option>
-                <option value="holiday">Holiday / Christmas</option>
-                <option value="summer">Summer</option>
-                <option value="valentines">Valentine's Day</option>
-                <option value="other">Other peak coming</option>
-              </select>
-              <div class="field-hint">Peak urgency amplifies your close</div>
-            </div>
-          </div>
-          <div
-            class="info-box amber"
-            id="ltv-hint"
-            style="margin-top: 10px"
-          ></div>
-        </div>
-
-        <!-- 07 RECOVERY METRICS & COSTS -->
-        <div class="section">
-          <div class="section-header">
-            <span class="section-num">07</span>
-            <span class="section-title">Recovery strategy & costs</span>
-            <div class="section-line"></div>
-          </div>
-          <div class="slider-wrap" style="margin-bottom: 24px">
-            <div class="slider-labels">
-              <span>Conservative (8%)</span>
-              <span>Strong (12–15%)</span>
-              <span>Best case (20%)</span>
-            </div>
-            <input
-              type="range"
-              id="recovery"
-              min="3"
-              max="20"
-              value="8"
-              step="1"
-              oninput="calc()"
-            />
-            <div class="slider-val" id="recovery-out">8%</div>
-          </div>
-          <div
-            class="field-grid three"
-            style="grid-template-columns: repeat(2, 1fr)"
-          >
-            <div class="field-group">
-              <label>Average discount offered %</label>
-              <input
-                type="number"
-                id="discount-offered"
-                placeholder="e.g. 10"
-                min="0"
-                max="100"
-                oninput="calc()"
-              />
-              <div class="field-hint">
-                In recovery emails — lowers recouped revenue
-              </div>
-            </div>
-            <div class="field-group">
-              <label>Discount Code</label>
-              <input
-                type="text"
-                id="discount-code"
-                placeholder="e.g. SAVE10"
-                oninput="calc()"
-              />
-              <div class="field-hint">
-                Number in code applied as % off if Average is 0
-              </div>
-            </div>
-            <div class="field-group">
-              <label>SMS Recovery Enabled?</label>
-              <select id="sms-enabled" onchange="calc()">
-                <option value="no">No</option>
-                <option value="yes">Yes</option>
-              </select>
-              <div class="field-hint">SMS boosts recovery rates by 2–4%</div>
-            </div>
-            <div class="field-group">
-              <label
-                >Software / ESP costs (<span class="cur-sym">$</span>/mo)</label
-              >
-              <input
-                type="number"
-                id="software-cost"
-                placeholder="e.g. 150"
-                min="0"
-                oninput="calc()"
-              />
-              <div class="field-hint">
-                Klaviyo/Mailchimp fees — factored into Net ROI
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 08 TIER -->
-        <div class="section">
-          <div class="section-header">
-            <span class="section-num">08</span>
-            <span class="section-title">Select retainer tier</span>
-            <div class="section-line"></div>
-          </div>
-          <div class="tier-grid">
-            <div class="tier-card" id="t1" onclick="selectTier(1)">
-              <div
-                class="tier-name"
-                style="
-                  display: flex;
-                  align-items: center;
-                  justify-content: space-between;
-                "
-              >
-                Starter
-                <span class="tooltip-wrap" onclick="event.stopPropagation()">
-                  <svg
-                    class="tooltip-icon"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                  </svg>
-                  <span class="tooltip-content">
-                    Includes basic set up of a 3-part abandoned cart email
-                    sequence, 1 SMS recovery touchpoint, and a monthly
-                    performance report outlining recovered revenue.
-                  </span>
-                </span>
-              </div>
-              <div class="tier-price">
-                <span class="cur-sym">$</span
-                ><input
-                  type="number"
-                  id="t1-price-input"
-                  value="1500"
-                  class="price-input"
-                  onclick="event.stopPropagation()"
-                  oninput="updateTierPrice(1, this.value)"
-                /><sub>/mo</sub>
-              </div>
-              <div class="tier-features">
-                <div class="tier-feature">3-email cart sequence</div>
-                <div class="tier-feature">1 SMS recovery touch</div>
-                <div class="tier-feature">Monthly performance report</div>
-              </div>
-            </div>
-            <div class="tier-card active" id="t2" onclick="selectTier(2)">
-              <div
-                class="tier-name"
-                style="
-                  display: flex;
-                  align-items: center;
-                  justify-content: space-between;
-                "
-              >
-                Growth
-                <span class="tooltip-wrap" onclick="event.stopPropagation()">
-                  <svg
-                    class="tooltip-icon"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                  </svg>
-                  <span class="tooltip-content">
-                    Includes advanced cart and browse abandonment flows,
-                    continuous AI-driven A/B testing on subject lines and
-                    content, and a 1-on-1 monthly strategy call.
-                  </span>
-                </span>
-              </div>
-              <div class="tier-price">
-                <span class="cur-sym">$</span
-                ><input
-                  type="number"
-                  id="t2-price-input"
-                  value="3000"
-                  class="price-input"
-                  onclick="event.stopPropagation()"
-                  oninput="updateTierPrice(2, this.value)"
-                /><sub>/mo</sub>
-              </div>
-              <div class="tier-features">
-                <div class="tier-feature">Cart + browse flows</div>
-                <div class="tier-feature">AI A/B testing</div>
-                <div class="tier-feature">Monthly strategy call</div>
-              </div>
-            </div>
-            <div class="tier-card" id="t3" onclick="selectTier(3)">
-              <div
-                class="tier-name"
-                style="
-                  display: flex;
-                  align-items: center;
-                  justify-content: space-between;
-                "
-              >
-                Pro
-                <span class="tooltip-wrap" onclick="event.stopPropagation()">
-                  <svg
-                    class="tooltip-icon"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                  </svg>
-                  <span class="tooltip-content">
-                    Includes all Growth features, plus post-purchase and winback
-                    flows, dedicated Slack channel support, and custom roadmap
-                    planning.
-                  </span>
-                </span>
-              </div>
-              <div class="tier-price">
-                <span class="cur-sym">$</span
-                ><input
-                  type="number"
-                  id="t3-price-input"
-                  value="6500"
-                  class="price-input"
-                  onclick="event.stopPropagation()"
-                  oninput="updateTierPrice(3, this.value)"
-                /><sub>/mo</sub>
-              </div>
-              <div class="tier-features">
-                <div class="tier-feature">All Growth features</div>
-                <div class="tier-feature">Post-purchase + winback</div>
-                <div class="tier-feature">Dedicated Slack + roadmap</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 09 PROPOSAL SETTINGS -->
-        <div class="section">
-          <div class="section-header">
-            <span class="section-num">09</span>
-            <span class="section-title">Proposal settings</span>
-            <div class="section-line"></div>
-          </div>
-          <div class="field-grid">
-            <div class="field-group full">
-              <label>Proposal Template</label>
-              <select id="proposal-template" onchange="resetProposal()">
-                <option value="standard">Standard Template</option>
-                <option value="aggressive">Aggressive / Hard Sell</option>
-                <option value="short">Short & Sweet</option>
-                <option value="data_driven">Data-Driven Report</option>
-                <option value="concise">Concise Summary</option>
-              </select>
-            </div>
-            <div class="field-group">
-              <label>Your name / agency</label>
-              <input
-                type="text"
-                id="your-name"
-                placeholder="e.g. Nimrod / ZylobotAI"
-                oninput="calc()"
-              />
-            </div>
-            <div class="field-group">
-              <label>Offer expiry date</label>
-              <input type="text" id="expiry" />
-              <div class="field-hint">Creates urgency — auto-set to 7 days</div>
-            </div>
-            <div class="field-group full">
-              <label>Case study / testimonial (optional)</label>
-              <input
-                type="text"
-                id="testimonial"
-                placeholder='"We recovered $18K in 60 days." — Jake, FitFuel'
-                oninput="calc()"
-              />
-              <div class="field-hint">
-                Paste a short quote — embeds automatically in the proposal
-              </div>
-            </div>
-          </div>
-          <div class="testimonial-preview" id="testimonial-preview">
-            <div class="t-quote" id="t-quote"></div>
-            <div class="t-author" id="t-author"></div>
-          </div>
-        </div>
-      </div>
-      <!-- /left -->
-
-      <!-- ═══ RIGHT ═══ -->
-      <div class="right">
-        <div class="right-logo">Recovery Intelligence</div>
-
-        <div class="roi-hero">
-          <div class="roi-label">Recoverable revenue / month</div>
-          <div class="roi-main empty" id="roi-hero">—</div>
-          <div class="roi-sub" id="roi-sub">
-            Fill in the inputs to see your projection
-          </div>
-        </div>
-
-        <div class="metric-list">
-          <div class="metric-row">
-            <span class="metric-key">Abandoned carts / mo</span
-            ><span class="metric-val muted" id="m-carts">—</span>
-          </div>
-          <div class="metric-row">
-            <span class="metric-key">Effective abandonment rate</span
-            ><span class="metric-val muted" id="m-eff-abandon">—</span>
-          </div>
-          <div class="metric-row">
-            <span class="metric-key"
-              >Estimated AOV
-              <span
-                id="m-aov-ind"
-                class="aov-ind"
-                style="display: none"
-              ></span></span
-            ><span class="metric-val muted" id="m-aov">—</span>
-          </div>
-          <div class="metric-row">
-            <span class="metric-key">Gross revenue left on table</span
-            ><span class="metric-val muted" id="m-lost">—</span>
-          </div>
-          <div class="metric-row">
-            <span class="metric-key">Net after refunds</span
-            ><span class="metric-val muted" id="m-net">—</span>
-          </div>
-          <div class="metric-row">
-            <span class="metric-key">Recoverable / mo (net)</span
-            ><span class="metric-val green" id="m-recover">—</span>
-          </div>
-          <div class="metric-row">
-            <span class="metric-key">Delta vs. current flow</span
-            ><span class="metric-val muted" id="m-delta">—</span>
-          </div>
-          <div class="metric-row">
-            <span class="metric-key">LTV-adjusted value / cart</span
-            ><span class="metric-val muted" id="m-ltv">—</span>
-          </div>
-          <div class="metric-row">
-            <span class="metric-key" style="display: flex; align-items: center">
-              <span id="m-roi-label">ROI on retainer</span>
-              <span class="tooltip-wrap">
                 <svg
-                  class="tooltip-icon"
                   xmlns="http://www.w3.org/2000/svg"
-                  width="12"
-                  height="12"
+                  width="14"
+                  height="14"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -2145,333 +2590,228 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <line x1="12" y1="16" x2="12" y2="12"></line>
-                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                  <path
+                    d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"
+                  ></path>
+                  <path
+                    d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"
+                  ></path>
                 </svg>
-                <span class="tooltip-content" id="m-roi-tooltip">
-                  Calculated as: (Recovered Revenue - Retainer Costs - Software
-                  Costs - Discount Adjustments) / (Retainer + Software Costs). A
-                  net positive return after all expenses are factored in.
-                </span>
-              </span> </span
-            ><span class="metric-val gold" id="m-roi">—</span>
-          </div>
-          <div class="metric-row">
-            <span class="metric-key">Payback period</span
-            ><span class="metric-val muted" id="m-payback">—</span>
-          </div>
-          <div class="metric-row">
-            <span class="metric-key">Revenue cross-check</span
-            ><span class="metric-val muted" id="m-crosscheck">—</span>
-          </div>
-          <div class="metric-row">
-            <span class="metric-key">Peak season urgency</span
-            ><span class="metric-val muted" id="m-peak">—</span>
-          </div>
-        </div>
-
-        <div class="aov-confidence" id="aov-confidence-right"></div>
-
-        <div class="proposal-section">
-          <div class="proposal-label">
-            <span>Proposal preview</span>
-          </div>
-          <div class="editor-toolbar">
-            <button type="button" onclick="formatDoc('undo')" title="Undo">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+              </button>
+              <span class="toolbar-divider"></span>
+              <button
+                type="button"
+                onclick="insertTemplateElement('table')"
+                title="Insert Table"
               >
-                <path d="M3 7v6h6"></path>
-                <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path>
-              </svg>
-            </button>
-            <button type="button" onclick="formatDoc('redo')" title="Redo">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M3 3h18v18H3z"></path>
+                  <path d="M3 9h18"></path>
+                  <path d="M3 15h18"></path>
+                  <path d="M9 3v18"></path>
+                  <path d="M15 3v18"></path>
+                </svg>
+              </button>
+              <button
+                type="button"
+                onclick="insertTemplateElement('image')"
+                title="Insert Image"
               >
-                <path d="M21 7v6h-6"></path>
-                <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"></path>
-              </svg>
-            </button>
-            <span class="toolbar-divider"></span>
-            <button type="button" onclick="formatDoc('bold')" title="Bold">
-              <b>B</b>
-            </button>
-            <button type="button" onclick="formatDoc('italic')" title="Italic">
-              <i>I</i>
-            </button>
-            <button
-              type="button"
-              onclick="formatDoc('underline')"
-              title="Underline"
-            >
-              <u>U</u>
-            </button>
-            <button
-              type="button"
-              onclick="formatDoc('strikeThrough')"
-              title="Strikethrough"
-            >
-              <s>S</s>
-            </button>
-            <span class="toolbar-divider"></span>
-            <button
-              type="button"
-              onclick="formatDoc('formatBlock', 'H3')"
-              title="Heading"
-            >
-              <b>H3</b>
-            </button>
-            <button
-              type="button"
-              onclick="formatDoc('formatBlock', 'P')"
-              title="Paragraph"
-            >
-              <b>P</b>
-            </button>
-            <button
-              type="button"
-              onclick="formatDoc('insertOrderedList')"
-              title="Numbered List"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                  <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+              </button>
+              <button
+                type="button"
+                onclick="insertTemplateElement('branding')"
+                title="Insert Branding Block"
               >
-                <line x1="10" y1="6" x2="21" y2="6"></line>
-                <line x1="10" y1="12" x2="21" y2="12"></line>
-                <line x1="10" y1="18" x2="21" y2="18"></line>
-                <path d="M4 6h1v4"></path>
-                <path d="M4 10h2"></path>
-                <path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"></path>
-              </svg>
-            </button>
-            <button
-              type="button"
-              onclick="formatDoc('formatBlock', 'BLOCKQUOTE')"
-              title="Quote"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path
-                  d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"
-                ></path>
-                <path
-                  d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"
-                ></path>
-              </svg>
-            </button>
-            <span class="toolbar-divider"></span>
-            <button
-              type="button"
-              onclick="insertTemplateElement('table')"
-              title="Insert Table"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M3 3h18v18H3z"></path>
-                <path d="M3 9h18"></path>
-                <path d="M3 15h18"></path>
-                <path d="M9 3v18"></path>
-                <path d="M15 3v18"></path>
-              </svg>
-            </button>
-            <button
-              type="button"
-              onclick="insertTemplateElement('image')"
-              title="Insert Image"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                <polyline points="21 15 16 10 5 21"></polyline>
-              </svg>
-            </button>
-            <button
-              type="button"
-              onclick="insertTemplateElement('branding')"
-              title="Insert Branding Block"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-                <polyline points="2 17 12 22 22 17"></polyline>
-                <polyline points="2 12 12 17 22 12"></polyline>
-              </svg>
-            </button>
-            <span class="toolbar-divider"></span>
-            <select
-              class="toolbar-select"
-              onchange="
-                if (this.value) {
-                  insertMergeTag(this.value);
-                  this.value = '';
-                }
-              "
-              title="Insert Merge Tag"
-            >
-              <option value="">Insert Tag...</option>
-              <option value="[Brand Name]">Brand Name</option>
-              <option value="[Contact Name]">Contact Name</option>
-              <option value="[Recovered Revenue]">Recovered Revenue</option>
-              <option value="[Store URL]">Store URL</option>
-              <option value="[Niche]">Niche</option>
-              <option value="[Monthly Visitors]">Monthly Visitors</option>
-            </select>
-            <span
-              class="proposal-label-hint"
-              id="edit-hint"
-              style="display: none; color: var(--warn); margin-left: auto"
-            >
-              Manual edits active (<a
-                href="#"
-                onclick="
-                  resetProposal();
-                  return false;
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                  <polyline points="2 17 12 22 22 17"></polyline>
+                  <polyline points="2 12 12 17 22 12"></polyline>
+                </svg>
+              </button>
+              <span class="toolbar-divider"></span>
+              <select
+                class="toolbar-select"
+                onchange="
+                  if (this.value) {
+                    insertMergeTag(this.value);
+                    this.value = '';
+                  }
                 "
-                style="color: inherit"
-                >Reset</a
-              >)
-            </span>
-          </div>
-          <div
-            class="proposal-text"
-            id="proposal-text"
-            contenteditable="true"
-            spellcheck="false"
-            oninput="handleProposalEdit()"
-          >
-            <p class="p-lead placeholder-text">Hey [Contact],</p>
-            <p class="placeholder-text">
-              Fill in the inputs on the left to generate your personalised
-              proposal.
-            </p>
-          </div>
-          <div class="btn-row">
-            <button class="btn btn-primary" onclick="copyROI()">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                title="Insert Merge Tag"
               >
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                <path
-                  d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
-                ></path>
-              </svg>
-              ROI
-            </button>
-            <button class="btn btn-primary" onclick="savePdf()">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                <option value="">Insert Tag...</option>
+                <option value="[Brand Name]">Brand Name</option>
+                <option value="[Contact Name]">Contact Name</option>
+                <option value="[Recovered Revenue]">Recovered Revenue</option>
+                <option value="[Store URL]">Store URL</option>
+                <option value="[Niche]">Niche</option>
+                <option value="[Monthly Visitors]">Monthly Visitors</option>
+              </select>
+              <span
+                class="proposal-label-hint"
+                id="edit-hint"
+                style="display: none; color: var(--warn); margin-left: auto"
               >
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="7 10 12 15 17 10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
-              </svg>
-              PDF
-            </button>
-            <button class="btn btn-primary" onclick="emailProposal()">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path
-                  d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
-                ></path>
-                <polyline points="22,6 12,13 2,6"></polyline>
-              </svg>
-              Email
-            </button>
+                Manual edits active (<a
+                  href="#"
+                  onclick="
+                    resetProposal();
+                    return false;
+                  "
+                  style="color: inherit"
+                  >Reset</a
+                >)
+              </span>
+            </div>
+            <div
+              class="proposal-text"
+              id="proposal-text"
+              contenteditable="true"
+              spellcheck="false"
+              oninput="handleProposalEdit()"
+            >
+              <p class="p-lead placeholder-text">Hey [Contact],</p>
+              <p class="placeholder-text">
+                Fill in the inputs on the left to generate your personalised
+                proposal.
+              </p>
+            </div>
           </div>
-          <div class="copy-feedback" id="copy-feedback"></div>
+          <div class="actions-wrapper">
+              <div class="btn-row">
+                <button class="btn btn-primary" onclick="exportCSV()">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  CSV
+                </button>
+                <button class="btn btn-primary" onclick="savePdf()">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  PDF
+                </button>
+                <button class="btn btn-primary" onclick="emailProposal()">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path
+                      d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                    ></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                  </svg>
+                  Email
+                </button>
+              </div>
+              <div class="btn-row" style="margin-top: 8px">
+                <button
+                  class="btn btn-primary"
+                  onclick="copyProposal()"
+                  style="width: 100%"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <rect
+                      x="9"
+                      y="9"
+                      width="13"
+                      height="13"
+                      rx="2"
+                      ry="2"
+                    ></rect>
+                    <path
+                      d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                    ></path>
+                  </svg>
+                  Copy Proposal
+                </button>
+              </div>
+            </div>
+            <div class="copy-feedback" id="copy-feedback"></div>
+          </div>
         </div>
+        <!-- /right -->
       </div>
-      <!-- /right -->
+      <!-- /app -->
     </div>
-    <!-- /app -->
+    <!-- /main-layout -->
 
     <!-- Competitor Insights Modal -->
     <div
@@ -3294,6 +3634,15 @@
             paybackDays + " days";
           document.getElementById("m-payback").className = "metric-val";
 
+          var indEl = document.getElementById("discount-impact-indicator");
+          if (discountOffered > 0 && recoveredRaw > 0) {
+            var diff = recoveredRaw - recovered;
+            indEl.innerHTML = "<strong>Impact:</strong> Lowers recouped revenue by " + fmt(diff) + " per month.";
+            indEl.style.display = "block";
+          } else {
+            indEl.style.display = "none";
+          }
+
           if (revReported > 0) {
             var impliedR =
               visitors *
@@ -3336,6 +3685,8 @@
             document.getElementById(id).className = "metric-val muted";
           });
           document.getElementById("m-aov-ind").style.display = "none";
+          var indEl = document.getElementById("discount-impact-indicator");
+          if (indEl) indEl.style.display = "none";
         }
 
         // Build proposal
@@ -3623,43 +3974,81 @@
         });
       }
 
-      function copyROI() {
+      function exportCSV() {
         var brand = document.getElementById("brand").value || "Brand";
         var t = tiers[tier];
-        var rows = [
-          "=== ROI Projection: " + brand + " ===",
-          "Abandoned carts/mo:         " +
+
+        var escapeCsv = function (str) {
+          if (str == null) return '""';
+          str = str.toString().replace(/"/g, '""');
+          if (str.search(/("|,|\n)/g) >= 0) {
+            str = '"' + str + '"';
+          }
+          return str;
+        };
+
+        var data = [
+          ["Metric", "Value"],
+          ["Brand", brand],
+          [
+            "Abandoned carts/mo",
             document.getElementById("m-carts").textContent,
-          "Effective abandonment:      " +
+          ],
+          [
+            "Effective abandonment",
             document.getElementById("m-eff-abandon").textContent,
-          "Estimated AOV:              " +
-            document.getElementById("m-aov").textContent,
-          "Gross revenue left on table:" +
+          ],
+          ["Estimated AOV", document.getElementById("m-aov").textContent],
+          [
+            "Gross revenue left on table",
             document.getElementById("m-lost").textContent,
-          "Net after refunds:          " +
-            document.getElementById("m-net").textContent,
-          "Recoverable/mo (net):       " +
+          ],
+          ["Net after refunds", document.getElementById("m-net").textContent],
+          [
+            "Recoverable/mo (net)",
             document.getElementById("m-recover").textContent,
-          "Delta vs current flow:      " +
+          ],
+          [
+            "Delta vs current flow",
             document.getElementById("m-delta").textContent,
-          "LTV-adjusted value/cart:    " +
+          ],
+          [
+            "LTV-adjusted value/cart",
             document.getElementById("m-ltv").textContent,
-          "ROI on " +
-            t.name +
-            " (" +
-            fmt(t.price) +
-            "/mo): " +
+          ],
+          [
+            "ROI on " + t.name + " (" + fmt(t.price) + "/mo)",
             document.getElementById("m-roi").textContent,
-          "Payback period:             " +
-            document.getElementById("m-payback").textContent,
-          "Revenue cross-check:        " +
+          ],
+          ["Payback period", document.getElementById("m-payback").textContent],
+          [
+            "Revenue cross-check",
             document.getElementById("m-crosscheck").textContent,
-          "Peak season:                " +
-            document.getElementById("m-peak").textContent,
+          ],
+          ["Peak season", document.getElementById("m-peak").textContent],
+          ["Proposal Text", getProposalText()],
         ];
-        navigator.clipboard.writeText(rows.join("\n")).then(function () {
-          showFeedback("ROI sheet copied");
-        });
+
+        var csvContent = data
+          .map(function (e) {
+            return e.map(escapeCsv).join(",");
+          })
+          .join("\n");
+
+        var blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        var url = URL.createObjectURL(blob);
+
+        var link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute(
+          "download",
+          brand.replace(/\s+/g, "_").toLowerCase() + "_roi_projection.csv",
+        );
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        showFeedback("CSV Exported");
       }
 
       function emailProposal() {
@@ -3682,7 +4071,9 @@
 
       function savePdf() {
         var element = document.querySelector(".right");
-        var btnRow = document.querySelector(".btn-row");
+        var btnRow =
+          document.querySelector(".actions-wrapper") ||
+          document.querySelector(".btn-row");
         var feedback = document.getElementById("copy-feedback");
 
         // Temporarily modify styles for full capture
@@ -4052,6 +4443,9 @@ Provide a 1-2 sentence recommendation specifying realistic estimates for these m
           brand: document.getElementById("brand").value,
           contact: document.getElementById("contact").value,
           "client-email": document.getElementById("client-email").value,
+          "client-social": document.getElementById("client-social")
+            ? document.getElementById("client-social").value
+            : "",
           visitors: document.getElementById("visitors").value,
           "aov-known": document.getElementById("aov-known").value,
           items: document.getElementById("items").value,
@@ -4082,13 +4476,11 @@ Provide a 1-2 sentence recommendation specifying realistic estimates for these m
           proposalManuallyEdited: proposalManuallyEdited,
         };
         localStorage.setItem("cartRecoveryCalcState", JSON.stringify(state));
-        showFeedback("State saved to browser");
       }
 
       function loadState() {
         var saved = localStorage.getItem("cartRecoveryCalcState");
         if (!saved) {
-          alert("No saved state found.");
           return;
         }
         try {
@@ -4099,6 +4491,7 @@ Provide a 1-2 sentence recommendation specifying realistic estimates for these m
             "brand",
             "contact",
             "client-email",
+            "client-social",
             "visitors",
             "aov-known",
             "items",
@@ -4156,13 +4549,128 @@ Provide a 1-2 sentence recommendation specifying realistic estimates for these m
             document.getElementById("proposal-text").innerHTML =
               state["proposal-text"];
           }
-
-          showFeedback("State loaded");
         } catch (e) {
           console.error(e);
-          alert("Error loading state.");
         }
       }
+
+      // --- Sidebar Navigation ---
+      function toggleSidebar() {
+        var sidebar = document.querySelector(".sidebar");
+        if (sidebar) {
+          sidebar.classList.toggle("collapsed");
+        }
+      }
+
+      function initSidebar() {
+        if (window.innerWidth <= 960) {
+          var sidebar = document.querySelector(".sidebar");
+          if (sidebar) {
+            sidebar.classList.add("collapsed");
+          }
+        }
+      }
+      initSidebar();
+      window.addEventListener("resize", function () {
+        if (window.innerWidth > 960) {
+          var sidebar = document.querySelector(".sidebar");
+          if (sidebar && sidebar.classList.contains("collapsed")) {
+            sidebar.classList.remove("collapsed");
+          }
+        }
+      });
+      document.addEventListener("DOMContentLoaded", initSidebar);
+
+      function navTo(e, sectionId) {
+        e.preventDefault();
+        var section = document.getElementById(sectionId);
+        if (section) {
+          if (section.tagName === "DETAILS") {
+            section.setAttribute("open", "true");
+          }
+          if (window.innerWidth <= 960) {
+            var appNode = document.querySelector(".app");
+            appNode.scrollTo({
+              top: section.offsetTop - 32,
+              behavior: "smooth",
+            });
+            // Update active state manually
+            var links = document.querySelectorAll(".sidebar-link");
+            links.forEach(function (link) {
+              link.classList.remove("active");
+              if (link.getAttribute("href") === "#" + sectionId) {
+                link.classList.add("active");
+              }
+            });
+            if (window.innerWidth <= 960) {
+              var sidebar = document.querySelector(".sidebar");
+              if (sidebar && !sidebar.classList.contains("collapsed")) {
+                sidebar.classList.add("collapsed");
+              }
+            }
+          } else {
+            var leftPane = document.getElementById("left-pane");
+            if (leftPane && leftPane.contains(section)) {
+              leftPane.scrollTo({
+                top: section.offsetTop - 32, // Padding offset
+                behavior: "smooth",
+              });
+            }
+          }
+        }
+      }
+
+      function updateActiveSection() {
+        var isMobile = window.innerWidth <= 960;
+        var scrollContainer = isMobile
+          ? document.querySelector(".app")
+          : document.getElementById("left-pane");
+        if (!scrollContainer) return;
+
+        var scrollPos = scrollContainer.scrollTop + 100;
+        var sections = isMobile
+          ? document.querySelectorAll(".section, #sec-08")
+          : document.querySelectorAll(".left .section");
+
+        var currentSectionId = null;
+        for (var i = 0; i < sections.length; i++) {
+          if (sections[i].offsetTop <= scrollPos) {
+            currentSectionId = sections[i].id;
+          }
+        }
+
+        if (currentSectionId) {
+          var links = document.querySelectorAll(".sidebar-link");
+          links.forEach(function (link) {
+            link.classList.remove("active");
+            if (link.getAttribute("href") === "#" + currentSectionId) {
+              link.classList.add("active");
+            }
+          });
+        }
+      }
+
+      // Add scroll listener to .app for mobile
+      document.addEventListener("DOMContentLoaded", function () {
+        document
+          .querySelector(".app")
+          .addEventListener("scroll", updateActiveSection);
+          
+        // Load initial state
+        loadState();
+        
+        // Autosave logic
+        document.addEventListener("input", function(e) {
+          if (["INPUT", "SELECT", "TEXTAREA"].indexOf(e.target.tagName) !== -1 || e.target.isContentEditable) {
+            saveState();
+          }
+        });
+        document.addEventListener("change", function(e) {
+          if (["INPUT", "SELECT", "TEXTAREA"].indexOf(e.target.tagName) !== -1 || e.target.isContentEditable) {
+            saveState();
+          }
+        });
+      });
     </script>
   </body>
 </html>
