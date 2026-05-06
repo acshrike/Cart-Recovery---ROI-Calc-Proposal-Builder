@@ -3572,6 +3572,13 @@
         }
       }
 
+      function wrapPlaceholder(val, placeholder) {
+        if (!val || val.trim() === "" || val.trim() === "[" + placeholder + "]") {
+          return '<span class="placeholder-text">[' + placeholder + ']</span>';
+        }
+        return val;
+      }
+
       function calc() {
         [
           "current-rate",
@@ -3796,9 +3803,13 @@
           window.currentAovAiRecKey = null;
         }
 
-        var brand = document.getElementById("brand").value || "[Brand]";
-        var contact = document.getElementById("contact").value || "[Contact]";
-        var yourName = document.getElementById("your-name").value || "";
+        var rawBrand = document.getElementById("brand").value;
+        var rawContact = document.getElementById("contact").value;
+        var rawYourName = document.getElementById("your-name").value;
+
+        var brand = wrapPlaceholder(rawBrand, "Brand");
+        var contact = wrapPlaceholder(rawContact, "Contact");
+        var yourName = wrapPlaceholder(rawYourName, "Your Name");
         var expiry = document.getElementById("expiry").value;
         var testimonial = document.getElementById("testimonial").value || "";
         var t = tiers[tier];
@@ -4166,11 +4177,7 @@
 
         if (pTpl === "standard") {
           html =
-            '<p class="p-lead">Hey ' +
-            (contact !== "[Contact]"
-              ? contact
-              : '<span class="placeholder-text">[Contact]</span>') +
-            ",</p>";
+            '<p class="p-lead">Hey ' + contact + ",</p>";
           if (flowLine) html += "<p>" + flowLine + "</p>";
           if (nicheLine) html += "<p>" + nicheLine + "</p>";
           if (espLine) html += "<p>" + espLine + "</p>";
@@ -4188,46 +4195,38 @@
             html +=
               " If you want the full stack — post-purchase flows, winbacks, and dedicated support — the <strong>" +
               higherTier.name +
-              "</strong> plan at " +
+              "</strong> plan at <strong>" +
               fmt(higherTier.price) +
-              "/mo covers all of that.";
+              "</strong>/mo covers all of that.";
           html += "</p>";
           html +=
             '<p class="p-price">Investment: ' + fmt(t.price) + "/month.</p>";
         } else if (pTpl === "aggressive") {
           html =
-            '<p class="p-lead">Hey ' +
-            (contact !== "[Contact]"
-              ? contact
-              : '<span class="placeholder-text">[Contact]</span>') +
-            ",</p>";
+            '<p class="p-lead">Hey ' + contact + ",</p>";
           html +=
             "<p>Right now, you are leaving <strong>" +
             fmt(netLost) +
-            "/month</strong> on the table due to cart abandonment. We can capture " +
+            "/month</strong> on the table due to cart abandonment. We can capture <strong>" +
             fmt(recovered) +
-            " of that immediately with AI-driven flows.</p>";
+            "</strong> of that immediately with AI-driven flows.</p>";
           html +=
             "<p>Your ROI on the <strong>" +
             t.name +
-            "</strong> plan is a massive " +
+            "</strong> plan is a massive <strong>" +
             roi +
-            "x. That means the investment (" +
+            "x</strong>. That means the investment (<strong>" +
             fmt(t.price) +
-            "/mo) pays for itself in just " +
+            "</strong>/mo) pays for itself in just <strong>" +
             paybackDays +
-            " days.</p>";
+            " days</strong>.</p>";
           html +=
             '<p class="p-price">Ready to stop losing revenue? Investment: ' +
             fmt(t.price) +
             "/month.</p>";
         } else if (pTpl === "short") {
           html =
-            '<p class="p-lead">Hi ' +
-            (contact !== "[Contact]"
-              ? contact
-              : '<span class="placeholder-text">[Contact]</span>') +
-            ",</p>";
+            '<p class="p-lead">Hi ' + contact + ",</p>";
           html +=
             "<p>Based on your store data, a well-optimised cart recovery setup will generate an additional <strong>" +
             fmt(recovered) +
@@ -4235,18 +4234,14 @@
           html +=
             "<p>We handle the strategy, copy, and technical setup under our <strong>" +
             t.name +
-            "</strong> plan for " +
+            "</strong> plan for <strong>" +
             fmt(t.price) +
-            "/mo.</p>";
+            "</strong>/mo.</p>";
         } else if (pTpl === "data_driven") {
           html =
-            '<p class="p-lead">Hi ' +
-            (contact !== "[Contact]"
-              ? contact
-              : '<span class="placeholder-text">[Contact]</span>') +
-            ",</p>";
+            '<p class="p-lead">Hi ' + contact + ",</p>";
           html +=
-            "<p>Here is a breakdown of our cart recovery projection for your store based on current metrics:</p>";
+            "<p>Here is a breakdown of our cart recovery projection for <strong>" + brand + "</strong> based on current metrics:</p>";
           html += "<ul>";
           html +=
             "<li><strong>Monthly Visitors:</strong> " +
@@ -4258,7 +4253,7 @@
             "/mo</li>";
           html +=
             "<li><strong>Projected Recovery Rate:</strong> " +
-            Math.round(recovery) +
+            Math.round(recoveryAdjusted) +
             "%</li>";
           html +=
             "<li><strong>Net Recovered Revenue:</strong> " +
@@ -4268,28 +4263,24 @@
           html +=
             "<p>Under the <strong>" +
             t.name +
-            "</strong> plan (" +
+            "</strong> plan (<strong>" +
             fmt(t.price) +
-            "/mo), the projected ROI is <strong>" +
+            "</strong>/mo), the projected ROI is <strong>" +
             roi +
             "x</strong>.</p>";
         } else if (pTpl === "concise") {
           html =
-            '<p class="p-lead">Hi ' +
-            (contact !== "[Contact]"
-              ? contact
-              : '<span class="placeholder-text">[Contact]</span>') +
-            ",</p>";
+            '<p class="p-lead">Hi ' + contact + ",</p>";
           html +=
-            "<p>We can help you recover an estimated <strong>" +
+            "<p>We can help <strong>" + brand + "</strong> recover an estimated <strong>" +
             fmt(recovered) +
             "/month</strong> in lost sales.</p>";
           html +=
             "<p>The <strong>" +
             t.name +
-            "</strong> plan is " +
+            "</strong> plan is <strong>" +
             fmt(t.price) +
-            "/mo, delivering an estimated <strong>" +
+            "</strong>/mo, delivering an estimated <strong>" +
             roi +
             "x ROI</strong>.</p>";
         }
@@ -4306,23 +4297,23 @@
             '<p class="p-lead">Let’s get this live by next week. Reply YES and I’ll send the link.</p>';
         } else if (pTpl === "short") {
           html +=
-            "<p>Let me know if you want to proceed and I will send the next steps.</p>";
+            '<p class="p-lead">Let me know if you want to proceed and I will send the next steps.</p>';
         } else if (pTpl === "data_driven") {
           html +=
-            "<p>Please review the figures above. Let me know if you have any questions or are ready to proceed with the setup.</p>";
+            '<p class="p-lead">Please review the figures above. Let me know if you have any questions or are ready to proceed with the setup.</p>';
         } else if (pTpl === "concise") {
           html +=
-            "<p>If this sounds good, reply YES and we'll get started.</p>";
+            '<p class="p-lead">If this sounds good, reply YES and we\'ll get started.</p>';
         }
 
         if (expiryLine)
           html +=
-            '<p class="p-expiry" style="margin-top: 12px; font-weight: 500; font-size: 13px; color: var(--accent);">' +
+            '<p class="p-expiry">' +
             expiryLine +
             "</p>";
-        if (yourName)
+        if (rawYourName || rawYourName === "")
           html +=
-            '<p class="p-sig" style="margin-top: 24px; font-weight: bold; color: var(--ink);">— ' +
+            '<p class="p-sig">— ' +
             yourName +
             "</p>";
 
