@@ -2700,6 +2700,7 @@
                   <option value="short">Short & Sweet</option>
                   <option value="data_driven">Data-Driven Report</option>
                   <option value="concise">Concise Summary</option>
+                  <option value="fomo">FOMO / Competitive Analysis</option>
                 </select>
               </div>
               <div class="field-group">
@@ -3363,6 +3364,7 @@
           atc: 8,
           abandon: 72,
           aovBase: 75,
+          famousBrand: "AG1",
           hint: "Avg AOV $60–110. Subscriptions common — LTV is high even when AOV looks lower. Urgency and social proof drive best recovery rates.",
           proposalMsg:
             "In the supplements space, consistency and trust are everything. We'll implement a recovery strategy highlighting social proof, reviews, and easy subscription options.",
@@ -3371,6 +3373,7 @@
           atc: 6,
           abandon: 76,
           aovBase: 90,
+          famousBrand: "Nike",
           hint: "Avg AOV $70–130. Highest browse abandonment of any niche. Size/fit hesitation is the #1 drop-off reason — address it in recovery copy.",
           proposalMsg:
             "For apparel brands, sizing uncertainty is the #1 reason for cart abandonment. Our sequences proactively address fit and return policies to save those lost sales.",
@@ -3379,6 +3382,7 @@
           atc: 7,
           abandon: 74,
           aovBase: 65,
+          famousBrand: "Sephora",
           hint: "Avg AOV $50–90. Multi-product bundles common. Loyalty perks and free samples are strongest recovery hooks.",
           proposalMsg:
             "Beauty consumers respond particularly well to education and sampling. Our recovery strategy focuses on application tips and loyalty framing to drive conversions.",
@@ -3387,6 +3391,7 @@
           atc: 5,
           abandon: 70,
           aovBase: 110,
+          famousBrand: "IKEA",
           hint: "Avg AOV $80–180. Longer decision cycle — lead with reviews and easy returns, not urgency.",
           proposalMsg:
             "Home and furniture purchases carry longer consideration cycles. We'll deploy a multi-touch sequence leading with lifestyle imagery, financing options, and detailed social proof.",
@@ -3395,6 +3400,7 @@
           atc: 4,
           abandon: 68,
           aovBase: 180,
+          famousBrand: "Apple",
           hint: "Avg AOV $120–350. High-research category. Social proof, comparisons, and warranty details outperform discount offers.",
           proposalMsg:
             "Tech buyers do heavy research. Instead of rushing a discount, our tech recovery strategy focuses on competitive differentiation, spec comparisons, and warranty assurances.",
@@ -3403,6 +3409,7 @@
           atc: 9,
           abandon: 71,
           aovBase: 60,
+          famousBrand: "Chewy",
           hint: "Avg AOV $45–90. Subscription-friendly. Emotional appeal and pet-specific personalisation work very well.",
           proposalMsg:
             "Pet owners buy on emotion. We'll structure your abandoned cart paths with highly personalised, pet-centric messaging to recapture their attention.",
@@ -3411,6 +3418,7 @@
           atc: 7,
           abandon: 72,
           aovBase: 80,
+          famousBrand: "industry leaders",
           hint: "No benchmark defaults. Fill in your own values for an accurate projection.",
           proposalMsg: "",
         },
@@ -3582,8 +3590,14 @@
         var el = document.getElementById("currency");
         return el ? el.value : "$";
       }
-      function fmt(n) {
-        return getCurrency() + Math.round(n).toLocaleString();
+      function fmt(n, decimals) {
+        var options = decimals
+          ? {
+              minimumFractionDigits: decimals,
+              maximumFractionDigits: decimals,
+            }
+          : { maximumFractionDigits: 0 };
+        return getCurrency() + n.toLocaleString(undefined, options);
       }
       function fmtDate(d) {
         if (!d) return "";
@@ -3964,7 +3978,7 @@
           "metric-val " + (peakInfo.color || "muted");
 
         if (hasInputs) {
-          document.getElementById("roi-hero").textContent = fmt(recovered);
+          document.getElementById("roi-hero").textContent = fmt(recovered, 2);
           document.getElementById("roi-hero").classList.remove("empty");
           var roiSubParts = [
             roi + "x " + (softwareCost > 0 ? "net " : "") + "return",
@@ -3981,14 +3995,14 @@
             Math.round(abandonedCarts).toLocaleString();
           document.getElementById("m-carts").className = "metric-val";
           document.getElementById("m-eff-abandon").textContent =
-            Math.round(effectiveAbandon) +
+            effectiveAbandon.toFixed(2) +
             "%" +
             (mobilePct > 0 ? " (mobile-adjusted)" : "");
           document.getElementById("m-eff-abandon").className = "metric-val";
           var aovLabelEl = document.querySelector('#m-aov').previousElementSibling;
           if (aovResult.source === "known") {
             if (aovLabelEl) aovLabelEl.childNodes[0].textContent = "Specified AOV ";
-            document.getElementById("m-aov").textContent = fmt(aov);
+            document.getElementById("m-aov").textContent = fmt(aov, 2);
             var aovInd = document.getElementById("m-aov-ind");
             aovInd.style.display = "inline-block";
             aovInd.className = "aov-ind high";
@@ -3997,7 +4011,7 @@
             aovInd.style.color = "var(--bg)";
           } else {
             if (aovLabelEl) aovLabelEl.childNodes[0].textContent = "Estimated AOV ";
-            document.getElementById("m-aov").textContent = fmt(aov) + " (est.)";
+            document.getElementById("m-aov").textContent = fmt(aov, 2) + " (est.)";
             var aovInd = document.getElementById("m-aov-ind");
             aovInd.style.display = "inline-block";
             aovInd.className = "aov-ind " + (aovResult.confidenceLevel || "low");
@@ -4006,20 +4020,20 @@
             aovInd.style.color = "";
           }
           document.getElementById("m-aov").className = "metric-val";
-          document.getElementById("m-lost").textContent = fmt(grossLost);
+          document.getElementById("m-lost").textContent = fmt(grossLost, 2);
           document.getElementById("m-lost").className = "metric-val";
 
           var netText =
             refundRate > 0
-              ? fmt(netLost) +
+              ? fmt(netLost, 2) +
                 " (after " +
                 Math.round(refundRate) +
                 "% returns)"
-              : fmt(netLost);
+              : fmt(netLost, 2);
           document.getElementById("m-net").textContent = netText;
           document.getElementById("m-net").className = "metric-val";
 
-          var recText = fmt(recovered);
+          var recText = fmt(recovered, 2);
           if (discountOffered > 0)
             recText += " (net of " + discountOffered + "% disc)";
           document.getElementById("m-recover").textContent = recText;
@@ -4028,8 +4042,8 @@
           var wfViz = document.getElementById("waterfall-viz");
           if (wfViz && grossLost > 0) {
             wfViz.style.display = "flex";
-            document.getElementById("wf-gross-val").textContent = fmt(grossLost);
-            document.getElementById("wf-rec-val").textContent = fmt(recovered);
+            document.getElementById("wf-gross-val").textContent = fmt(grossLost, 2);
+            document.getElementById("wf-rec-val").textContent = fmt(recovered, 2);
             var pct = Math.min(100, Math.max(0, (recovered / grossLost) * 100));
             document.getElementById("wf-rec-bar").style.width = pct + "%";
           } else if (wfViz) {
@@ -4042,7 +4056,7 @@
             document.getElementById("m-delta").className = "metric-val green";
           } else if (showCurRate && currentRateVal > 0) {
             document.getElementById("m-delta").textContent =
-              "+" + fmt(delta) + "/mo above current";
+              "+" + fmt(delta, 2) + "/mo above current";
             document.getElementById("m-delta").className = "metric-val green";
           } else {
             document.getElementById("m-delta").textContent =
@@ -4051,7 +4065,7 @@
           }
 
           document.getElementById("m-ltv").textContent =
-            fmt(ltvPerCart) +
+            fmt(ltvPerCart, 2) +
             (repeatRate > 0
               ? " (" + Math.round(repeatRate) + "% repeat adj.)"
               : "");
@@ -4059,7 +4073,7 @@
           var roiLabel =
             softwareCost > 0 ? "Net ROI (Strategy + ESP)" : "ROI on retainer";
           document.getElementById("m-roi-label").textContent = roiLabel;
-          document.getElementById("m-roi").textContent = roi + "x";
+          document.getElementById("m-roi").textContent = roi.toFixed(2) + "x";
           document.getElementById("m-roi").className =
             roi >= 3
               ? "metric-val gold"
@@ -4100,28 +4114,36 @@
               "metric-val muted";
           }
         } else {
-          document.getElementById("roi-hero").textContent = "—";
+          var cur = getCurrency();
+          document.getElementById("roi-hero").textContent = cur + "0.00";
           document.getElementById("roi-hero").classList.add("empty");
           document.getElementById("roi-sub").textContent =
             "Fill in the inputs to see your projection";
           var wfViz = document.getElementById("waterfall-viz");
           if (wfViz) wfViz.style.display = "none";
-          [
-            "m-carts",
-            "m-eff-abandon",
-            "m-aov",
-            "m-lost",
-            "m-net",
-            "m-recover",
-            "m-delta",
-            "m-ltv",
-            "m-roi",
-            "m-payback",
-            "m-crosscheck",
-          ].forEach(function (id) {
-            document.getElementById(id).textContent = "—";
-            document.getElementById(id).className = "metric-val muted";
+
+          var placeholders = {
+            "m-carts": "0",
+            "m-eff-abandon": "0.00%",
+            "m-aov": cur + "0.00",
+            "m-lost": cur + "0.00",
+            "m-net": cur + "0.00",
+            "m-recover": cur + "0.00",
+            "m-delta": cur + "0.00",
+            "m-ltv": cur + "0.00",
+            "m-roi": "0.00x",
+            "m-payback": "0 days",
+            "m-crosscheck": "0.00%",
+          };
+
+          Object.keys(placeholders).forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) {
+              el.textContent = placeholders[id];
+              el.className = "metric-val muted";
+            }
           });
+
           document.getElementById("m-aov-ind").style.display = "none";
           var indEl = document.getElementById("discount-impact-indicator");
           if (indEl) indEl.style.display = "none";
@@ -4310,6 +4332,17 @@
             "</strong>/mo), the projected ROI is <strong>" +
             roi +
             "x</strong>.</p>";
+        } else if (pTpl === "fomo") {
+          html = '<p class="p-lead">Hey ' + contact + ',</p>';
+          var brandName = nicheData[niche] && nicheData[niche].famousBrand ? nicheData[niche].famousBrand : "your category leaders";
+          html += '<p>I was analyzing strategies in the <strong>' + niche + '</strong> space, and I noticed that leaders like <strong>' + brandName + '</strong> are using sophisticated recovery tactics that you are currently missing out on:</p>';
+          if (window.competitorData && window.competitorData.length > 0) {
+            window.competitorData.slice(0, 2).forEach(function(comp) {
+              html += '<p><strong>' + comp.name + '</strong> uses: <em>' + comp.tactics + '</em>.</p>';
+            });
+          }
+          html += '<p>Why allow this competitive advantage to go to them instead of you? We can bridge this gap and plug these leaks immediately.</p>';
+          html += '<p class="p-price">Investment: ' + fmt(t.price, 0) + "/month.</p>";
         } else if (pTpl === "concise") {
           html =
             '<p class="p-lead">Hi ' + contact + ",</p>";
