@@ -3829,6 +3829,25 @@
           confElLeft.innerHTML = finalHtml;
           confEl.style.display = "block";
           confElLeft.style.display = "block";
+        } else if (aovResult.source === "known") {
+          var manualHtml = `
+            <div class="conf-header">
+              <span class="conf-title">AOV Source</span>
+              <span class="conf-level-badge high">Verified</span>
+            </div>
+            <div class="conf-bar-bg">
+              <div class="conf-bar-fill high" style="width: 100%"></div>
+            </div>
+            <p style="font-size: 11.5px; color: rgba(245, 242, 237, 0.7); margin-top: 12px; line-height: 1.5;">
+              Using manually entered AOV. This value overrides all sector benchmarks and signals for maximum calculation precision.
+            </p>
+          `;
+          confEl.innerHTML = manualHtml;
+          confElLeft.innerHTML = manualHtml;
+          confEl.style.display = "block";
+          confElLeft.style.display = "block";
+          window.currentAovAiRec = null;
+          window.currentAovAiRecKey = null;
         } else {
           confEl.style.display = "none";
           confElLeft.style.display = "none";
@@ -3972,16 +3991,27 @@
             "%" +
             (mobilePct > 0 ? " (mobile-adjusted)" : "");
           document.getElementById("m-eff-abandon").className = "metric-val";
-          document.getElementById("m-aov").textContent =
-            fmt(aov) + (aovResult.source === "estimated" ? " (est.)" : "");
-          document.getElementById("m-aov").className = "metric-val";
-          var aovInd = document.getElementById("m-aov-ind");
-          if (aovResult.source === "estimated") {
+          var aovLabelEl = document.querySelector('#m-aov').previousElementSibling;
+          if (aovResult.source === "known") {
+            if (aovLabelEl) aovLabelEl.childNodes[0].textContent = "Specified AOV ";
+            document.getElementById("m-aov").textContent = fmt(aov);
+            var aovInd = document.getElementById("m-aov-ind");
             aovInd.style.display = "inline-block";
-            aovInd.className = "aov-ind " + aovResult.confidenceLevel;
+            aovInd.className = "aov-ind high";
+            aovInd.innerHTML = "MANUAL";
+            aovInd.style.background = "var(--ink)";
+            aovInd.style.color = "var(--bg)";
           } else {
-            aovInd.style.display = "none";
+            if (aovLabelEl) aovLabelEl.childNodes[0].textContent = "Estimated AOV ";
+            document.getElementById("m-aov").textContent = fmt(aov) + " (est.)";
+            var aovInd = document.getElementById("m-aov-ind");
+            aovInd.style.display = "inline-block";
+            aovInd.className = "aov-ind " + (aovResult.confidenceLevel || "low");
+            aovInd.innerHTML = (aovResult.confidenceLevel || "low").toUpperCase();
+            aovInd.style.background = ""; // revert to class-based background
+            aovInd.style.color = "";
           }
+          document.getElementById("m-aov").className = "metric-val";
           document.getElementById("m-lost").textContent = fmt(grossLost);
           document.getElementById("m-lost").className = "metric-val";
 
