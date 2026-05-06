@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cart Recovery · ROI Calc & Proposal Builder</title>
+    <title>ZylobotAI</title>
     <!-- Patch to prevent html2pdf fetch overwrite error -->
     <script>
       (function () {
@@ -39,6 +39,7 @@
         color-scheme: dark;
         --white: #09090b;
         --cream: #18181b;
+        --bg-card: #000000;
         --ink: #fafafa;
         --muted: #a1a1aa;
         --border: #27272a;
@@ -153,6 +154,70 @@
         gap: 12px;
         white-space: nowrap;
       }
+
+      /* Tooltip Styles */
+      .tooltip-trigger {
+        position: relative;
+        display: inline-block;
+        border-bottom: 1px dotted rgba(255, 255, 255, 0.4);
+        cursor: help;
+      }
+      .tooltip-trigger:hover .tooltip-content {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(-8px);
+      }
+      .tooltip-content {
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%) translateY(0);
+        background: #18181b;
+        color: #fafafa;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 11px;
+        min-width: 180px;
+        max-width: 260px;
+        line-height: 1.4;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 10000;
+        pointer-events: none;
+        text-align: center;
+        white-space: normal;
+        font-family: inherit;
+        font-weight: 400;
+      }
+      .tooltip-content::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border-width: 5px;
+        border-style: solid;
+        border-color: #18181b transparent transparent transparent;
+      }
+
+      .comp-tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 500;
+        margin-right: 6px;
+        margin-bottom: 6px;
+        line-height: 1;
+        border-bottom: none !important;
+      }
+      .tag-tactic { background: rgba(56, 189, 248, 0.1); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.2); }
+      .tag-strength { background: rgba(34, 197, 94, 0.1); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.2); }
+      .tag-weakness { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
       .nav-num {
         display: flex;
         align-items: center;
@@ -722,22 +787,98 @@
       }
 
       .aov-confidence {
-        padding: 9px 11px;
-        border-radius: 4px;
+        padding: 16px;
+        border-radius: 8px;
         border: 1px solid rgba(255, 255, 255, 0.09);
-        margin-bottom: 14px;
-        font-size: 10px;
-        color: rgba(245, 242, 237, 0.5);
-        line-height: 1.55;
-        font-family: "DM Mono", monospace;
+        margin-bottom: 24px;
+        font-size: 13px;
+        color: rgba(245, 242, 237, 0.9);
+        background: rgba(255, 255, 255, 0.03);
         display: none;
+      }
+      .conf-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+      }
+      .conf-title {
+        font-weight: 600;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--ink);
+      }
+      .conf-level-badge {
+        padding: 2px 8px;
+        border-radius: 99px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+      .conf-level-badge.low { background: rgba(255, 112, 112, 0.15); color: #ff7070; }
+      .conf-level-badge.medium { background: rgba(242, 201, 76, 0.15); color: #f2c94c; }
+      .conf-level-badge.high { background: rgba(111, 207, 151, 0.15); color: #6fcf97; }
+
+      .conf-bar-bg {
+        height: 6px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 3px;
+        overflow: hidden;
+        margin-bottom: 16px;
+      }
+      .conf-bar-fill {
+        height: 100%;
+        transition: width 0.4s ease;
+      }
+      .conf-bar-fill.low { background: #ff7070; width: 33%; }
+      .conf-bar-fill.medium { background: #f2c94c; width: 66%; }
+      .conf-bar-fill.high { background: #6fcf97; width: 100%; }
+
+      .conf-factors {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+      .conf-factor {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+      }
+      .factor-icon {
+        width: 14px;
+        height: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        font-size: 8px;
+        background: rgba(255, 255, 255, 0.1);
+      }
+      .factor-icon.active { background: rgba(111, 207, 151, 0.2); color: #6fcf97; }
+      
+      .conf-improve {
+        background: rgba(255, 255, 255, 0.04);
+        border-radius: 6px;
+        padding: 12px;
+        font-size: 11.5px;
+        line-height: 1.5;
+        color: rgba(245, 242, 237, 0.95);
+      }
+      .conf-improve-title {
+        font-weight: 700;
+        margin-bottom: 4px;
+        color: var(--ink);
       }
 
       .proposal-section {
-        flex: 1;
         display: flex;
         flex-direction: column;
-        min-height: 0;
+        margin-top: 40px;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        padding-top: 32px;
       }
       .proposal-label {
         font-size: 10px;
@@ -815,13 +956,11 @@
       }
 
       .actions-wrapper {
-        position: sticky;
-        bottom: 0;
-        background: var(--chalk, #111113);
-        padding: 16px 36px 40px 36px;
-        margin: 24px -36px -40px -36px;
-        border-top: 1px solid var(--border);
-        z-index: 10;
+        background: #111113;
+        padding: 32px 0 0 0;
+        margin-top: 24px;
+        border-top: 1px dashed rgba(255, 255, 255, 0.1);
+        z-index: 5;
         display: flex;
         flex-direction: column;
       }
@@ -1125,8 +1264,9 @@
           gap: 4px !important;
         }
         .actions-wrapper {
-          padding: 16px 24px 24px 24px;
-          margin: 24px -24px -24px -24px;
+          padding: 16px 24px;
+          margin: 0 -24px;
+          position: static;
         }
         .logo-text {
           font-size: 13px;
@@ -1147,8 +1287,9 @@
           padding: 20px 16px;
         }
         .actions-wrapper {
-          padding: 16px 16px 20px 16px;
-          margin: 24px -16px -20px -16px;
+          padding: 16px;
+          margin: 0 -16px;
+          position: static;
         }
         .logo-text {
           max-width: calc(100vw - 120px);
@@ -1272,8 +1413,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(0, 0, 0, 0.6);
-        backdrop-filter: blur(4px);
+        background: rgba(0, 0, 0, 0.7);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -1287,7 +1427,7 @@
         pointer-events: auto;
       }
       .modal-content {
-        background: var(--bg-card);
+        background: #000;
         width: 90%;
         max-width: 600px;
         max-height: 85vh;
@@ -1295,7 +1435,7 @@
         border: 1px solid var(--border);
         display: flex;
         flex-direction: column;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
         transform: translateY(10px);
         transition: transform 0.2s;
       }
@@ -1431,7 +1571,7 @@
         <div class="logo">
           <div class="logo-mark"><span></span></div>
           <span class="logo-text"
-            >Cart Recovery · ROI Calc & Proposal Builder</span
+            >ZylobotAI</span
           >
         </div>
       </div>
@@ -1484,7 +1624,7 @@
 
     <div class="main-layout">
       <!-- Sidebar -->
-      <aside class="sidebar">
+      <aside class="sidebar collapsed">
         <button
           class="sidebar-toggle-btn"
           onclick="toggleSidebar()"
@@ -1597,74 +1737,87 @@
               <span class="section-title">Store Details</span>
               <div class="section-line"></div>
             </div>
-            <div class="field-grid">
-              <div class="field-group full">
-                <label>Store URL</label>
-                <div style="display: flex; gap: 8px">
-                  <input
-                    type="text"
-                    id="store-url"
-                    placeholder="e.g. https://brand.com"
-                    onkeydown="
-                      if (event.key === 'Enter') {
-                        window.analyzeStoreWithAI();
-                        this.blur();
-                      }
-                    "
-                  />
+            <div class="analysis-group" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 20px; margin-bottom: 24px; position: relative; overflow: hidden;">
+              <div style="position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--accent);"></div>
+              <div class="field-grid">
+                <div class="field-group full">
+                  <label>Store URL</label>
+                  <div style="display: flex; gap: 8px">
+                    <input
+                      type="text"
+                      id="store-url"
+                      placeholder="e.g. https://brand.com"
+                      onkeydown="
+                        if (event.key === 'Enter') {
+                          window.analyzeStoreWithAI();
+                          this.blur();
+                        }
+                      "
+                    />
+                    <button
+                      class="btn btn-ghost"
+                      id="analyze-btn"
+                      onclick="window.analyzeStoreWithAI()"
+                      style="flex: none; white-space: nowrap"
+                    >
+                      ✨ Auto-fill
+                    </button>
+                  </div>
                   <button
+                    id="view-competitors-btn"
                     class="btn btn-ghost"
-                    id="analyze-btn"
-                    onclick="window.analyzeStoreWithAI()"
-                    style="flex: none; white-space: nowrap"
+                    style="display: none; margin-top: 8px; width: fit-content"
+                    onclick="openCompetitorModal()"
                   >
-                    ✨ Auto-fill
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      style="margin-right: 4px"
+                    >
+                      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                    </svg>
+                    View Competitor Strategy Analysis
                   </button>
                 </div>
-                <button
-                  id="view-competitors-btn"
-                  class="btn btn-ghost"
-                  style="display: none; margin-top: 8px; width: fit-content"
-                  onclick="openCompetitorModal()"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    style="margin-right: 4px"
-                  >
-                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                  </svg>
-                  View Competitor Strategy Analysis
-                </button>
+                <div id="recovery-gaps-container" style="display: none; width: 100%; margin-top: 20px; padding: 16px; background: rgba(111, 207, 151, 0.05); border: 1px solid rgba(111, 207, 151, 0.2); border-radius: 8px;">
+                  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: #6fcf97; font-weight: 600; font-size: 13px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                    RECOVERY GAP ANALYSIS
+                  </div>
+                  <p id="recovery-gaps-text" style="font-size: 13px; line-height: 1.6; color: var(--muted); margin: 0;"></p>
+                </div>
+                <div class="field-group full">
+                  <label>Store Leads / Extracted Data (Optional)</label>
+                  <textarea
+                    id="store-data-context"
+                    placeholder="Paste data copied from Store Leads extension or other tools to improve accuracy..."
+                    rows="2"
+                    style="
+                      width: 100%;
+                      border: 1px solid var(--border);
+                      border-radius: 6px;
+                      padding: 10px;
+                      font-family: inherit;
+                      font-size: 14px;
+                      background: var(--bg-card);
+                      color: var(--text);
+                      resize: vertical;
+                      box-sizing: border-box;
+                    "
+                  ></textarea>
+                </div>
               </div>
-              <div class="field-group full">
-                <label>Store Leads / Extracted Data (Optional)</label>
-                <textarea
-                  id="store-data-context"
-                  placeholder="Paste data copied from Store Leads extension or other tools to improve accuracy..."
-                  rows="2"
-                  style="
-                    width: 100%;
-                    border: 1px solid var(--border);
-                    border-radius: 6px;
-                    padding: 10px;
-                    font-family: inherit;
-                    font-size: 14px;
-                    background: var(--bg-card);
-                    color: var(--text);
-                    resize: vertical;
-                    box-sizing: border-box;
-                  "
-                ></textarea>
-              </div>
+            </div>
+
+            <div class="field-grid">
               <div class="field-group">
                 <label>Brand name</label>
                 <input
@@ -1692,6 +1845,20 @@
                 />
                 <div class="field-hint">
                   Primary contact email for sending the proposal.
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label>Lead Source</label>
+                <select id="lead-source" onchange="calc()">
+                  <option value="">Select source...</option>
+                  <option value="Referral">Referral</option>
+                  <option value="Cold Outreach">Cold Outreach</option>
+                  <option value="Inbound">Inbound</option>
+                  <option value="Other">Other</option>
+                </select>
+                <div class="field-hint">
+                  Used to track proposal effectiveness across channels.
                 </div>
               </div>
 
@@ -2386,6 +2553,21 @@
             </div>
           </div>
 
+          <div class="waterfall-viz" id="waterfall-viz" style="display: none; flex-direction: column; gap: 8px; margin-bottom: 24px; padding: 16px; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+            <div style="display: flex; justify-content: space-between; font-size: 11px; font-family: 'DM Mono', monospace; color: rgba(245,242,237,0.6);">
+              <span>Gross Lost</span>
+              <span id="wf-gross-val" style="color: #eb5757; font-weight: 600;">—</span>
+            </div>
+            <div class="waterfall-track" style="height: 14px; background: rgba(255,255,255,0.05); border-radius: 7px; overflow: hidden; position: relative;">
+              <div id="wf-gross-bar" style="position: absolute; top: 0; left: 0; height: 100%; width: 100%; background: #eb5757; opacity: 0.8; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);"></div>
+              <div id="wf-rec-bar" style="position: absolute; top: 0; left: 0; height: 100%; width: 0%; background: #6fcf97; box-shadow: 2px 0 8px rgba(111, 207, 151, 0.4); border-right: 2px solid #fff; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 11px; font-family: 'DM Mono', monospace; color: rgba(245,242,237,0.6);">
+              <span>Recoverable (Net)</span>
+              <span id="wf-rec-val" style="color: #6fcf97; font-weight: 600;">—</span>
+            </div>
+          </div>
+
           <div class="metric-list">
             <div class="metric-row">
               <span class="metric-key">Abandoned carts / mo</span
@@ -2474,8 +2656,12 @@
           <div class="aov-confidence" id="aov-confidence-right"></div>
 
           <div class="proposal-section">
-            <div class="proposal-label">
-              <span>Proposal preview</span>
+            <div class="proposal-label" style="display: flex; justify-content: space-between; align-items: center;">
+              <h2 style="font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 600; color: var(--ink); margin: 0; text-transform: uppercase; letter-spacing: 0.1em;">Proposal preview</h2>
+              <button class="btn btn-secondary toolbar-btn" style="font-size: 9px; padding: 0 8px; height: 20px; width: auto; flex: none; white-space: nowrap; margin-left: auto;" onclick="refineProposalAI()" id="btn-ai-refine">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/></svg>
+                AI Enhance
+              </button>
             </div>
             <div class="editor-toolbar">
               <button type="button" onclick="formatDoc('undo')" title="Undo">
@@ -2858,21 +3044,94 @@
           .classList.remove("visible");
       }
 
+      function wrapWithTooltips(text, type) {
+        if (!text) return text;
+        const explanations = {
+          "abandoned cart email": "Automatically notify users who left items, ensuring the brand stays top-of-mind.",
+          "sms reminder": "Highly direct channel with 98% open rates, perfect for urgent recovery.",
+          "exit-intent popup": "Captures emails or offers discounts just as a user is about to leave.",
+          "dynamic discount": "Tailors offers based on cart value, protecting margins while incentivizing a purchase.",
+          "multi-channel": "Reaches customers across email, SMS, and ads to increase return probability.",
+          "personalization": "Matching messaging to user behavior leads to significantly higher conversion.",
+          "urgency": "Leveraging FOMO (Fear of Missing Out) encourages immediate action.",
+          "scarcity": "Highlighting low stock levels to prompt faster decision making.",
+          "high conversion": "Indicates their messaging effectively moves customers from consideration to purchase.",
+          "strong brand": "Brand loyalty reduces the need for heavy discounting in the recovery phase.",
+          "clear cta": "Reduces friction by showing users exactly how to complete their purchase.",
+          "mobile optimize": "Crucial as over 70% of e-commerce traffic now happens on mobile devices.",
+          "fast load": "Speed minimizes drop-off during the transition from recovery link to checkout.",
+          "low frequency": "Failing to follow up enough leaves money on the table; customers often need 3+ touches.",
+          "generic": "One-size-fits-all copy fails to build a connection or address specific hesitations.",
+          "no incentive": "Without free shipping or a discount, price-sensitive shoppers rarely return.",
+          "friction": "Complicated checkouts or long forms are the leading causes of cart abandonment.",
+          "lack of trust": "Missing social proof or security badges during recovery can stall the purchase."
+        };
+
+        const list = text.split(/,(?![^()]*\))/);
+        return list.map(item => {
+          const trimmed = item.trim();
+          if (!trimmed) return "";
+          let explanation = "";
+          const lower = trimmed.toLowerCase();
+          for (const [key, val] of Object.entries(explanations)) {
+            if (lower.includes(key)) {
+              explanation = val;
+              break;
+            }
+          }
+          if (!explanation) {
+            if (type === 'tactics') explanation = "A specific strategic lever used to re-engage and convert abandoned shoppers.";
+            if (type === 'strengths') explanation = "A performance-driving attribute that increases their recovery efficiency.";
+            if (type === 'weaknesses') explanation = "A strategic gap where poor execution leads to lost revenue opportunity.";
+          }
+
+          let tagClass = "tag-tactic";
+          if (type === "strengths") tagClass = "tag-strength";
+          if (type === "weaknesses") tagClass = "tag-weakness";
+
+          return `<span class="tooltip-trigger comp-tag ${tagClass}">${trimmed}<span class="tooltip-content">${explanation}</span></span>`;
+        }).join("");
+      }
+
       window.openCompetitorModal = function () {
         const overlay = document.getElementById("comp-modal-overlay");
         const body = document.getElementById("comp-modal-body");
         overlay.classList.add("visible");
 
         if (window.competitorData && window.competitorData.length > 0) {
-          let html = `<p style="margin-bottom: 24px; color: var(--muted);">Key competitors and their cart recovery tactics. Use this to position your proposal.</p>`;
+          let html = `<p style="margin-bottom: 24px; color: var(--muted);">Key competitors and their cart recovery tactics. Hover over terms to see why they matter.</p>`;
           html +=
             '<div style="display: flex; flex-direction: column; gap: 16px;">';
           window.competitorData.forEach((comp) => {
-            html += `<div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 16px; border-radius: 6px;">
-              <h3 style="margin: 0 0 8px 0; color: var(--ink); font-family: 'Syne', sans-serif;">${comp.name}</h3>
-              <p style="margin: 0 0 8px 0; font-size: 13px;"><strong>Tactics:</strong> ${comp.tactics}</p>
-              <p style="margin: 0 0 8px 0; font-size: 13px; color: #6fcf97;"><strong>Strengths:</strong> ${comp.strengths}</p>
-              <p style="margin: 0; font-size: 13px; color: #ff7070;"><strong>Weaknesses:</strong> ${comp.weaknesses}</p>
+            html += `<div style="background: #09090b; border: 1px solid rgba(255,255,255,0.1); padding: 20px; border-radius: 8px; margin-bottom: 12px;">
+              <h3 style="margin: 0 0 16px 0; color: var(--ink); font-family: \'Syne\', sans-serif; font-size: 18px; display: flex; align-items: center; gap: 8px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--muted);"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                ${comp.name}
+              </h3>
+              
+              <div style="margin-bottom: 16px;">
+                <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 8px; font-weight: 600;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
+                  Tactics
+                </div>
+                <div style="display: flex; flex-wrap: wrap;">${wrapWithTooltips(comp.tactics, 'tactics')}</div>
+              </div>
+
+              <div style="margin-bottom: 16px;">
+                <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 8px; font-weight: 600;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  Strengths
+                </div>
+                <div style="display: flex; flex-wrap: wrap;">${wrapWithTooltips(comp.strengths, 'strengths')}</div>
+              </div>
+
+              <div>
+                <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 8px; font-weight: 600;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  Weaknesses
+                </div>
+                <div style="display: flex; flex-wrap: wrap;">${wrapWithTooltips(comp.weaknesses, 'weaknesses')}</div>
+              </div>
             </div>`;
           });
           html += "</div>";
@@ -3199,27 +3458,24 @@
               ")",
           );
         }
-        var used = 0;
-        if (pr) used++;
-        if (items > 1) used++;
-        if (sub !== "no") used++;
-        if (bundles === "yes") used++;
-        if (freeship > 0) used++;
+        
+        var factors = [
+          { name: "Catalog Pricing", active: !!pr, id: 'pr' },
+          { name: "Average Items", active: items > 1, id: 'items' },
+          { name: "Subscription Data", active: sub !== "no", id: 'sub' },
+          { name: "Checkout Upsells", active: bundles === "yes", id: 'bundles' },
+          { name: "Shipping Tiers", active: freeship > 0, id: 'freeship' }
+        ];
+        
+        var used = factors.filter(f => f.active).length;
         var confLevel = used >= 4 ? "high" : used >= 2 ? "medium" : "low";
-        var confLabel =
-          used >= 4
-            ? "High confidence estimate"
-            : used >= 2
-              ? "Medium confidence estimate"
-              : "Low confidence estimate. To improve accuracy, add values for 'Catalog price range', 'Avg items per order', and 'Free shipping threshold'";
-        var confText = signals.length
-          ? confLabel + ". Adjusted for: " + signals.join(", ") + "."
-          : confLabel + ".";
+        
         return {
           val: Math.round(aov),
           source: "estimated",
-          confidence: confText,
-          confidenceLevel: confLevel,
+          signals: signals,
+          factors: factors,
+          confidenceLevel: confLevel
         };
       }
 
@@ -3408,24 +3664,65 @@
         var confEl = document.getElementById("aov-confidence-right");
         var confElLeft = document.getElementById("aov-confidence");
 
-        if (aovResult.source === "estimated" && aovResult.confidence) {
-          var confHtml = aovResult.confidence;
+        if (aovResult.source === "estimated") {
+          var label = aovResult.confidenceLevel === "high" ? "High Confidence" : aovResult.confidenceLevel === "medium" ? "Medium Confidence" : "Low Confidence";
+          
+          var factorsHtml = aovResult.factors.map(f => `
+            <div class="conf-factor" style="color: rgba(245, 242, 237, 0.95);">
+              <span class="factor-icon ${f.active ? 'active' : ''}">${f.active ? '✓' : '○'}</span>
+              ${f.name}
+            </div>
+          `).join('');
+
+          var adjustHtml = aovResult.signals.length 
+            ? `<div style="margin-top:12px; border-top: 1px solid rgba(255,255,255,0.05); padding-top:8px;">
+                 <span style="font-size:10px; color: rgba(245, 242, 237, 0.6); text-transform:uppercase; font-weight:700;">Adjustments applied</span>
+                 <div style="font-size:11px; margin-top:2px; color: var(--ink);">${aovResult.signals.join(', ')}</div>
+               </div>` 
+            : '';
+
+          var improveHtml = '';
+          if (aovResult.confidenceLevel !== 'high') {
+            var missing = aovResult.factors.filter(f => !f.active).map(f => f.name);
+            improveHtml = `
+              <div class="conf-improve" style="margin-top:16px;">
+                <div class="conf-improve-title">✨ How to improve</div>
+                To reach high confidence, provide data for: <strong style="color: var(--ink);">${missing.join(', ')}</strong>.
+              </div>
+            `;
+          }
+
+          var finalHtml = `
+            <div class="conf-header">
+              <span class="conf-title">AOV Estimation accuracy</span>
+              <span class="conf-level-badge ${aovResult.confidenceLevel}">${label}</span>
+            </div>
+            <div class="conf-bar-bg">
+              <div class="conf-bar-fill ${aovResult.confidenceLevel}"></div>
+            </div>
+            <div class="conf-factors">
+              ${factorsHtml}
+            </div>
+            ${adjustHtml}
+            ${improveHtml}
+          `;
+
           if (aovResult.confidenceLevel === "low") {
             if (window.getAovAiRecommendation) {
               window.getAovAiRecommendation();
             }
             if (window.currentAovAiRec) {
-              confHtml +=
-                "<br><br><strong>AI Hint:</strong> " + window.currentAovAiRec;
-            } else {
-              confHtml += "<br><br><em>Loading AI recommendation...</em>";
+              finalHtml +=
+                "<div class='conf-improve' style='margin-top:12px; border-left: 2px solid var(--accent); color: var(--ink);'>" +
+                "<div class='conf-improve-title'>AI Recommendation</div>" + window.currentAovAiRec + "</div>";
             }
           } else {
-            window.currentAovAiRec = null; // clear it when confidence improves
+            window.currentAovAiRec = null;
             window.currentAovAiRecKey = null;
           }
-          confEl.innerHTML = confHtml;
-          confElLeft.innerHTML = confHtml;
+
+          confEl.innerHTML = finalHtml;
+          confElLeft.innerHTML = finalHtml;
           confEl.style.display = "block";
           confElLeft.style.display = "block";
         } else {
@@ -3600,6 +3897,17 @@
           document.getElementById("m-recover").textContent = recText;
           document.getElementById("m-recover").className = "metric-val green";
 
+          var wfViz = document.getElementById("waterfall-viz");
+          if (wfViz && grossLost > 0) {
+            wfViz.style.display = "flex";
+            document.getElementById("wf-gross-val").textContent = fmt(grossLost);
+            document.getElementById("wf-rec-val").textContent = fmt(recovered);
+            var pct = Math.min(100, Math.max(0, (recovered / grossLost) * 100));
+            document.getElementById("wf-rec-bar").style.width = pct + "%";
+          } else if (wfViz) {
+            wfViz.style.display = "none";
+          }
+
           if (existingFlow === "no") {
             document.getElementById("m-delta").textContent =
               "No baseline — 100% upside";
@@ -3668,6 +3976,8 @@
           document.getElementById("roi-hero").classList.add("empty");
           document.getElementById("roi-sub").textContent =
             "Fill in the inputs to see your projection";
+          var wfViz = document.getElementById("waterfall-viz");
+          if (wfViz) wfViz.style.display = "none";
           [
             "m-carts",
             "m-eff-abandon",
@@ -4054,7 +4364,7 @@
       function emailProposal() {
         var email = document.getElementById("client-email").value || "";
         var brand = document.getElementById("brand").value || "Brand";
-        var subject = encodeURIComponent("Cart Recovery Proposal: " + brand);
+        var subject = encodeURIComponent("ZylobotAI Proposal: " + brand);
         var body = encodeURIComponent(getProposalText());
         window.location.href =
           "mailto:" + email + "?subject=" + subject + "&body=" + body;
@@ -4193,7 +4503,7 @@
           window.currentAovAiRecKey = key; // Lock
           try {
             const response = await ai.models.generateContent({
-              model: "gemini-2.5-flash",
+              model: "gemini-3-flash-preview",
               contents: `We are analyzing AOV (Average Order Value) for this e-commerce brand:
 Brand: ${brand || "Unknown"}
 URL: ${url || "Unknown"}
@@ -4204,7 +4514,7 @@ Our estimate logic is missing these inputs: 'Catalog price range', 'Avg items pe
 Provide a 1-2 sentence recommendation specifying realistic estimates for these missing values based on what you know about the brand, their typical products, or their specific industry. Explain briefly why these fit. Do NOT use markdown formatting.`,
             });
 
-            let recText = response.text();
+            let recText = response.text;
             const rec = recText.trim();
             window.aovAiCache[key] = rec;
 
@@ -4255,13 +4565,14 @@ Provide a 1-2 sentence recommendation specifying realistic estimates for these m
 
         try {
           const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
+            model: "gemini-3-flash-preview",
             contents: `Analyze this URL: ${url}
         ${storeDataContext ? "Additionally, here is some extracted data about the store (from Store Leads or similar):\\n" + storeDataContext : ""}
         First, determine if this is an e-commerce store (where users can purchase physical or digital products online). 
         If it is NOT an e-commerce store, return ONLY a JSON object with a single key "error" set to "This URL does not appear to be an e-commerce store." and nothing else.
         
-        If it IS an e-commerce store, perform a comprehensive web search to gather accurate data for a cart recovery projection. Prioritize data from sources like Store Leads, SimilarWeb, Semrush, and BuiltWith.
+        If it IS an e-commerce store, perform a comprehensive web search to gather accurate data for a cart recovery projection. 
+        Data Sources: Store Leads, SimilarWeb, Semrush, BuiltWith, LinkedIn, and 2024-2025 industry performance reports.
         If extracted data was provided above, use it as your primary source of truth.
         
         Return ONLY a JSON object with the exact following keys, no markdown wrapping, no explanation:
@@ -4275,12 +4586,13 @@ Provide a 1-2 sentence recommendation specifying realistic estimates for these m
         - "existingFlow": string (Estimate of their current cart recovery flow quality. Choose exactly one of: 'no', 'basic', 'partial', 'yes', or 'unknown'. Base this on brand maturity or specific search results. Default to 'unknown' if unsure.)
         - "items": number (Estimated average items per order based on the types of products they sell. Provide a realistic number like 1.5, 2, etc. If unsure, return 1.)
         - "freeship": number (Free shipping threshold in USD. Find this via search or estimate if standard in their niche. If unknown or not offered, return 0.)
-        - "competitors": array of objects (Identify 3-5 key competitors for this store. Each object should have: "name": string, "tactics": string (Their cart recovery tactics like email frequency, offers, channels), "strengths": string, "weaknesses": string)
+        - "competitors": array of objects (Identify 3-5 key competitors. Perform real-time searches for their 2024/2025 cart recovery strategies. Each object: "name": string, "tactics": string (e.g., '3-email flow, 10% coupon, SMS at 24h'), "strengths": string (e.g., 'Loyalty integration'), "weaknesses": string (e.g., 'No SMS recovery')),
+        - "recoveryGaps": string (2-3 sentence analysis of major recovery gaps compared to niche leaders.)
         `,
             tools: [{ googleSearch: {} }],
           });
 
-          let text = response.text();
+          let text = response.text;
           text = text
             .replace(/```json/gi, "")
             .replace(/```/gi, "")
@@ -4324,17 +4636,24 @@ Provide a 1-2 sentence recommendation specifying realistic estimates for these m
           }
           if (data.existingFlow && data.existingFlow !== "unknown")
             document.getElementById("existing-flow").value = data.existingFlow;
+          
+          if (data.recoveryGaps) {
+            document.getElementById("recovery-gaps-text").innerText = data.recoveryGaps;
+            document.getElementById("recovery-gaps-container").style.display = "block";
+          } else {
+            document.getElementById("recovery-gaps-container").style.display = "none";
+          }
 
           if (!data.contactName || !data.clientEmail) {
             try {
               btn.innerHTML = "Finding contacts...";
               const deepSearchRes = await ai.models.generateContent({
-                model: "gemini-2.5-flash",
+                model: "gemini-3-flash-preview",
                 contents: `Perform a deep targeted web search to find the founder, CEO, owner, or primary contact email for the e-commerce brand "${data.brand || url}" on ${url}.
             Return ONLY a JSON object with keys "contactName" and "clientEmail". If not found, leave as empty strings.`,
                 tools: [{ googleSearch: {} }],
               });
-              let dsText = deepSearchRes.text();
+              let dsText = deepSearchRes.text;
               dsText = dsText
                 .replace(/```json/gi, "")
                 .replace(/```/gi, "")
@@ -4371,6 +4690,59 @@ Provide a 1-2 sentence recommendation specifying realistic estimates for these m
               "Error analyzing store. Please try again or fill the details manually.",
             );
           }
+        } finally {
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        }
+      };
+
+      window.refineProposalAI = async function () {
+        const btn = document.getElementById("btn-ai-refine");
+        const originalText = btn.innerHTML;
+        btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.93 4.93l2.83 2.83"/><path d="M16.24 16.24l2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.93 19.07l2.83-2.83"/><path d="M16.24 7.76l2.83-2.83"/></svg> Enhancing...`;
+        btn.disabled = true;
+
+        try {
+          // Gather necessary context
+          const brand = document.getElementById("brand").value || "Brand";
+          const contact = document.getElementById("contact").value || "Contact";
+          const niche = document.getElementById("niche").value || "General E-com";
+          
+          let currentContent = document.getElementById("proposal-text").innerHTML;
+
+          const response = await ai.models.generateContent({
+            model: "gemini-3-flash-preview",
+            contents: `You are an expert copywriter and sales strategist for cart recovery proposals. 
+Your goal is to refine, enhance, and structure the text of an e-commerce cart recovery proposal.
+The proposal is for the brand "${brand}" and the contact "${contact}". Their niche is "${niche}".
+Here is the current text/HTML of the proposal:
+
+${currentContent}
+
+Make the proposal more compelling, professional, and convincing.
+Improve the flow and persuasiveness of the Introduction, Problem Statement, Solution, and Call to Action based on the provided metrics in the HTML.
+Keep the overall tone professional and confident but conversational. Do not make up fake data—rely on the data points in the text.
+Format the output as clean HTML without any markdown code block wrappers (do NOT wrap in \`\`\`html ... \`\`\`, just the raw HTML).
+Use appropriate HTML tags like <h3>, <p>, <ul>, <li>, <strong>, etc. Keep the formatting visually pleasing.`
+          });
+
+          let newContent = response.text.trim();
+          if (newContent.startsWith("\`\`\`html")) {
+             newContent = newContent.replace(/^\`\`\`html\s*/i, "").replace(/\`\`\`$/i, "");
+          } else if (newContent.startsWith("\`\`\`")) {
+             newContent = newContent.replace(/^\`\`\`\s*/i, "").replace(/\`\`\`$/i, "");
+          }
+
+          document.getElementById("proposal-text").innerHTML = newContent;
+          if (window.handleProposalEdit) {
+            window.handleProposalEdit();
+          }
+          if (window.saveState) {
+            window.saveState();
+          }
+        } catch (err) {
+          console.error("AI Refine error:", err);
+          alert("Failed to refine proposal. Please try again.");
         } finally {
           btn.innerHTML = originalText;
           btn.disabled = false;
@@ -4563,21 +4935,14 @@ Provide a 1-2 sentence recommendation specifying realistic estimates for these m
       }
 
       function initSidebar() {
-        if (window.innerWidth <= 960) {
-          var sidebar = document.querySelector(".sidebar");
-          if (sidebar) {
-            sidebar.classList.add("collapsed");
-          }
+        var sidebar = document.querySelector(".sidebar");
+        if (sidebar) {
+          sidebar.classList.add("collapsed");
         }
       }
       initSidebar();
       window.addEventListener("resize", function () {
-        if (window.innerWidth > 960) {
-          var sidebar = document.querySelector(".sidebar");
-          if (sidebar && sidebar.classList.contains("collapsed")) {
-            sidebar.classList.remove("collapsed");
-          }
-        }
+        // Removed automatic expansion on desktop to keep it retracted by default
       });
       document.addEventListener("DOMContentLoaded", initSidebar);
 
