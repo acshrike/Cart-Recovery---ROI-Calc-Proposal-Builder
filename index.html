@@ -256,14 +256,15 @@
       }
       .app {
         flex: 1;
-        display: grid;
-        grid-template-columns: 1fr 430px;
+        display: flex;
         height: 100%;
         overflow: hidden;
+        width: 100%;
       }
       .left {
+        flex: 1;
         min-width: 0;
-        padding: 48px 52px;
+        padding: 40px 32px;
         border-right: 1px solid var(--border);
         height: 100%;
         overflow-y: auto;
@@ -271,18 +272,31 @@
         position: relative;
         scroll-behavior: smooth;
       }
+      .left > * {
+        width: 100%;
+        max-width: none;
+      }
+      .center {
+        background: rgba(255, 255, 255, 0.02);
+        padding: 32px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        margin-top: 48px;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+      }
       .right {
         background: #111113;
-        color: var(
-          --white
-        ); /* Updated color for dark theme right panel if necessary, previously was var(--ink) */
-        padding: 40px 36px;
-        position: sticky;
-        top: 0;
+        color: var(--white);
+        padding: 32px 28px;
         height: 100%;
+        width: 480px;
+        flex-shrink: 0;
         overflow-y: auto;
         display: flex;
         flex-direction: column;
+        min-width: 480px;
       }
 
       .logo {
@@ -1240,24 +1254,42 @@
       }
 
       @media (max-width: 960px) {
-        .app {
-          grid-template-columns: 1fr;
+        .sidebar {
+          display: none !important;
+        }
+        .main-layout {
+          display: block;
           overflow-y: auto;
-          display: flex;
-          flex-direction: column;
+          height: auto;
+        }
+        .app {
+          display: block !important;
+          height: auto !important;
+          overflow: visible !important;
+          width: 100% !important;
         }
         .left {
-          height: auto;
-          overflow: visible;
+          height: auto !important;
+          overflow: visible !important;
+          min-width: 0 !important;
+          padding: 24px !important;
+          border-right: none !important;
+          border-bottom: 1px solid var(--border) !important;
+          position: static !important;
         }
+        .center,
         .right {
-          position: static;
-          height: auto;
-          overflow: visible;
+          position: static !important;
+          height: auto !important;
+          width: 100% !important;
+          min-width: 0 !important;
+          overflow: visible !important;
+          display: block !important;
+          padding: 24px !important;
         }
-        .left,
-        .right {
-          padding: 24px;
+        .center {
+          border-right: none;
+          border-bottom: 1px solid var(--border);
         }
         .tier-grid,
         .field-grid.three {
@@ -1717,42 +1749,35 @@
             class="sidebar-link"
             onclick="navTo(event, 'sec-03')"
             ><span class="nav-num">03</span
-            ><span class="nav-text">Revenue cross-check</span></a
+            ><span class="nav-text">Revenue audit</span></a
           >
           <a
             href="#sec-04"
             class="sidebar-link"
             onclick="navTo(event, 'sec-04')"
             ><span class="nav-num">04</span
-            ><span class="nav-text">AOV signals</span></a
+            ><span class="nav-text">AOV & LTV signals</span></a
           >
           <a
             href="#sec-05"
             class="sidebar-link"
             onclick="navTo(event, 'sec-05')"
             ><span class="nav-num">05</span
-            ><span class="nav-text">Strategy & costs</span></a
-          >
-          <a
-            href="#sec-06"
-            class="sidebar-link"
-            onclick="navTo(event, 'sec-06')"
-            ><span class="nav-num">06</span
-            ><span class="nav-text">Retainer tier</span></a
-          >
-          <a
-            href="#sec-07"
-            class="sidebar-link"
-            onclick="navTo(event, 'sec-07')"
-            ><span class="nav-num">07</span
-            ><span class="nav-text">Proposal settings</span></a
+            ><span class="nav-text">Optimization strategy</span></a
           >
           <a
             href="#sec-08"
             class="sidebar-link"
             onclick="navTo(event, 'sec-08')"
-            ><span class="nav-num">RI</span
-            ><span class="nav-text">Recovery Intelligence</span></a
+            ><span class="nav-num">06</span
+            ><span class="nav-text">Results projection</span></a
+          >
+          <a
+            href="#sec-06"
+            class="sidebar-link"
+            onclick="navTo(event, 'sec-06')"
+            ><span class="nav-num">07</span
+            ><span class="nav-text">Investment tiers</span></a
           >
         </nav>
       </aside>
@@ -2102,11 +2127,11 @@
             ></div>
           </div>
 
-          <!-- 03 REVENUE CROSS-CHECK -->
+          <!-- 03 REVENUE AUDIT -->
           <div class="section" id="sec-03">
             <div class="section-header">
               <span class="section-num">03</span>
-              <span class="section-title">Revenue cross-check</span>
+              <span class="section-title">Revenue audit</span>
               <div class="section-line"></div>
             </div>
             <div class="field-grid">
@@ -2130,11 +2155,11 @@
             </div>
           </div>
 
-          <!-- 04 AOV SIGNALS -->
+          <!-- 04 AOV & LTV SIGNALS -->
           <div class="section" id="sec-04">
             <div class="section-header">
               <span class="section-num">04</span>
-              <span class="section-title">AOV signals</span>
+              <span class="section-title">AOV & LTV signals</span>
               <div class="section-line"></div>
             </div>
             <div class="field-grid">
@@ -2275,11 +2300,11 @@
             </details>
           </div>
 
-          <!-- 05 RECOVERY METRICS & COSTS -->
+          <!-- 05 OPTIMIZATION STRATEGY -->
           <div class="section" id="sec-05">
             <div class="section-header">
               <span class="section-num">05</span>
-              <span class="section-title">Recovery strategy & costs</span>
+              <span class="section-title">Optimization strategy & costs</span>
               <div class="section-line"></div>
             </div>
             <div class="slider-wrap" style="margin-bottom: 24px">
@@ -2357,11 +2382,129 @@
             </div>
           </div>
 
-          <!-- 06 TIER -->
-          <div class="section" id="sec-06">
+          <!-- 06 RESULTS PROJECTION -->
+          <div class="section" id="sec-08">
             <div class="section-header">
               <span class="section-num">06</span>
-              <span class="section-title">Select retainer tier</span>
+              <span class="section-title">Results projection</span>
+              <div class="section-line"></div>
+            </div>
+            <div class="roi-hero">
+              <div class="roi-label">Recoverable revenue / month</div>
+              <div class="roi-main empty" id="roi-hero">—</div>
+              <div class="roi-sub" id="roi-sub">
+                Fill in the inputs to see your projection
+              </div>
+            </div>
+
+            <div class="waterfall-viz" id="waterfall-viz" style="display: none; flex-direction: column; gap: 8px; margin-bottom: 24px; padding: 16px; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+              <div style="display: flex; justify-content: space-between; font-size: 11px; font-family: 'DM Mono', monospace; color: rgba(245,242,237,0.6);">
+                <span>Gross Lost</span>
+                <span id="wf-gross-val" style="color: #eb5757; font-weight: 600;">—</span>
+              </div>
+              <div class="waterfall-track" style="height: 14px; background: rgba(255,255,255,0.05); border-radius: 7px; overflow: hidden; position: relative;">
+                <div id="wf-gross-bar" style="position: absolute; top: 0; left: 0; height: 100%; width: 100%; background: #eb5757; opacity: 0.8; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);"></div>
+                <div id="wf-rec-bar" style="position: absolute; top: 0; left: 0; height: 100%; width: 0%; background: #6fcf97; box-shadow: 2px 0 8px rgba(111, 207, 151, 0.4); border-right: 2px solid #fff; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);"></div>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 11px; font-family: 'DM Mono', monospace; color: rgba(245,242,237,0.6);">
+                <span>Recoverable (Net)</span>
+                <span id="wf-rec-val" style="color: #6fcf97; font-weight: 600;">—</span>
+              </div>
+            </div>
+
+            <div class="metric-list">
+              <div class="metric-row">
+                <span class="metric-key">Abandoned carts / mo</span
+                ><span class="metric-val muted" id="m-carts">—</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-key">Effective abandonment rate</span
+                ><span class="metric-val muted" id="m-eff-abandon">—</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-key"
+                  >Estimated AOV
+                  <span
+                    id="m-aov-ind"
+                    class="aov-ind"
+                    style="display: none"
+                  ></span></span
+                ><span class="metric-val muted" id="m-aov">—</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-key">Gross revenue left on table</span
+                ><span class="metric-val muted" id="m-lost">—</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-key">Net after refunds</span
+                ><span class="metric-val muted" id="m-net">—</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-key">Recoverable / mo (net)</span
+                ><span class="metric-val green" id="m-recover">—</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-key">Delta vs. current flow</span
+                ><span class="metric-val muted" id="m-delta">—</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-key">LTV-adjusted value / cart</span
+                ><span class="metric-val muted" id="m-ltv">—</span>
+              </div>
+              <div class="metric-row">
+                <span
+                  class="metric-key"
+                  style="display: flex; align-items: center"
+                >
+                  <span id="m-roi-label">ROI on retainer</span>
+                  <span class="tooltip-wrap">
+                    <svg
+                      class="tooltip-icon"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="16" x2="12" y2="12"></line>
+                      <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    <span class="tooltip-content" id="m-roi-tooltip">
+                      Calculated as: (Recovered Revenue - Retainer Costs -
+                      Software Costs - Discount Adjustments) / (Retainer +
+                      Software Costs). A net positive return after all expenses
+                      are factored in.
+                    </span>
+                  </span> </span
+                ><span class="metric-val gold" id="m-roi">—</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-key">Payback period</span
+                ><span class="metric-val muted" id="m-payback">—</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-key">Revenue cross-check</span
+                ><span class="metric-val muted" id="m-crosscheck">—</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-key">Peak season urgency</span
+                ><span class="metric-val muted" id="m-peak">—</span>
+              </div>
+            </div>
+
+            <div class="aov-confidence" id="aov-confidence-right"></div>
+          </div>
+
+          <!-- 07 TIER -->
+          <div class="section" id="sec-06">
+            <div class="section-header">
+              <span class="section-num">07</span>
+              <span class="section-title">Select investment tier</span>
               <div class="section-line"></div>
             </div>
             <div class="tier-grid">
@@ -2520,18 +2663,23 @@
               </div>
             </div>
           </div>
+        </div>
+        <!-- /left -->
 
-          <!-- 07 PROPOSAL SETTINGS -->
-          <div class="section" id="sec-07">
+        <!-- Removed separate center column -->
+
+        <!-- ═══ RIGHT (Proposal) ═══ -->
+        <div class="right">
+          <!-- Proposal Settings moved here -->
+          <div class="section" id="sec-07" style="margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid rgba(255,255,255,0.1);">
             <div class="section-header">
-              <span class="section-num">07</span>
-              <span class="section-title">Proposal settings</span>
+              <span class="section-title" style="letter-spacing: 0.1em; text-transform: uppercase; font-size: 11px; opacity: 0.8;">Proposal settings</span>
               <div class="section-line"></div>
             </div>
             <div class="field-grid">
               <div class="field-group full">
                 <label>Proposal Template</label>
-                <select id="proposal-template" onchange="resetProposal()">
+                <select id="proposal-template" onchange="resetProposal()" style="background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1);">
                   <option value="standard">Standard Template</option>
                   <option value="aggressive">Aggressive / Hard Sell</option>
                   <option value="short">Short & Sweet</option>
@@ -2544,28 +2692,24 @@
                 <input
                   type="text"
                   id="your-name"
-                  placeholder="e.g. Nimrod / ZylobotAI · Cart Recovery"
+                  placeholder="e.g. Nimrod / ZylobotAI"
                   oninput="calc()"
+                  style="background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1);"
                 />
               </div>
               <div class="field-group">
                 <label>Offer expiry date</label>
-                <input type="text" id="expiry" />
-                <div class="field-hint">
-                  Creates urgency — auto-set to 7 days
-                </div>
+                <input type="text" id="expiry" style="background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1);" />
               </div>
               <div class="field-group full">
-                <label>Case study / testimonial (optional)</label>
+                <label>Case study (optional)</label>
                 <input
                   type="text"
                   id="testimonial"
-                  placeholder='"We recovered $18K in 60 days." — Jake, FitFuel'
+                  placeholder='Quote...'
                   oninput="calc()"
+                  style="background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1);"
                 />
-                <div class="field-hint">
-                  Paste a short quote — embeds automatically in the proposal
-                </div>
               </div>
             </div>
             <div class="testimonial-preview" id="testimonial-preview">
@@ -2573,124 +2717,7 @@
               <div class="t-author" id="t-author"></div>
             </div>
           </div>
-        </div>
-        <!-- /left -->
-
-        <!-- ═══ RIGHT ═══ -->
-        <div class="right" id="sec-08">
-          <div class="right-logo">Recovery Intelligence</div>
-
-          <div class="roi-hero">
-            <div class="roi-label">Recoverable revenue / month</div>
-            <div class="roi-main empty" id="roi-hero">—</div>
-            <div class="roi-sub" id="roi-sub">
-              Fill in the inputs to see your projection
-            </div>
-          </div>
-
-          <div class="waterfall-viz" id="waterfall-viz" style="display: none; flex-direction: column; gap: 8px; margin-bottom: 24px; padding: 16px; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
-            <div style="display: flex; justify-content: space-between; font-size: 11px; font-family: 'DM Mono', monospace; color: rgba(245,242,237,0.6);">
-              <span>Gross Lost</span>
-              <span id="wf-gross-val" style="color: #eb5757; font-weight: 600;">—</span>
-            </div>
-            <div class="waterfall-track" style="height: 14px; background: rgba(255,255,255,0.05); border-radius: 7px; overflow: hidden; position: relative;">
-              <div id="wf-gross-bar" style="position: absolute; top: 0; left: 0; height: 100%; width: 100%; background: #eb5757; opacity: 0.8; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);"></div>
-              <div id="wf-rec-bar" style="position: absolute; top: 0; left: 0; height: 100%; width: 0%; background: #6fcf97; box-shadow: 2px 0 8px rgba(111, 207, 151, 0.4); border-right: 2px solid #fff; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);"></div>
-            </div>
-            <div style="display: flex; justify-content: space-between; font-size: 11px; font-family: 'DM Mono', monospace; color: rgba(245,242,237,0.6);">
-              <span>Recoverable (Net)</span>
-              <span id="wf-rec-val" style="color: #6fcf97; font-weight: 600;">—</span>
-            </div>
-          </div>
-
-          <div class="metric-list">
-            <div class="metric-row">
-              <span class="metric-key">Abandoned carts / mo</span
-              ><span class="metric-val muted" id="m-carts">—</span>
-            </div>
-            <div class="metric-row">
-              <span class="metric-key">Effective abandonment rate</span
-              ><span class="metric-val muted" id="m-eff-abandon">—</span>
-            </div>
-            <div class="metric-row">
-              <span class="metric-key"
-                >Estimated AOV
-                <span
-                  id="m-aov-ind"
-                  class="aov-ind"
-                  style="display: none"
-                ></span></span
-              ><span class="metric-val muted" id="m-aov">—</span>
-            </div>
-            <div class="metric-row">
-              <span class="metric-key">Gross revenue left on table</span
-              ><span class="metric-val muted" id="m-lost">—</span>
-            </div>
-            <div class="metric-row">
-              <span class="metric-key">Net after refunds</span
-              ><span class="metric-val muted" id="m-net">—</span>
-            </div>
-            <div class="metric-row">
-              <span class="metric-key">Recoverable / mo (net)</span
-              ><span class="metric-val green" id="m-recover">—</span>
-            </div>
-            <div class="metric-row">
-              <span class="metric-key">Delta vs. current flow</span
-              ><span class="metric-val muted" id="m-delta">—</span>
-            </div>
-            <div class="metric-row">
-              <span class="metric-key">LTV-adjusted value / cart</span
-              ><span class="metric-val muted" id="m-ltv">—</span>
-            </div>
-            <div class="metric-row">
-              <span
-                class="metric-key"
-                style="display: flex; align-items: center"
-              >
-                <span id="m-roi-label">ROI on retainer</span>
-                <span class="tooltip-wrap">
-                  <svg
-                    class="tooltip-icon"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                  </svg>
-                  <span class="tooltip-content" id="m-roi-tooltip">
-                    Calculated as: (Recovered Revenue - Retainer Costs -
-                    Software Costs - Discount Adjustments) / (Retainer +
-                    Software Costs). A net positive return after all expenses
-                    are factored in.
-                  </span>
-                </span> </span
-              ><span class="metric-val gold" id="m-roi">—</span>
-            </div>
-            <div class="metric-row">
-              <span class="metric-key">Payback period</span
-              ><span class="metric-val muted" id="m-payback">—</span>
-            </div>
-            <div class="metric-row">
-              <span class="metric-key">Revenue cross-check</span
-              ><span class="metric-val muted" id="m-crosscheck">—</span>
-            </div>
-            <div class="metric-row">
-              <span class="metric-key">Peak season urgency</span
-              ><span class="metric-val muted" id="m-peak">—</span>
-            </div>
-          </div>
-
-          <div class="aov-confidence" id="aov-confidence-right"></div>
-
-          <div class="proposal-section">
+          <div class="proposal-section" style="margin-top: 0; border: none; padding-top: 0;">
             <div class="proposal-label" style="display: flex; justify-content: space-between; align-items: center;">
               <h2 style="font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 600; color: var(--ink); margin: 0; text-transform: uppercase; letter-spacing: 0.1em;">Proposal preview</h2>
               <button class="btn btn-secondary toolbar-btn" style="font-size: 11px; padding: 0 12px; height: 28px; width: auto; flex: none; white-space: nowrap; margin-left: auto;" onclick="refineProposalAI()" id="btn-ai-refine">
@@ -2876,100 +2903,98 @@
             </div>
           </div>
           <div class="actions-wrapper">
-              <div class="btn-row">
-                <button class="btn btn-primary" onclick="exportCSV()">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                  </svg>
-                  CSV
-                </button>
-                <button class="btn btn-primary" onclick="savePdf()">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                  </svg>
-                  PDF
-                </button>
-                <button class="btn btn-primary" onclick="emailProposal()">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path
-                      d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
-                    ></path>
-                    <polyline points="22,6 12,13 2,6"></polyline>
-                  </svg>
-                  Email
-                </button>
-              </div>
-              <div class="btn-row" style="margin-top: 8px">
-                <button
-                  class="btn btn-primary"
-                  onclick="copyProposal()"
-                  style="width: 100%"
+            <div class="btn-row">
+              <button class="btn btn-primary" onclick="exportCSV()">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <rect
-                      x="9"
-                      y="9"
-                      width="13"
-                      height="13"
-                      rx="2"
-                      ry="2"
-                    ></rect>
-                    <path
-                      d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
-                    ></path>
-                  </svg>
-                  Copy Proposal
-                </button>
-              </div>
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                CSV
+              </button>
+              <button class="btn btn-primary" onclick="savePdf()">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                PDF
+              </button>
+              <button class="btn btn-primary" onclick="emailProposal()">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                  ></path>
+                  <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+                Email
+              </button>
             </div>
-            <div class="copy-feedback" id="copy-feedback"></div>
+            <div class="btn-row" style="margin-top: 8px">
+              <button
+                class="btn btn-primary"
+                onclick="copyProposal()"
+                style="width: 100%"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect
+                    x="9"
+                    y="9"
+                    width="13"
+                    height="13"
+                    rx="2"
+                    ry="2"
+                  ></rect>
+                  <path
+                    d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                  ></path>
+                </svg>
+                Copy Proposal
+              </button>
+            </div>
           </div>
+          <div class="copy-feedback" id="copy-feedback"></div>
         </div>
-        <!-- /right -->
       </div>
       <!-- /app -->
     </div>
