@@ -3089,6 +3089,8 @@
               if (input._flatpickr) input._flatpickr.setDate(input.value);
             } else if (input.tagName === "SELECT") {
               input.selectedIndex = 0;
+            } else if (input.id === "recovery") {
+              input.value = "8";
             } else if (input.id !== "settings-btn") {
               // Avoid clearing the settings button if it somehow got caught
               input.value = "";
@@ -4890,6 +4892,7 @@ Do NOT include any inline styles or color attributes.`
           items: document.getElementById("items").value,
           freeship: document.getElementById("freeship").value,
           "price-range": document.getElementById("price-range").value,
+          recovery: document.getElementById("recovery").value,
           niche: document.getElementById("niche").value,
           subscription: document.getElementById("subscription").value,
           bundles: document.getElementById("bundles").value,
@@ -4936,6 +4939,7 @@ Do NOT include any inline styles or color attributes.`
             "items",
             "freeship",
             "price-range",
+            "recovery",
             "niche",
             "subscription",
             "bundles",
