@@ -1581,6 +1581,14 @@
       >
         <button
           class="settings-btn"
+          title="Reset Form"
+          onclick="window.resetForm()"
+          style="display: flex; align-items: center; justify-content: center;"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+        </button>
+        <button
+          class="settings-btn"
           id="settings-btn"
           title="Settings"
           onclick="
@@ -1758,9 +1766,10 @@
                       class="btn btn-ghost"
                       id="analyze-btn"
                       onclick="window.analyzeStoreWithAI()"
-                      style="flex: none; white-space: nowrap"
+                      style="flex: none; white-space: nowrap; height: 42px; padding: 0 20px; font-size: 11px;"
                     >
-                      ✨ Auto-fill
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><path d="M15 4V2"/><path d="M15 16v-2"/><path d="M8 9h2"/><path d="M20 9h2"/><path d="M17.8 11.8 19 13"/><path d="M15 9h0"/><path d="M17.8 6.2 19 5"/><path d="m3 21 9-9"/><path d="M12.2 6.2 11 5"/></svg>
+                      Auto-fill
                     </button>
                   </div>
                   <button
@@ -2658,8 +2667,8 @@
           <div class="proposal-section">
             <div class="proposal-label" style="display: flex; justify-content: space-between; align-items: center;">
               <h2 style="font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 600; color: var(--ink); margin: 0; text-transform: uppercase; letter-spacing: 0.1em;">Proposal preview</h2>
-              <button class="btn btn-secondary toolbar-btn" style="font-size: 9px; padding: 0 8px; height: 20px; width: auto; flex: none; white-space: nowrap; margin-left: auto;" onclick="refineProposalAI()" id="btn-ai-refine">
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/></svg>
+              <button class="btn btn-secondary toolbar-btn" style="font-size: 11px; padding: 0 12px; height: 28px; width: auto; flex: none; white-space: nowrap; margin-left: auto;" onclick="refineProposalAI()" id="btn-ai-refine">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/></svg>
                 AI Enhance
               </button>
             </div>
@@ -3092,6 +3101,75 @@
           return `<span class="tooltip-trigger comp-tag ${tagClass}">${trimmed}<span class="tooltip-content">${explanation}</span></span>`;
         }).join("");
       }
+
+      window.resetForm = function () {
+        try {
+          // 1. Clear stored state to prevent auto-reload
+          localStorage.removeItem("cartRecoveryCalcState");
+
+          // 2. Reset all standard form controls
+          const inputs = document.querySelectorAll("input, textarea, select");
+          inputs.forEach((input) => {
+            if (input.type === "checkbox" || input.type === "radio") {
+              input.checked = false;
+            } else if (input.id === "currency") {
+              input.value = "$";
+            } else if (input.id === "expiry") {
+              // Restore default expiry (7 days)
+              var d = new Date();
+              d.setDate(d.getDate() + 7);
+              input.value = d.toISOString().split("T")[0];
+              if (input._flatpickr) input._flatpickr.setDate(input.value);
+            } else if (input.tagName === "SELECT") {
+              input.selectedIndex = 0;
+            } else if (input.id !== "settings-btn") {
+              // Avoid clearing the settings button if it somehow got caught
+              input.value = "";
+            }
+
+            // Trigger events for reactive updates
+            input.dispatchEvent(new Event("change", { bubbles: true }));
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+          });
+
+          // 3. Reset internal logic states
+          if (typeof resetProposal === "function") resetProposal();
+          if (typeof selectTier === "function") selectTier(2);
+          window.competitorData = null;
+
+          // 4. Update UI Components
+          const gapContainer = document.getElementById("recovery-gaps-container");
+          if (gapContainer) {
+            gapContainer.style.display = "none";
+            const gapText = document.getElementById("recovery-gaps-text");
+            if (gapText) gapText.innerText = "";
+          }
+
+          const compBtn = document.getElementById("view-competitors-btn");
+          if (compBtn) compBtn.style.display = "none";
+
+          const proposalText = document.getElementById("proposal-text");
+          if (proposalText) {
+            proposalText.innerHTML = `
+              <p class="p-lead placeholder-text">Hey [Contact],</p>
+              <p class="placeholder-text">
+                Fill in the inputs on the left to generate your personalised
+                proposal.
+              </p>
+            `;
+          }
+
+          // 5. Force recalculation of charts and projections
+          if (typeof calc === "function") calc();
+
+          // 6. User feedback
+          if (typeof showFeedback === "function") showFeedback("Form reset successfully");
+
+          console.log("Form reset completed.");
+        } catch (err) {
+          console.error("Reset error:", err);
+        }
+      };
 
       window.openCompetitorModal = function () {
         const overlay = document.getElementById("comp-modal-overlay");
