@@ -1341,6 +1341,12 @@
           text-overflow: ellipsis;
           max-width: calc(100vw - 150px);
         }
+        .mobile-stack {
+          flex-direction: column !important;
+        }
+        .mobile-stack button {
+          width: 100% !important;
+        }
       }
       @media (max-width: 600px) {
         .field-grid,
@@ -1809,7 +1815,7 @@
               <div class="field-grid">
                 <div class="field-group full">
                   <label>Store URL</label>
-                  <div style="display: flex; gap: 8px">
+                  <div class="mobile-stack" style="display: flex; gap: 8px">
                     <input
                       type="text"
                       id="store-url"
