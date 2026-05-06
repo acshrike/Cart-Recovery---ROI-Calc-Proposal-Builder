@@ -380,7 +380,7 @@ span.flatpickr-weekday { color: var(--muted) !important; font-family: 'DM Mono',
       </div>
       <div class="field-group">
         <label>Store conversion rate %</label>
-        <input type="number" id="conv-rate" placeholder="e.g. 2.5" step="0.1" oninput="calc()">
+        <input type="number" id="conv-rate" placeholder="e.g. 2.5" step="0.1" max="100" oninput="calc()">
         <div class="field-hint">From GA4 or Shopify dashboard</div>
       </div>
     </div>
@@ -419,7 +419,7 @@ span.flatpickr-weekday { color: var(--muted) !important; font-family: 'DM Mono',
       </div>
       <div class="field-group">
         <label>Catalog price range (<span class="cur-sym">$</span>)</label>
-        <input type="text" id="price-range" placeholder="e.g. 40–120" oninput="calc()">
+        <input type="text" id="price-range" placeholder="e.g. 40–120" oninput="this.value = this.value.replace(/[^\-0-9. –—]/g, ''); calc()">
         <div class="field-hint">Low to high end</div>
       </div>
       <div class="field-group">
@@ -635,6 +635,9 @@ span.flatpickr-weekday { color: var(--muted) !important; font-family: 'DM Mono',
 
 </div><!-- /app -->
 <script>
+window.currentAovAiRec = null;
+window.currentAovAiRecKey = null;
+
 var tier=2;
 var tiers={
   1:{name:'Starter',price:1500,features:'a 3-email abandoned cart sequence, 1 SMS recovery touch, and a monthly performance report'},
@@ -702,7 +705,7 @@ function estimateAOV(){
   var used=0;
   if(pr)used++;if(items>1)used++;if(sub!=='no')used++;if(bundles==='yes')used++;if(freeship>0)used++;
   var confLevel=used>=4?'high':used>=2?'medium':'low';
-  var confLabel=used>=4?'High confidence estimate':used>=2?'Medium confidence estimate':'Low confidence — add price range, items/order & shipping threshold';
+  var confLabel=used>=4?'High confidence estimate':used>=2?'Medium confidence estimate':"Low confidence estimate. To improve accuracy, add values for 'Catalog price range', 'Avg items per order', and 'Free shipping threshold'";
   var confText=signals.length?confLabel+'. Adjusted for: '+signals.join(', ')+'.':confLabel+'.';
   return{val:Math.round(aov),source:'estimated',confidence:confText,confidenceLevel:confLevel};
 }
@@ -740,6 +743,11 @@ function updateTierPrice(id, val) {
 }
 
 function calc(){
+  ['current-rate', 'atc', 'abandon', 'mobile-pct', 'paid-pct', 'conv-rate', 'repeat-rate', 'refund-rate', 'discount-offered'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el && parseFloat(el.value) > 100) el.value = 100;
+  });
+
   var cur = getCurrency();
   document.querySelectorAll('.cur-sym').forEach(function(el) {
     el.textContent = cur;
@@ -803,7 +811,7 @@ function calc(){
   var discountOffered=parseFloat(document.getElementById('discount-offered').value)||0;
   var softwareCost=parseFloat(document.getElementById('software-cost').value)||0;
 
-  // Paid recovery uplift: paid traffic recovers ~15% better
+  // paid traffic recovers ~15% better
   var recoveryAdjusted=recovery;
   if(paidPct>0) recoveryAdjusted=recovery*(1+(paidPct/100)*0.15);
 
@@ -811,12 +819,33 @@ function calc(){
   var aovResult=estimateAOV();
   var aov=aovResult.val;
   var confEl=document.getElementById('aov-confidence-right');
-  if(aovResult.source==='estimated'&&aovResult.confidence){confEl.textContent=aovResult.confidence;confEl.style.display='block';}
-  else confEl.style.display='none';
-  // Also show in left panel
   var confElLeft=document.getElementById('aov-confidence');
-  if(aovResult.source==='estimated'&&aovResult.confidence){confElLeft.textContent=aovResult.confidence;confElLeft.style.display='block';}
-  else confElLeft.style.display='none';
+  
+  if(aovResult.source==='estimated'&&aovResult.confidence){
+      var confHtml = aovResult.confidence;
+      if (aovResult.confidenceLevel === 'low') {
+         if (window.getAovAiRecommendation) {
+             window.getAovAiRecommendation();
+         }
+         if (window.currentAovAiRec) {
+             confHtml += "<br><br><strong>AI Hint:</strong> " + window.currentAovAiRec;
+         } else {
+             confHtml += "<br><br><em>Loading AI recommendation...</em>";
+         }
+      } else {
+         window.currentAovAiRec = null; // clear it when confidence improves
+         window.currentAovAiRecKey = null;
+      }
+      confEl.innerHTML=confHtml;
+      confElLeft.innerHTML=confHtml;
+      confEl.style.display='block';
+      confElLeft.style.display='block';
+  } else {
+      confEl.style.display='none';
+      confElLeft.style.display='none';
+      window.currentAovAiRec = null;
+      window.currentAovAiRecKey = null;
+  }
 
   var brand=document.getElementById('brand').value||'[Brand]';
   var contact=document.getElementById('contact').value||'[Contact]';
@@ -1143,6 +1172,61 @@ calc();
   
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
   
+  let aovRecTimer = null;
+  window.aovAiCache = {};
+  window.getAovAiRecommendation = function() {
+    clearTimeout(aovRecTimer);
+    aovRecTimer = setTimeout(async () => {
+      const brand = document.getElementById('brand').value.trim();
+      const niche = document.getElementById('niche').value;
+      const url = document.getElementById('store-url').value.trim();
+      if (!brand && !url) {
+         window.currentAovAiRec = "Enter a Store URL or Brand name for an AI-powered AOV recommendation.";
+         window.calc();
+         return;
+      }
+      
+      const key = `${brand}-${niche}-${url}`;
+      if (window.currentAovAiRecKey === key) return; // already fetched or fetching
+      
+      if (window.aovAiCache[key]) {
+         window.currentAovAiRecKey = key;
+         window.currentAovAiRec = window.aovAiCache[key];
+         window.calc();
+         return;
+      }
+      
+      window.currentAovAiRecKey = key; // Lock
+      try {
+        const response = await ai.models.generateContent({
+          model: 'gemini-2.5-flash',
+          contents: `We are analyzing AOV (Average Order Value) for this e-commerce brand:
+Brand: ${brand || 'Unknown'}
+URL: ${url || 'Unknown'}
+Niche: ${niche || 'Unknown'}
+
+Our estimate logic is missing these inputs: 'Catalog price range', 'Avg items per order', and 'Free shipping threshold'.
+
+Provide a 1-2 sentence recommendation specifying realistic estimates for these missing values based on what you know about the brand, their typical products, or their specific industry. Explain briefly why these fit. Do NOT use markdown formatting.`
+        });
+        
+        const rec = response.text.trim();
+        window.aovAiCache[key] = rec;
+        
+        // Only update if we are still analyzing the same store
+        if (window.currentAovAiRecKey === key) {
+           window.currentAovAiRec = rec;
+           window.calc();
+        }
+      } catch (err) {
+        console.error("AI AOV Recommendation error:", err);
+        window.currentAovAiRecKey = null; // unlock
+        window.currentAovAiRec = "Failed to load AI recommendation. Please try again.";
+        window.calc();
+      }
+    }, 1200);
+  };
+  
   window.analyzeStoreWithAI = async function() {
     const url = document.getElementById('store-url').value.trim();
     if (!url) {
@@ -1201,8 +1285,29 @@ calc();
       if (data.aovKnown) document.getElementById('aov-known').value = data.aovKnown;
       if (data.items !== undefined) document.getElementById('items').value = data.items;
       if (data.freeship !== undefined) document.getElementById('freeship').value = data.freeship;
-      if (data.esp) document.getElementById('esp').value = data.esp;
+      if (data.esp) {
+        document.getElementById('esp').value = data.esp;
+        if (window.toggleCustomESP) window.toggleCustomESP();
+      }
       if (data.existingFlow && data.existingFlow !== 'unknown') document.getElementById('existing-flow').value = data.existingFlow;
+
+      if (!data.contactName || !data.clientEmail) {
+        try {
+          btn.innerHTML = 'Finding contacts...';
+          const deepSearchRes = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: `Perform a deep targeted web search to find the founder, CEO, owner, or primary contact email for the e-commerce brand "${data.brand || url}" on ${url}.
+            Return ONLY a JSON object with keys "contactName" and "clientEmail". If not found, leave as empty strings.`,
+            tools: [{ googleSearch: {} }]
+          });
+          let dsText = deepSearchRes.text.replace(/```json/gi, '').replace(/```/gi, '').trim();
+          const dsData = JSON.parse(dsText);
+          if (!data.contactName && dsData.contactName) document.getElementById('contact').value = dsData.contactName;
+          if (!data.clientEmail && dsData.clientEmail) document.getElementById('client-email').value = dsData.clientEmail;
+        } catch (e) {
+          console.error("Deep search error:", e);
+        }
+      }
       
       window.calc();
       
