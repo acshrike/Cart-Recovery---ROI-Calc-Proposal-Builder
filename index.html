@@ -1255,18 +1255,26 @@
 
       @media (max-width: 960px) {
         .sidebar {
-          display: none !important;
+          height: calc(100vh - 64px) !important;
+          position: sticky !important;
+          top: 64px !important;
+          z-index: 100 !important;
+          display: flex !important;
+        }
+        .sidebar-toggle-btn {
+          display: flex !important;
         }
         .main-layout {
-          display: block;
-          overflow-y: auto;
-          height: auto;
+          display: flex !important;
+          flex-direction: row !important;
+          overflow-x: hidden !important;
         }
         .app {
           display: block !important;
-          height: auto !important;
-          overflow: visible !important;
-          width: 100% !important;
+          flex: 1 !important;
+          height: 100% !important;
+          overflow-y: auto !important;
+          min-width: 0 !important;
         }
         .left {
           height: auto !important;
