@@ -2701,6 +2701,8 @@
                   <option value="data_driven">Data-Driven Report</option>
                   <option value="concise">Concise Summary</option>
                   <option value="fomo">FOMO / Competitive Analysis</option>
+                   <option value="benefit">Benefit-driven</option>
+                   <option value="quick_win">Quick Win Focused</option>
                 </select>
               </div>
               <div class="field-group">
@@ -4334,7 +4336,7 @@
             "x</strong>.</p>";
         } else if (pTpl === "fomo") {
           html = '<p class="p-lead">Hey ' + contact + ',</p>';
-          var brandName = nicheData[niche] && nicheData[niche].famousBrand ? nicheData[niche].famousBrand : "your category leaders";
+          var brandName = window.famousBrand || (nicheData[niche] && nicheData[niche].famousBrand) || "your category leaders";
           html += '<p>I was analyzing strategies in the <strong>' + niche + '</strong> space, and I noticed that leaders like <strong>' + brandName + '</strong> are using sophisticated recovery tactics that you are currently missing out on:</p>';
           if (window.competitorData && window.competitorData.length > 0) {
             window.competitorData.slice(0, 2).forEach(function(comp) {
@@ -4343,6 +4345,16 @@
           }
           html += '<p>Why allow this competitive advantage to go to them instead of you? We can bridge this gap and plug these leaks immediately.</p>';
           html += '<p class="p-price">Investment: ' + fmt(t.price, 0) + "/month.</p>";
+        } else if (pTpl === "benefit") {
+          html = '<p class="p-lead">Hi ' + contact + ',</p>';
+          html += '<p>Focusing on the customer journey, we can enhance <strong>' + brand + '</strong>\'s conversion rate by addressing the root causes of abandonment.</p>';
+          html += '<p>By implementing a behavioral recovery strategy, we anticipate recovering <strong>' + fmt(recovered) + '</strong>/month in revenue, while actively increasing engagement and brand loyalty.</p>';
+          html += '<p>With ' + t.name + ' (<strong>' + fmt(t.price) + '</strong>/mo), you gain a sustainable pipeline for long-term growth.</p>';
+        } else if (pTpl === "quick_win") {
+          html = '<p class="p-lead">Hi ' + contact + ',</p>';
+          html += '<p>We can launch a high-impact, low-lift recovery strategy for <strong>' + brand + '</strong> within 48 hours to start capturing lost sales immediately.</p>';
+          html += '<p>This rapid deployment is designed to solve your most acute revenue leaks by targeting the highest-value carts, projecting <strong>' + fmt(recovered) + '</strong> in immediate monthly gains.</p>';
+          html += '<p>Investment for ' + t.name + ' is <strong>' + fmt(t.price) + '</strong>/mo.</p>';
         } else if (pTpl === "concise") {
           html =
             '<p class="p-lead">Hi ' + contact + ",</p>";
@@ -4379,6 +4391,15 @@
         } else if (pTpl === "concise") {
           html +=
             '<p class="p-lead">If this sounds good, reply YES and we\'ll get started.</p>';
+        } else if (pTpl === "fomo") {
+          html +=
+            '<p class="p-lead">Ready to stop losing this revenue to your competitors? Reply YES and we can start within 24 hours.</p>';
+        } else if (pTpl === "benefit") {
+          html +=
+            '<p class="p-lead">Let\'s get started on enhancing your customer journey. Reply YES and I\'ll send over the agreement.</p>';
+        } else if (pTpl === "quick_win") {
+          html +=
+            '<p class="p-lead">Ready for an immediate lift? Reply YES and we will start the 48-hour launch sequence.</p>';
         }
 
         if (expiryLine)
@@ -4731,7 +4752,8 @@ Provide a 1-2 sentence recommendation specifying realistic estimates for these m
           "items": number,
           "freeship": number,
           "competitors": [{"name": "string", "tactics": "string", "strengths": "string", "weaknesses": "string"}],
-          "recoveryGaps": "string"
+          "recoveryGaps": "string",
+          "famousBrand": "string"
         }
         
         Ensure the JSON is strictly valid, with no markdown formatting, no trailing commas, and no explanations. If you cannot find a value, use null or a sensible default.
@@ -4771,6 +4793,7 @@ Provide a 1-2 sentence recommendation specifying realistic estimates for these m
             const compBtn = document.getElementById("view-competitors-btn");
             if (compBtn) compBtn.style.display = "none";
           }
+          window.famousBrand = data.famousBrand;
 
           if (data.brand) document.getElementById("brand").value = data.brand;
           if (data.contactName)
@@ -4883,6 +4906,13 @@ Provide a 1-2 sentence recommendation specifying realistic estimates for these m
           const contact = document.getElementById("contact").value || "Contact";
           const niche = document.getElementById("niche").value || "General E-com";
           
+          let competitorAnalysis = "";
+          if (window.competitorData && window.competitorData.length > 0) {
+            competitorAnalysis = "Relevant Competitors in this niche:\\n" + window.competitorData.map(c => 
+              `- ${c.name}: Tactics include ${c.tactics}. Strengths: ${c.strengths}. Weaknesses: ${c.weaknesses}.`
+            ).join("\\n") + "\\nUse this competitor analysis to tailor the proposal's messaging, explicitly highlighting the client's competitive advantages where they align with competitor weaknesses, and suggesting a strategy that addresses any identified market gaps in the niche.";
+          }
+          
           let currentContent = document.getElementById("proposal-text").innerHTML;
 
           const response = await ai.models.generateContent({
@@ -4890,6 +4920,7 @@ Provide a 1-2 sentence recommendation specifying realistic estimates for these m
             contents: `You are an expert copywriter and sales strategist for cart recovery proposals. 
 Your goal is to refine, enhance, and structure the text of an e-commerce cart recovery proposal.
 The proposal is for the brand "${brand}" and the contact "${contact}". Their niche is "${niche}".
+${competitorAnalysis}
 Here is the current text/HTML of the proposal:
 
 ${currentContent}
