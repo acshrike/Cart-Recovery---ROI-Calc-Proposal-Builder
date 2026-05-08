@@ -3309,17 +3309,24 @@
 
           // 2. Reset all standard form controls
           const inputs = document.querySelectorAll("input, textarea, select");
+          const settingsIds = ["currency", "your-name", "proposal-template", "testimonial", "t1-price-input", "t2-price-input", "t3-price-input", "expiry"];
+          const protectedElements = new Set();
+          settingsIds.forEach((id) => {
+            const el = document.getElementById(id);
+            if (el) {
+              protectedElements.add(el);
+              if (el._flatpickr && el._flatpickr.altInput) {
+                protectedElements.add(el._flatpickr.altInput);
+              }
+            }
+          });
+
           inputs.forEach((input) => {
             if (input.type === "checkbox" || input.type === "radio") {
               input.checked = false;
-            } else if (input.id === "currency") {
-              input.value = "$";
-            } else if (input.id === "expiry") {
-              // Restore default expiry (7 days)
-              var d = new Date();
-              d.setDate(d.getDate() + 7);
-              input.value = d.toISOString().split("T")[0];
-              if (input._flatpickr) input._flatpickr.setDate(input.value);
+            } else if (protectedElements.has(input)) {
+              // Skip resetting proposal settings
+              return;
             } else if (input.tagName === "SELECT") {
               input.selectedIndex = 0;
             } else if (input.id === "recovery") {
@@ -5226,6 +5233,7 @@ Do NOT include any inline styles or color attributes.`
           "t1-price": tiers[1].price,
           "t2-price": tiers[2].price,
           "t3-price": tiers[3].price,
+          testimonial: document.getElementById("testimonial").value,
           // Handle the proposal editing
           "proposal-text": document.getElementById("proposal-text").innerHTML,
           proposalManuallyEdited: proposalManuallyEdited,
@@ -5263,6 +5271,7 @@ Do NOT include any inline styles or color attributes.`
             "currency",
             "your-name",
             "proposal-template",
+            "testimonial",
             "expiry",
             "t1-price-input",
             "t2-price-input",
