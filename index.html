@@ -2791,13 +2791,8 @@
                 <label>Proposal Template</label>
                 <select id="proposal-template" onchange="resetProposal()" style="background-color: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1);">
                   <option value="standard">Standard Template</option>
-                  <option value="aggressive">Aggressive / Hard Sell</option>
                   <option value="short">Short & Sweet</option>
-                  <option value="data_driven">Data-Driven Report</option>
                   <option value="concise">Concise Summary</option>
-                  <option value="fomo">FOMO / Competitive Analysis</option>
-                   <option value="benefit">Benefit-driven</option>
-                   <option value="quick_win">Quick Win Focused</option>
                 </select>
               </div>
               <div class="field-group">
@@ -4452,28 +4447,6 @@
           html += "</p>";
           html +=
             '<p class="p-price">Investment: ' + fmt(t.price) + "/month.</p>";
-        } else if (pTpl === "aggressive") {
-          html = '<p class="p-lead">Hey ' + contact + ",</p>";
-          html +=
-            "<p>Every month you wait, " + brand + " is losing <strong>" +
-            fmt(netLost) +
-            "</strong> to cart abandonment. I can help you capture <strong>" +
-            fmt(recovered) +
-            "</strong> of that immediately with more aggressive, AI-driven flows.</p>";
-          html +=
-            "<p>The ROI on the <strong>" +
-            t.name +
-            "</strong> plan is <strong>" +
-            roi +
-            "x</strong>. Your investment of <strong>" +
-            fmt(t.price) +
-            "</strong>/mo should pay for itself in just <strong>" +
-            paybackDays +
-            " days</strong>.</p>";
-          html +=
-            '<p class="p-price">Let\'s stop the revenue leak. Investment: ' +
-            fmt(t.price) +
-            "/month.</p>";
         } else if (pTpl === "short") {
           html = '<p class="p-lead">Hi ' + contact + ",</p>";
           html +=
@@ -4486,57 +4459,6 @@
             "</strong> plan for <strong>" +
             fmt(t.price) +
             "</strong>/mo.</p>";
-        } else if (pTpl === "data_driven") {
-          html = '<p class="p-lead">Hi ' + contact + ",</p>";
-          html +=
-            "<p>I've put together a projection for <strong>" + brand + "</strong> based on your current traffic and abandonment data:</p>";
-          html += "<ul>";
-          html +=
-            "<li><strong>Monthly Visitors:</strong> " +
-            Math.round(visitors).toLocaleString() +
-            "</li>";
-          html +=
-            "<li><strong>Abandoned Carts:</strong> " +
-            Math.round(abandonedCarts).toLocaleString() +
-            "/mo</li>";
-          html +=
-            "<li><strong>Target Recovery Rate:</strong> " +
-            Math.round(recoveryAdjusted) +
-            "%</li>";
-          html +=
-            "<li><strong>Projected Revenue Lift:</strong> " +
-            fmt(recovered) +
-            "/mo</li>";
-          html += "</ul>";
-          html +=
-            "<p>Under the <strong>" +
-            t.name +
-            "</strong> plan (<strong>" +
-            fmt(t.price) +
-            "</strong>/mo), we're looking at a projected ROI of <strong>" +
-            roi +
-            "x</strong>.</p>";
-        } else if (pTpl === "fomo") {
-          html = '<p class="p-lead">Hey ' + contact + ',</p>';
-          var brandName = window.famousBrand || (nicheData[niche] && nicheData[niche].famousBrand) || "your category leaders";
-          html += '<p>I\'ve been looking at the top players in the <strong>' + niche + '</strong> space. Leaders like <strong>' + brandName + '</strong> are using sophisticated recovery tactics that ' + brand + ' is currently missing out on:</p>';
-          if (window.competitorData && window.competitorData.length > 0) {
-            window.competitorData.slice(0, 2).forEach(function(comp) {
-              html += '<p><strong>' + comp.name + '</strong> is already leveraging ' + comp.tactics + '.</p>';
-            });
-          }
-          html += '<p>There\'s no reason to let this revenue go to them. We can bridge this gap and plug these leaks immediately.</p>';
-          html += '<p class="p-price">Investment: ' + fmt(t.price, 0) + "/month.</p>";
-        } else if (pTpl === "benefit") {
-          html = '<p class="p-lead">Hi ' + contact + ',</p>';
-          html += '<p>I\'ve been looking at the customer journey for <strong>' + brand + '</strong>. We can see a significant conversion lift by addressing the root causes of abandonment.</p>';
-          html += '<p>By implementing a behavioral recovery strategy, I anticipate we can recover <strong>' + fmt(recovered) + '</strong>/month. This doesn\'t just save sales; it builds brand loyalty by helping customers when they\'re most interested.</p>';
-          html += '<p>With ' + t.name + ' (<strong>' + fmt(t.price) + '</strong>/mo), you\'ll have a sustainable system for consistent growth.</p>';
-        } else if (pTpl === "quick_win") {
-          html = '<p class="p-lead">Hi ' + contact + ',</p>';
-          html += '<p>I can launch a high-impact recovery strategy for <strong>' + brand + '</strong> within the next 48 hours to start capturing lost sales immediately.</p>';
-          html += '<p>This is designed to plug your most acute revenue leaks by targeting high-value carts first. I project <strong>' + fmt(recovered) + '</strong> in immediate monthly gains.</p>';
-          html += '<p>Investment for the ' + t.name + ' plan is <strong>' + fmt(t.price) + '</strong>/mo.</p>';
         } else if (pTpl === "concise") {
           html = '<p class="p-lead">Hi ' + contact + ",</p>";
           html +=
@@ -4560,28 +4482,13 @@
 
         if (pTpl === "standard") {
           html +=
-            '<p class="p-lead">Reply YES and I\'ll send the agreement over today. I only have a few spots available this month.</p>';
-        } else if (pTpl === "aggressive") {
-          html +=
-            '<p class="p-lead">Let’s get this live by next week so we can start capturing this revenue. Reply YES and I’ll send the link.</p>';
+            '<p class="p-lead">Reply to this and I\'ll send the agreement over today.</p>';
         } else if (pTpl === "short") {
           html +=
-            '<p class="p-lead">Let me know if you want to proceed and I\'ll send over the next steps.</p>';
-        } else if (pTpl === "data_driven") {
-          html +=
-            '<p class="p-lead">Please review the figures above and let me know if you have any questions or are ready to get started.</p>';
+            '<p class="p-lead">Reply and I\'ll send the next steps over today.</p>';
         } else if (pTpl === "concise") {
           html +=
-            '<p class="p-lead">If this looks good, reply YES and I\'ll get the ball rolling.</p>';
-        } else if (pTpl === "fomo") {
-          html +=
-            '<p class="p-lead">Ready to stop losing this revenue to your competitors? Reply YES and we can have this live for you within 24 hours.</p>';
-        } else if (pTpl === "benefit") {
-          html +=
-            '<p class="p-lead">Let\'s get started on enhancing your customer journey. Reply YES and I\'ll send the formal agreement.</p>';
-        } else if (pTpl === "quick_win") {
-          html +=
-            '<p class="p-lead">Ready for an immediate lift? Reply YES and I\'ll start the 48-hour launch sequence for you.</p>';
+            '<p class="p-lead">Reply and I\'ll send the agreement over today.</p>';
         }
 
         if (expiryLine)
