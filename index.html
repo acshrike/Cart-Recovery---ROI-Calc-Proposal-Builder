@@ -91,6 +91,9 @@
         flex: 1;
         overflow: hidden;
       }
+      .sidebar, .sidebar * {
+        box-sizing: border-box;
+      }
       .sidebar {
         width: 240px;
         background: var(--cream);
@@ -103,9 +106,15 @@
         justify-content: space-between;
         z-index: 40;
         position: relative;
+        overflow-x: hidden;
+        overflow-y: hidden;
       }
       .sidebar.collapsed {
         width: 64px;
+        overflow-x: hidden;
+      }
+      .sidebar-link {
+        white-space: nowrap;
       }
       .sidebar-toggle-btn {
         background: transparent;
@@ -146,19 +155,28 @@
       }
       .sidebar-footer {
         padding: 16px;
+        padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
         border-top: 1px solid var(--border);
         display: flex;
         flex-direction: column;
         gap: 8px;
         background: var(--cream);
         position: relative;
+        box-sizing: border-box;
+        width: 100%;
+        overflow: hidden;
       }
       .sidebar.collapsed .sidebar-footer {
-        padding: 12px 6px;
+        padding: 16px 6px;
+        padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
         align-items: center;
+        width: 64px;
       }
       .sidebar.collapsed .sidebar-footer > div {
         flex-direction: column !important;
+        width: 100%;
+        display: flex;
+        align-items: center;
       }
       .sidebar.collapsed .sidebar-footer .settings-btn {
         width: 100%;
@@ -259,9 +277,7 @@
         color: var(--cream);
       }
       .sidebar.collapsed .nav-text {
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.2s;
+        display: none;
       }
       .sidebar-link:hover,
       .sidebar-link.active {
@@ -1136,24 +1152,18 @@
       }
 
       .settings-popover {
-        position: absolute;
-        bottom: 100%;
-        left: 16px;
-        margin-bottom: 8px;
+        position: fixed;
         background: var(--white);
         border: 1px solid var(--border);
         border-radius: 6px;
         padding: 16px;
         width: 200px;
-        z-index: 100;
+        z-index: 200;
         box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.1);
         display: none;
         flex-direction: column;
         gap: 8px;
-      }
-      .sidebar.collapsed .settings-popover {
-        left: 64px;
-        bottom: 16px;
+        pointer-events: auto;
       }
       .settings-popover.visible {
         display: flex;
@@ -1282,11 +1292,12 @@
 
       @media (max-width: 960px) {
         .sidebar {
-          height: calc(100vh - 64px) !important;
+          height: 100% !important;
           position: sticky !important;
           top: 64px !important;
           z-index: 100 !important;
           display: flex !important;
+          overflow: hidden !important; 
         }
         .sidebar-toggle-btn {
           display: flex !important;
@@ -1295,6 +1306,7 @@
           display: flex !important;
           flex-direction: row !important;
           overflow-x: hidden !important;
+          height: 100% !important;
         }
         .app {
           display: block !important;
@@ -1804,39 +1816,28 @@
           >
         </nav>
         <div class="sidebar-footer">
-          <div id="settings-popover" class="settings-popover">
-            <div class="field-group">
-              <label>Currency</label>
-              <select id="currency" onchange="calc()">
-                <option value="$">USD ($)</option>
-                <option value="£">GBP (£)</option>
-                <option value="€">EUR (€)</option>
-                <option value="A$">AUD (A$)</option>
-                <option value="C$">CAD (C$)</option>
-                <option value="₹">INR (₹)</option>
-              </select>
-            </div>
-            <div style="border-top: 1px solid rgba(255,255,255,0.1); margin: 8px 0; padding-top: 8px;">
-              <button 
-                class="btn btn-secondary toolbar-btn" 
-                style="width: 100%; font-size: 11px; height: 32px; justify-content: center; background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.2); color: var(--accent);"
-                onclick="openHelpModal()"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                Calculations Help
-              </button>
-            </div>
-          </div>
           <div style="width: 100%;">
             <button
               class="settings-btn"
               id="settings-btn"
               title="Settings"
-              style="width: 100%; height: 36px;"
+              style="width: 100%; height: 36px; box-sizing: border-box;"
               onclick="
-                document
-                  .getElementById('settings-popover')
-                  .classList.toggle('visible')
+                const popover = document.getElementById('settings-popover');
+                const btn = document.getElementById('settings-btn');
+                const sidebar = document.querySelector('.sidebar');
+                const rect = btn.getBoundingClientRect();
+                
+                if (sidebar.classList.contains('collapsed')) {
+                  // Position outside to the right when retracted
+                  popover.style.left = (rect.right + 10) + 'px';
+                  popover.style.bottom = (window.innerHeight - rect.bottom) + 'px';
+                } else {
+                  // Position inside (above) the button when expanded
+                  popover.style.left = rect.left + 'px';
+                  popover.style.bottom = (window.innerHeight - rect.top + 8) + 'px';
+                }
+                popover.classList.toggle('visible');
               "
             >
               <svg
@@ -3111,6 +3112,31 @@
       <!-- /app -->
     </div>
     <!-- /main-layout -->
+
+    <!-- Settings Popover (Moved here to avoid sidebar clipping) -->
+    <div id="settings-popover" class="settings-popover">
+      <div class="field-group">
+        <label>Currency</label>
+        <select id="currency" onchange="calc()">
+          <option value="$">USD ($)</option>
+          <option value="£">GBP (£)</option>
+          <option value="€">EUR (€)</option>
+          <option value="A$">AUD (A$)</option>
+          <option value="C$">CAD (C$)</option>
+          <option value="₹">INR (₹)</option>
+        </select>
+      </div>
+      <div style="border-top: 1px solid rgba(255,255,255,0.1); margin: 8px 0; padding-top: 8px;">
+        <button 
+          class="btn btn-secondary toolbar-btn" 
+          style="width: 100%; font-size: 11px; height: 32px; justify-content: center; background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.2); color: var(--accent);"
+          onclick="openHelpModal()"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          Calculations Help
+        </button>
+      </div>
+    </div>
 
     <!-- Help / Explanation Modal -->
     <div id="help-modal-overlay" class="modal-overlay" onclick="closeHelpModal()">
