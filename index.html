@@ -97,11 +97,12 @@
         border-right: 1px solid var(--border);
         display: flex;
         flex-direction: column;
-        padding: 24px 0;
+        padding: 24px 0 0 0;
         flex-shrink: 0;
-        overflow-y: auto;
-        overflow-x: hidden;
         transition: width 0.3s ease;
+        justify-content: space-between;
+        z-index: 40;
+        position: relative;
       }
       .sidebar.collapsed {
         width: 64px;
@@ -140,6 +141,28 @@
         display: flex;
         flex-direction: column;
         gap: 4px;
+        overflow-y: auto;
+        flex: 1;
+      }
+      .sidebar-footer {
+        padding: 16px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        background: var(--cream);
+        position: relative;
+      }
+      .sidebar.collapsed .sidebar-footer {
+        padding: 12px 6px;
+        align-items: center;
+      }
+      .sidebar.collapsed .sidebar-footer > div {
+        flex-direction: column !important;
+      }
+      .sidebar.collapsed .sidebar-footer .settings-btn {
+        width: 100%;
+        padding: 0;
       }
       .sidebar-link {
         padding: 10px 18px;
@@ -1114,19 +1137,23 @@
 
       .settings-popover {
         position: absolute;
-        top: 100%;
-        right: 0;
-        margin-top: 8px;
+        bottom: 100%;
+        left: 16px;
+        margin-bottom: 8px;
         background: var(--white);
         border: 1px solid var(--border);
         border-radius: 6px;
         padding: 16px;
         width: 200px;
         z-index: 100;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.1);
         display: none;
         flex-direction: column;
         gap: 8px;
+      }
+      .sidebar.collapsed .settings-popover {
+        left: 64px;
+        bottom: 16px;
       }
       .settings-popover.visible {
         display: flex;
@@ -1634,6 +1661,28 @@
       details > summary::-webkit-details-marker {
         display: none;
       }
+
+      /* Help Modal Specific Styles */
+      .math-formula {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 12px 16px;
+        border-radius: 6px;
+        font-family: 'DM Mono', monospace;
+        color: var(--accent);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        margin: 12px 0;
+        font-size: 13px;
+        line-height: 1.4;
+      }
+      .help-section-title {
+        color: var(--ink);
+        font-weight: 600;
+        margin-top: 24px;
+        margin-bottom: 8px;
+        font-size: 15px;
+        border-left: 2px solid var(--accent);
+        padding-left: 12px;
+      }
     </style>
   </head>
   <body>
@@ -1659,46 +1708,6 @@
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
         </button>
-        <button
-          class="settings-btn"
-          id="settings-btn"
-          title="Settings"
-          onclick="
-            document
-              .getElementById('settings-popover')
-              .classList.toggle('visible')
-          "
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <circle cx="12" cy="12" r="3"></circle>
-            <path
-              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
-            ></path>
-          </svg>
-        </button>
-        <div id="settings-popover" class="settings-popover">
-          <div class="field-group">
-            <label>Currency</label>
-            <select id="currency" onchange="calc()">
-              <option value="$">USD ($)</option>
-              <option value="£">GBP (£)</option>
-              <option value="€">EUR (€)</option>
-              <option value="A$">AUD (A$)</option>
-              <option value="C$">CAD (C$)</option>
-              <option value="₹">INR (₹)</option>
-            </select>
-          </div>
-        </div>
       </div>
     </header>
 
@@ -1794,6 +1803,61 @@
             ><span class="nav-text">Investment tiers</span></a
           >
         </nav>
+        <div class="sidebar-footer">
+          <div id="settings-popover" class="settings-popover">
+            <div class="field-group">
+              <label>Currency</label>
+              <select id="currency" onchange="calc()">
+                <option value="$">USD ($)</option>
+                <option value="£">GBP (£)</option>
+                <option value="€">EUR (€)</option>
+                <option value="A$">AUD (A$)</option>
+                <option value="C$">CAD (C$)</option>
+                <option value="₹">INR (₹)</option>
+              </select>
+            </div>
+            <div style="border-top: 1px solid rgba(255,255,255,0.1); margin: 8px 0; padding-top: 8px;">
+              <button 
+                class="btn btn-secondary toolbar-btn" 
+                style="width: 100%; font-size: 11px; height: 32px; justify-content: center; background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.2); color: var(--accent);"
+                onclick="openHelpModal()"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                Calculations Help
+              </button>
+            </div>
+          </div>
+          <div style="width: 100%;">
+            <button
+              class="settings-btn"
+              id="settings-btn"
+              title="Settings"
+              style="width: 100%; height: 36px;"
+              onclick="
+                document
+                  .getElementById('settings-popover')
+                  .classList.toggle('visible')
+              "
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="3"></circle>
+                <path
+                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+                ></path>
+              </svg>
+            </button>
+          </div>
+        </div>
       </aside>
 
       <div class="app">
@@ -1948,7 +2012,7 @@
               <div class="field-group">
                 <label>Niche / category</label>
                 <select id="niche" onchange="applyNiche()">
-                  <option value="">Select niche — auto-fills benchmarks</option>
+                  <option value="">Select a niche to auto-fill industry benchmarks</option>
                   <option value="supplements">Supplements & health</option>
                   <option value="fashion">Fashion & apparel</option>
                   <option value="beauty">Beauty & skincare</option>
@@ -1983,7 +2047,7 @@
                   <option value="mailchimp">Mailchimp</option>
                   <option value="omnisend">Omnisend</option>
                   <option value="drip">Drip</option>
-                  <option value="none">None — nothing set up</option>
+                  <option value="none">None (nothing set up yet)</option>
                   <option value="other">Other</option>
                 </select>
                 <div class="info-box" id="esp-hint"></div>
@@ -2003,10 +2067,10 @@
               <div class="field-group">
                 <label>Cart recovery flow running?</label>
                 <select id="existing-flow" onchange="calc()">
-                  <option value="no">No — zero set up</option>
+                  <option value="no">No (zero setup currently)</option>
                   <option value="basic">Basic (1–2 emails only)</option>
                   <option value="partial">Partial (no SMS / no AI)</option>
-                  <option value="yes">Yes — full flow running</option>
+                  <option value="yes">Yes (complete multi-channel system)</option>
                 </select>
                 <div class="field-hint">
                   Frames the improvement delta in your pitch
@@ -2027,7 +2091,7 @@
                   oninput="calc()"
                 />
                 <div class="field-hint">
-                  Baseline — your pitch is the delta above this
+                  Baseline: your pitch is the improvement above this figure
                 </div>
               </div>
               <div class="field-group">
@@ -2140,7 +2204,7 @@
                       oninput="calc()"
                     />
                     <div class="field-hint">
-                      Paid recovers better — higher intent
+                      Paid traffic typically recovers better because of the higher purchase intent
                     </div>
                   </div>
                 </div>
@@ -2234,7 +2298,7 @@
                     <select id="subscription" onchange="calc()">
                       <option value="no">No</option>
                       <option value="some">Some (mixed)</option>
-                      <option value="yes">Yes — primary model</option>
+                      <option value="yes">Yes (it is the primary model)</option>
                     </select>
                     <div class="field-hint">Subs lower AOV, raise LTV</div>
                   </div>
@@ -2284,7 +2348,7 @@
                       oninput="calc()"
                     />
                     <div class="field-hint">
-                      Deflates actual recovered revenue — shown in net calc
+                      This lowers the actual recovered revenue as shown in the net calculation
                     </div>
                   </div>
                   <div class="field-group">
@@ -2325,11 +2389,11 @@
                 <input
                   type="number"
                   id="rev-reported"
-                  placeholder="What they tell you — e.g. 150000"
+                  placeholder="Reported revenue (e.g. 150000)"
                   oninput="calc()"
                 />
                 <div class="field-hint">
-                  Cross-checks against traffic × AOV × conv rate — flags
+                  Cross-checks against traffic, AOV, and conversion rates to flag discrepancies
                   discrepancies
                 </div>
                 <div class="rev-check" id="rev-check"></div>
@@ -2382,7 +2446,7 @@
                       oninput="calc()"
                     />
                     <div class="field-hint">
-                      In recovery emails — lowers recouped revenue
+                      Discounts in recovery emails lower the final recouped revenue
                     </div>
                     <div id="discount-impact-indicator" class="info-box amber" style="margin-top: 10px; display: none; margin-bottom: -10px;"></div>
                   </div>
@@ -2419,7 +2483,7 @@
                       oninput="calc()"
                     />
                     <div class="field-hint">
-                      Klaviyo/Mailchimp fees — factored into Net ROI
+                      Software fees are factored directly into the Net ROI calculation
                     </div>
                   </div>
                 </div>
@@ -3048,6 +3112,65 @@
     </div>
     <!-- /main-layout -->
 
+    <!-- Help / Explanation Modal -->
+    <div id="help-modal-overlay" class="modal-overlay" onclick="closeHelpModal()">
+      <div class="modal-content" style="max-width: 700px" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <div class="modal-title">How It Works & Mathematical Logic</div>
+          <button class="modal-close" onclick="closeHelpModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>This tool identifies "revenue leaks" in e-commerce shops and projects the impact of a professional recovery solution using store-specific data and niche benchmarks.</p>
+          
+          <div class="help-section-title">1. How the App Works</div>
+          <p>The app simulates your conversion funnel to find missing revenue. It uses several intelligent layers to ensure accuracy:</p>
+          <ul>
+            <li><strong>Data Validation:</strong> It cross-checks your traffic, AOV, and conversion rates to detect data discrepancies (Anomaly Detection).</li>
+            <li><strong>Effective Abandonment:</strong> It adjusts standard abandonment rates based on your mobile traffic percentage, as mobile users typically abandon at a 15-20% higher rate.</li>
+            <li><strong>Signal-Based Recovery:</strong> Projections aren't just guesses; they are adjusted for your traffic mix (paid vs organic) and recent promotional activity (list fatigue).</li>
+          </ul>
+
+          <div class="help-section-title">2. Core Mathematical Logic</div>
+          
+          <p><strong>A. Revenue Cross-check (The "Sanity Test")</strong></p>
+          <p>Before calculating losses, we calculate "Implied Revenue" to ensure your inputs align with reality:</p>
+          <div class="math-formula">
+            Visitors × (Total Conversion Rate / 100) × Average Order Value (AOV)
+          </div>
+          <p style="font-size: 11px;">If this differs from your reported revenue by >20%, the app flags a "Revenue Gap" to investigate your inputs.</p>
+
+          <p><strong>B. Gross Lost Revenue</strong></p>
+          <p>This represents the total order value of every customer who added to cart but didn't finish.</p>
+          <div class="math-formula">
+            Visitors × Add-to-Cart % × (Effective Abandonment %) × AOV
+          </div>
+
+          <p><strong>C. Net Lost Revenue</strong></p>
+          <p>Not every order is profit. We subtract your return/refund rate to find the actual revenue currently being "left on the table".</p>
+          <div class="math-formula">
+            Gross Lost Revenue × (1 - Return Rate %)
+          </div>
+
+          <p><strong>D. Recovered Revenue Projection</strong></p>
+          <p>We estimate how much of that Net Lost Revenue can be "clawed back" with professional flows.</p>
+          <div class="math-formula">
+            Net Lost Revenue × Recovery Rate % × (Signals Adjustment)
+          </div>
+          <p style="font-size: 11px;">Signals adjustment factors in list fatigue (-12% to -25%) and paid traffic boosts (+15%).</p>
+
+          <p><strong>E. ROI & Payback Timeline</strong></p>
+          <div class="math-formula">
+            ROI = (Monthly Recovered Revenue / Plan Price)<br>
+            Payback Days = (Plan Price / (Recovered Revenue / 30))
+          </div>
+          
+          <p style="margin-top: 20px; font-size: 12px; color: var(--muted); font-style: italic;">All calculations are transparently designed to help you build a business case for recovery services based on conservative, data-backed estimates.</p>
+        </div>
+      </div>
+    </div>
+
     <!-- Competitor Insights Modal -->
     <div
       id="comp-modal-overlay"
@@ -3087,6 +3210,17 @@
     </div>
 
     <script>
+      function openHelpModal() {
+        document.getElementById("help-modal-overlay").classList.add("visible");
+        // Close popover when opening modal
+        const popover = document.getElementById('settings-popover');
+        if (popover) popover.classList.remove('visible');
+      }
+
+      function closeHelpModal() {
+        document.getElementById("help-modal-overlay").classList.remove("visible");
+      }
+
       function closeCompetitorModal() {
         document
           .getElementById("comp-modal-overlay")
@@ -3397,18 +3531,18 @@
           abandon: 72,
           aovBase: 75,
           famousBrand: "AG1",
-          hint: "Avg AOV $60–110. Subscriptions common — LTV is high even when AOV looks lower. Urgency and social proof drive best recovery rates.",
+          hint: "Avg AOV $60–110. Subscriptions are common, which means LTV is high even when AOV looks lower. Urgency and social proof drive the best recovery rates.",
           proposalMsg:
-            "In the supplements space, consistency and trust are everything. We'll implement a recovery strategy highlighting social proof, reviews, and easy subscription options.",
+            "In the supplements space, trust is everything. I'll focus your recovery strategy on social proof and clear subscription benefits to keep customers coming back.",
         },
         fashion: {
           atc: 6,
           abandon: 76,
           aovBase: 90,
           famousBrand: "Nike",
-          hint: "Avg AOV $70–130. Highest browse abandonment of any niche. Size/fit hesitation is the #1 drop-off reason — address it in recovery copy.",
+          hint: "Avg AOV $70–130. This niche has the highest browse abandonment. Size and fit hesitation is the main drop-off reason, so address it in your recovery copy.",
           proposalMsg:
-            "For apparel brands, sizing uncertainty is the #1 reason for cart abandonment. Our sequences proactively address fit and return policies to save those lost sales.",
+            "I've noticed that for apparel brands, sizing uncertainty is the main conversion killer. My plan addresses fit concerns and return policies directly in the sequence to salvage those sales.",
         },
         beauty: {
           atc: 7,
@@ -3417,16 +3551,16 @@
           famousBrand: "Sephora",
           hint: "Avg AOV $50–90. Multi-product bundles common. Loyalty perks and free samples are strongest recovery hooks.",
           proposalMsg:
-            "Beauty consumers respond particularly well to education and sampling. Our recovery strategy focuses on application tips and loyalty framing to drive conversions.",
+            "Beauty consumers respond well to education and sampling. I'll structure your recovery strategy around application tips and loyalty perks to bridge the gap from interest to purchase.",
         },
         homegood: {
           atc: 5,
           abandon: 70,
           aovBase: 110,
           famousBrand: "IKEA",
-          hint: "Avg AOV $80–180. Longer decision cycle — lead with reviews and easy returns, not urgency.",
+          hint: "Avg AOV $80–180. These have a longer decision cycle, so lead with reviews and easy returns rather than urgency.",
           proposalMsg:
-            "Home and furniture purchases carry longer consideration cycles. We'll deploy a multi-touch sequence leading with lifestyle imagery, financing options, and detailed social proof.",
+            "Home and furniture purchases carry longer consideration cycles. I'll set up a multi-touch sequence that uses lifestyle imagery and social proof to support their decision process.",
         },
         electronics: {
           atc: 4,
@@ -3435,7 +3569,7 @@
           famousBrand: "Apple",
           hint: "Avg AOV $120–350. High-research category. Social proof, comparisons, and warranty details outperform discount offers.",
           proposalMsg:
-            "Tech buyers do heavy research. Instead of rushing a discount, our tech recovery strategy focuses on competitive differentiation, spec comparisons, and warranty assurances.",
+            "Tech buyers do heavy research. Instead of rushing a discount, I'll focus your recovery strategy on competitive differentiation and warranty assurances to win their confidence.",
         },
         pet: {
           atc: 9,
@@ -3444,7 +3578,7 @@
           famousBrand: "Chewy",
           hint: "Avg AOV $45–90. Subscription-friendly. Emotional appeal and pet-specific personalisation work very well.",
           proposalMsg:
-            "Pet owners buy on emotion. We'll structure your abandoned cart paths with highly personalised, pet-centric messaging to recapture their attention.",
+            "Pet owners buy on emotion. I'll build out your cart paths with personalized, pet-centric messaging that actually cuts through a crowded inbox.",
         },
         custom: {
           atc: 7,
@@ -3458,66 +3592,66 @@
       var espData = {
         klaviyo: {
           cls: "green",
-          msg: "Perfect fit. Klaviyo is the gold standard for Shopify cart recovery — deep native integration, predictive analytics, best deliverability. Easiest to build on.",
+          msg: "Perfect fit. Klaviyo is the gold standard for Shopify cart recovery with deep native integration, predictive analytics, and best deliverability. Extremely easy to build on.",
           proposalMsg:
-            "Since you're already on Klaviyo, we can immediately leverage its deep integration to build high-converting flows without migrating your stack.",
+            "Since you're on Klaviyo, we can hit the ground running. I'll leverage its deep integration to build high-converting flows without any migration headache.",
         },
         mailchimp: {
           cls: "amber",
           msg: "Workable but limited. Mailchimp's Shopify cart data sync is unreliable. Worth migrating them to Klaviyo as part of your onboarding.",
           proposalMsg:
-            "We can optimize your current Mailchimp setup, but for maximum ROI, we may recommend moving your cart flows to a dedicated e-commerce engine.",
+            "I'll optimize your Mailchimp setup, but we'll also look at whether a move to a more e-commerce focused engine would help scale your recovery ROI.",
         },
         omnisend: {
           cls: "green",
           msg: "Good platform. Solid Shopify integration with built-in SMS. Slightly less powerful than Klaviyo for segmentation but totally viable.",
           proposalMsg:
-            "Using Omnisend allows us to seamlessly layer SMS into your email recovery flows, capturing buyers on their preferred channel.",
+            "Using Omnisend allows us to seamlessly layer SMS directly into your email flows, so we can meet your customers on whatever channel they prefer.",
         },
         drip: {
           cls: "amber",
-          msg: "Drip is declining — limited Shopify support. Consider pitching a Klaviyo migration alongside your recovery service.",
+          msg: "Drip is declining with limited Shopify support. Consider suggesting a Klaviyo migration alongside your recovery service.",
           proposalMsg:
-            "We can work within Drip initially, but as we build out your recovery engine, we can evaluate a move to a more integrated platform.",
+            "I can build the first iteration in Drip, but as we scale, I'd suggest we evaluate a move to a platform with tighter Shopify integration.",
         },
         none: {
           cls: "red",
-          msg: "No ESP — maximum opportunity. They're recovering zero revenue right now. Any result you deliver is infinite ROI vs their current baseline.",
+          msg: "No ESP means maximum opportunity. They're currently recovering zero revenue, so any result you deliver is massive ROI compared to their baseline.",
           proposalMsg:
-            "Since you don't have a dedicated email platform yet, we will set up the foundational infrastructure from scratch to ensure you stop leaking revenue day one.",
+            "Since you're starting from scratch, I'll set up the foundational systems you need to stop the revenue leak and start building a robust recovery engine.",
         },
         other: {
           cls: "amber",
-          msg: "Unknown tool — confirm on the discovery call. The platform determines what's buildable and how fast you can launch.",
+          msg: "Unknown tool, so be sure to confirm on the discovery call. The platform determines what's buildable and how fast you can launch.",
           proposalMsg:
-            "We will audit your existing email platform to build the most effective recovery flows it supports.",
+            "I'll do a quick audit of your current platform to see exactly what we can build out and how to best optimize your recovery paths.",
         },
       };
       var peakData = {
         bfcm: {
           label: "BFCM approaching",
           color: "gold",
-          msg: "Black Friday / Cyber Monday is coming — this is your single strongest close angle. Every day without a recovery system is money they won't get back during their biggest revenue month.",
+          msg: "With Black Friday / Cyber Monday coming up, this is a critical time. Every day without a recovery system is revenue you won't get back during your biggest month.",
         },
         holiday: {
           label: "Holiday season",
           color: "gold",
-          msg: "Holiday season amplifies every cart. Pitch now — flows take 2 weeks to build and optimize, and the window closes fast.",
+          msg: "The holiday season amplifies every cart. It's best to get started now, as flows take about 2 weeks to build and optimize.",
         },
         summer: {
           label: "Summer peak",
           color: "green",
-          msg: "Summer peak ahead — good urgency to get flows live before traffic spikes.",
+          msg: "The summer peak is ahead. We should get these flows live before your traffic spikes.",
         },
         valentines: {
           label: "Valentine's coming",
           color: "gold",
-          msg: "Valentine's Day is a high-AOV moment — couples gifting pushes cart values up. Recovery flows during this window are especially high-yield.",
+          msg: "Valentine's Day is a high-AOV moment. Couples gifting pushes cart values up, making recovery flows especially high-yield right now.",
         },
         other: {
           label: "Peak season ahead",
           color: "gold",
-          msg: "Peak season approaching — urgency to get set up before traffic spikes is a strong close angle.",
+          msg: "Peak season is approaching. It's the perfect time to get set up before your traffic spikes.",
         },
         none: { label: "No major peak", color: "", msg: "" },
       };
@@ -3567,22 +3701,21 @@
         var aov = midPrice * Math.max(items, 1);
         if (sub === "yes") {
           aov *= 0.85;
-          signals.push("subscription model (−15%)");
+          signals.push("subscription model (adjusted -15%)");
         } else if (sub === "some") {
           aov *= 0.93;
-          signals.push("partial subscription (−7%)");
+          signals.push("partial subscription (adjusted -7%)");
         }
         if (bundles === "yes") {
           aov *= 1.25;
-          signals.push("bundles/upsells (+25%)");
+          signals.push("bundles and upsells (added 25%)");
         }
         if (freeship > 0 && aov < freeship * 1.05) {
           aov = freeship * 1.05;
           signals.push(
-            "free shipping anchor (" +
+            "free shipping anchor at " +
               getCurrency() +
-              Math.round(freeship * 1.05) +
-              ")",
+              Math.round(freeship * 1.05),
           );
         }
         
@@ -3729,15 +3862,15 @@
         var setupMsgs = [];
         if (existingFlow === "no")
           setupMsgs.push(
-            "No recovery flow — zero baseline. Any result you deliver is pure upside. This is your easiest pitch.",
+            "No recovery flow currently exists, which means the baseline is zero. Any results you deliver will be pure upside, making this your easiest pitch.",
           );
         if (recentPromo === "within2w")
           setupMsgs.push(
-            "Promo within 2 weeks — list is fatigued. Recovery projections adjusted down 25% for fatigue.",
+            "A promo ran within the last 2 weeks, so the list is likely fatigued. Recovery projections have been adjusted down by 25% to account for this.",
           );
         else if (recentPromo === "within1m")
           setupMsgs.push(
-            "Promo last month — mild fatigue. Projections adjusted down 12%.",
+            "A promo ran last month, so there is still some mild fatigue. Projections have been adjusted down by 12% for accuracy.",
           );
         if (setupMsgs.length) {
           setupHint.textContent = setupMsgs.join(" ");
@@ -3767,7 +3900,7 @@
           );
         if (paidPct > 50)
           tMsgs.push(
-            "Majority paid traffic — recovery rates tend to run 2–3pp above organic baselines due to higher purchase intent",
+            "Since the majority is paid traffic, recovery rates tend to run 2-3 percentage points above organic baselines because of the higher purchase intent",
           );
         if (tMsgs.length) {
           trafficHint.textContent = tMsgs.join(". ") + ".";
@@ -3962,21 +4095,21 @@
               (Math.abs(impliedRevenue - revReported) / revReported) * 100;
             if (diffPct < 20) {
               revCheck.textContent =
-                "✓ Match — implied " +
+                "✓ Data Match: implied " +
                 fmt(impliedRevenue) +
-                " is within range of reported " +
+                " is consistent with your reported " +
                 fmt(revReported) +
                 ".";
               revCheck.className = "rev-check ok";
             } else {
               revCheck.textContent =
-                "⚠ Gap — implied " +
+                "⚠ Revenue Gap: implied " +
                 fmt(impliedRevenue) +
-                " vs reported " +
+                " differs from reported " +
                 fmt(revReported) +
                 " (" +
                 Math.round(diffPct) +
-                "% off). Check traffic, AOV, or conv. rate inputs.";
+                "% variance). We should verify traffic, AOV, or conversion rate inputs.";
               revCheck.className = "rev-check warn";
             }
           } else revCheck.className = "rev-check";
@@ -3987,15 +4120,15 @@
         var lMsgs = [];
         if (refundRate > 15)
           lMsgs.push(
-            "High return rate (" +
+            "The high return rate of " +
               Math.round(refundRate) +
-              "%) — actual recovered revenue will be meaningfully lower than gross projections",
+              "% means that actual recovered revenue will be lower than gross projections",
           );
         if (repeatRate > 40)
           lMsgs.push(
-            "Strong repeat rate (" +
+            "A strong repeat rate of " +
               Math.round(repeatRate) +
-              "%) — each recovered cart is worth significantly more in lifetime value",
+              "% results in each recovered cart being worth significantly more in lifetime value",
           );
         if (lMsgs.length) {
           ltvHint.textContent = lMsgs.join(". ") + ".";
@@ -4005,7 +4138,7 @@
         // Peak season metric
         var peakInfo = peakData[peakSeason] || peakData["none"];
         document.getElementById("m-peak").textContent =
-          peakSeason === "none" || !peakSeason ? "—" : peakInfo.label;
+          peakSeason === "none" || !peakSeason ? "N/A" : peakInfo.label;
         document.getElementById("m-peak").className =
           "metric-val " + (peakInfo.color || "muted");
 
@@ -4084,7 +4217,7 @@
 
           if (existingFlow === "no") {
             document.getElementById("m-delta").textContent =
-              "No baseline — 100% upside";
+              "No current baseline (100% immediate upside)";
             document.getElementById("m-delta").className = "metric-val green";
           } else if (showCurRate && currentRateVal > 0) {
             document.getElementById("m-delta").textContent =
@@ -4135,8 +4268,8 @@
             var dp = (Math.abs(impliedR - revReported) / revReported) * 100;
             document.getElementById("m-crosscheck").textContent =
               dp < 20
-                ? "Match (within " + Math.round(dp) + "%)"
-                : "Off by " + Math.round(dp) + "% — check inputs";
+                ? "Data aligns within " + Math.round(dp) + "%"
+                : Math.round(dp) + "% variance (verify inputs)";
             document.getElementById("m-crosscheck").className =
               dp < 20 ? "metric-val green" : "metric-val red";
           } else {
@@ -4186,13 +4319,13 @@
         var flowLine = "";
         if (existingFlow === "no")
           flowLine =
-            "You have no cart recovery running today — meaning every abandoned cart is 100% lost revenue. That's the lowest-hanging fruit in e-commerce.";
+            "I noticed that there's no cart recovery running yet. This is realistically the lowest-hanging fruit for " + brand + " right now, because every abandoned cart is currently 100% lost revenue.";
         else if (existingFlow === "basic")
           flowLine =
-            "Your 1–2 email sequence is a start, but it's leaving the majority of recoverable revenue on the table. AI-powered flows with SMS and behavioural triggers typically 3–4x the recovery rate.";
+            "Your existing 1–2 email sequence is a good start, but it's likely missing about 60% of the possible revenue. I'll bridge that gap with a more strategic, multi-channel flow.";
         else if (existingFlow === "partial")
           flowLine =
-            "You have foundations in place — what's missing is the AI layer: dynamic copy, send-time optimisation, and SMS. That gap is the difference between a good flow and a great one.";
+            "You've got a foundation, but we're missing the AI-driven optimization layer, including smart timing and SMS. That's usually where the biggest ROI gains happen.";
 
         var roiMetricsLine = "";
         if (discountOffered > 0 && softwareCost > 0)
@@ -4201,33 +4334,25 @@
             discountOffered +
             "% discount and " +
             fmt(softwareCost) +
-            " ESP cost)";
+            " recurring costs)";
         else if (discountOffered > 0)
           roiMetricsLine = " (net of " + discountOffered + "% discount)";
         else if (softwareCost > 0)
-          roiMetricsLine = " (net of " + fmt(softwareCost) + " ESP cost)";
+          roiMetricsLine = " (net of " + fmt(softwareCost) + " recurring costs)";
 
         var roiLine = hasInputs
-          ? "Based on your store — " +
-            Math.round(atcRaw) +
-            "% add-to-cart, ~" +
-            Math.round(effectiveAbandon) +
-            "% effective abandonment, and an AOV of " +
-            fmt(aov) +
-            " — I estimate " +
+          ? "Looking at your traffic and abandonment rates, it looks like " +
             fmt(netLost) +
-            "/month is recoverable (net of returns). At a " +
-            Math.round(recoveryAdjusted) +
-            "% recovery rate, that's " +
+            "/month is being left on the table. My goal is to capture " +
             fmt(recovered) +
-            "/month we bring back" +
-            roiMetricsLine +
-            ". " +
+            " of that for you. That puts your ROI at about " +
             roi +
-            "x ROI. Payback in " +
+            "x, meaning the setup should pay for itself in just " +
             paybackDays +
-            " days."
-          : "Based on your traffic and conversion data, I can show you exactly how much revenue is walking out the door each month — and what the ROI looks like before you commit to anything.";
+            " days" +
+            roiMetricsLine +
+            "."
+          : "Based on your traffic and conversion data, I can show you exactly how much revenue is walking out the door each month and what the ROI looks like before you commit to anything.";
 
         var deltaLine =
           showCurRate && currentRateVal > 0 && delta > 0
@@ -4235,7 +4360,7 @@
               fmt(currentRecovered) +
               "/month. We'd target " +
               fmt(recovered) +
-              " — a net improvement of " +
+              ", a net improvement of " +
               fmt(delta) +
               "/month."
             : "";
@@ -4272,8 +4397,7 @@
           : "standard";
 
         if (pTpl === "standard") {
-          html =
-            '<p class="p-lead">Hey ' + contact + ",</p>";
+          html = '<p class="p-lead">Hi ' + contact + ",</p>";
           if (flowLine) html += "<p>" + flowLine + "</p>";
           if (nicheLine) html += "<p>" + nicheLine + "</p>";
           if (espLine) html += "<p>" + espLine + "</p>";
@@ -4282,77 +4406,72 @@
           if (peakLine) html += "<p>" + peakLine + "</p>";
           if (testLine) html += '<p class="p-testimonial">' + testLine + "</p>";
           html +=
-            "<p>On the <strong>" +
+            "<p>My recommendation is the <strong>" +
             t.name +
-            "</strong> plan, you'll get " +
+            "</strong> plan, which includes " +
             t.features +
             ".";
           if (higherTier)
             html +=
-              " If you want the full stack — post-purchase flows, winbacks, and dedicated support — the <strong>" +
+              " If you're looking for the full stack including post-purchase flows and winbacks, the <strong>" +
               higherTier.name +
-              "</strong> plan at <strong>" +
-              fmt(higherTier.price) +
-              "</strong>/mo covers all of that.";
+              "</strong> plan covers all of that.";
           html += "</p>";
           html +=
             '<p class="p-price">Investment: ' + fmt(t.price) + "/month.</p>";
         } else if (pTpl === "aggressive") {
-          html =
-            '<p class="p-lead">Hey ' + contact + ",</p>";
+          html = '<p class="p-lead">Hey ' + contact + ",</p>";
           html +=
-            "<p>Right now, you are leaving <strong>" +
+            "<p>Every month you wait, " + brand + " is losing <strong>" +
             fmt(netLost) +
-            "/month</strong> on the table due to cart abandonment. We can capture <strong>" +
+            "</strong> to cart abandonment. I can help you capture <strong>" +
             fmt(recovered) +
-            "</strong> of that immediately with AI-driven flows.</p>";
+            "</strong> of that immediately with more aggressive, AI-driven flows.</p>";
           html +=
-            "<p>Your ROI on the <strong>" +
+            "<p>The ROI on the <strong>" +
             t.name +
-            "</strong> plan is a massive <strong>" +
+            "</strong> plan is <strong>" +
             roi +
-            "x</strong>. That means the investment (<strong>" +
+            "x</strong>. Your investment of <strong>" +
             fmt(t.price) +
-            "</strong>/mo) pays for itself in just <strong>" +
+            "</strong>/mo should pay for itself in just <strong>" +
             paybackDays +
             " days</strong>.</p>";
           html +=
-            '<p class="p-price">Ready to stop losing revenue? Investment: ' +
+            '<p class="p-price">Let\'s stop the revenue leak. Investment: ' +
             fmt(t.price) +
             "/month.</p>";
         } else if (pTpl === "short") {
-          html =
-            '<p class="p-lead">Hi ' + contact + ",</p>";
+          html = '<p class="p-lead">Hi ' + contact + ",</p>";
           html +=
-            "<p>Based on your store data, a well-optimised cart recovery setup will generate an additional <strong>" +
+            "<p>I've looked at your store metrics and it looks like a well-optimised cart recovery setup should bring in an additional <strong>" +
             fmt(recovered) +
-            " per month</strong>.</p>";
+            " per month</strong> for " + brand + ".</p>";
           html +=
-            "<p>We handle the strategy, copy, and technical setup under our <strong>" +
+            "<p>I'll handle the strategy, copy, and technical setup under the <strong>" +
             t.name +
             "</strong> plan for <strong>" +
             fmt(t.price) +
             "</strong>/mo.</p>";
         } else if (pTpl === "data_driven") {
-          html =
-            '<p class="p-lead">Hi ' + contact + ",</p>";
+          html = '<p class="p-lead">Hi ' + contact + ",</p>";
           html +=
-            "<p>Here is a breakdown of our cart recovery projection for <strong>" + brand + "</strong> based on current metrics:</p>";
+            "<p>I've put together a projection for <strong>" + brand + "</strong> based on your current traffic and abandonment data:</p>";
           html += "<ul>";
           html +=
             "<li><strong>Monthly Visitors:</strong> " +
             Math.round(visitors).toLocaleString() +
             "</li>";
           html +=
-            "<li><strong>Estimated Abandoned Carts:</strong> " +
+            "<li><strong>Abandoned Carts:</strong> " +
             Math.round(abandonedCarts).toLocaleString() +
             "/mo</li>";
           html +=
-            "<li><strong>Projected Recovery Rate:</strong> " +
+            "<li><strong>Target Recovery Rate:</strong> " +
             Math.round(recoveryAdjusted) +
             "%</li>";
           html +=
-            "<li><strong>Net Recovered Revenue:</strong> " +
+            "<li><strong>Projected Revenue Lift:</strong> " +
             fmt(recovered) +
             "/mo</li>";
           html += "</ul>";
@@ -4361,35 +4480,34 @@
             t.name +
             "</strong> plan (<strong>" +
             fmt(t.price) +
-            "</strong>/mo), the projected ROI is <strong>" +
+            "</strong>/mo), we're looking at a projected ROI of <strong>" +
             roi +
             "x</strong>.</p>";
         } else if (pTpl === "fomo") {
           html = '<p class="p-lead">Hey ' + contact + ',</p>';
           var brandName = window.famousBrand || (nicheData[niche] && nicheData[niche].famousBrand) || "your category leaders";
-          html += '<p>I was analyzing strategies in the <strong>' + niche + '</strong> space, and I noticed that leaders like <strong>' + brandName + '</strong> are using sophisticated recovery tactics that you are currently missing out on:</p>';
+          html += '<p>I\'ve been looking at the top players in the <strong>' + niche + '</strong> space. Leaders like <strong>' + brandName + '</strong> are using sophisticated recovery tactics that ' + brand + ' is currently missing out on:</p>';
           if (window.competitorData && window.competitorData.length > 0) {
             window.competitorData.slice(0, 2).forEach(function(comp) {
-              html += '<p><strong>' + comp.name + '</strong> uses: <em>' + comp.tactics + '</em>.</p>';
+              html += '<p><strong>' + comp.name + '</strong> is already leveraging ' + comp.tactics + '.</p>';
             });
           }
-          html += '<p>Why allow this competitive advantage to go to them instead of you? We can bridge this gap and plug these leaks immediately.</p>';
+          html += '<p>There\'s no reason to let this revenue go to them. We can bridge this gap and plug these leaks immediately.</p>';
           html += '<p class="p-price">Investment: ' + fmt(t.price, 0) + "/month.</p>";
         } else if (pTpl === "benefit") {
           html = '<p class="p-lead">Hi ' + contact + ',</p>';
-          html += '<p>Focusing on the customer journey, we can enhance <strong>' + brand + '</strong>\'s conversion rate by addressing the root causes of abandonment.</p>';
-          html += '<p>By implementing a behavioral recovery strategy, we anticipate recovering <strong>' + fmt(recovered) + '</strong>/month in revenue, while actively increasing engagement and brand loyalty.</p>';
-          html += '<p>With ' + t.name + ' (<strong>' + fmt(t.price) + '</strong>/mo), you gain a sustainable pipeline for long-term growth.</p>';
+          html += '<p>I\'ve been looking at the customer journey for <strong>' + brand + '</strong>. We can see a significant conversion lift by addressing the root causes of abandonment.</p>';
+          html += '<p>By implementing a behavioral recovery strategy, I anticipate we can recover <strong>' + fmt(recovered) + '</strong>/month. This doesn\'t just save sales; it builds brand loyalty by helping customers when they\'re most interested.</p>';
+          html += '<p>With ' + t.name + ' (<strong>' + fmt(t.price) + '</strong>/mo), you\'ll have a sustainable system for consistent growth.</p>';
         } else if (pTpl === "quick_win") {
           html = '<p class="p-lead">Hi ' + contact + ',</p>';
-          html += '<p>We can launch a high-impact, low-lift recovery strategy for <strong>' + brand + '</strong> within 48 hours to start capturing lost sales immediately.</p>';
-          html += '<p>This rapid deployment is designed to solve your most acute revenue leaks by targeting the highest-value carts, projecting <strong>' + fmt(recovered) + '</strong> in immediate monthly gains.</p>';
-          html += '<p>Investment for ' + t.name + ' is <strong>' + fmt(t.price) + '</strong>/mo.</p>';
+          html += '<p>I can launch a high-impact recovery strategy for <strong>' + brand + '</strong> within the next 48 hours to start capturing lost sales immediately.</p>';
+          html += '<p>This is designed to plug your most acute revenue leaks by targeting high-value carts first. I project <strong>' + fmt(recovered) + '</strong> in immediate monthly gains.</p>';
+          html += '<p>Investment for the ' + t.name + ' plan is <strong>' + fmt(t.price) + '</strong>/mo.</p>';
         } else if (pTpl === "concise") {
-          html =
-            '<p class="p-lead">Hi ' + contact + ",</p>";
+          html = '<p class="p-lead">Hi ' + contact + ",</p>";
           html +=
-            "<p>We can help <strong>" + brand + "</strong> recover an estimated <strong>" +
+            "<p>I can help <strong>" + brand + "</strong> recover an estimated <strong>" +
             fmt(recovered) +
             "/month</strong> in lost sales.</p>";
           html +=
@@ -4397,10 +4515,11 @@
             t.name +
             "</strong> plan is <strong>" +
             fmt(t.price) +
-            "</strong>/mo, delivering an estimated <strong>" +
+            "</strong>/mo, which delivers an estimated <strong>" +
             roi +
             "x ROI</strong>.</p>";
         }
+
 
         // Call to action section appended below the main body
         html +=
@@ -4408,28 +4527,28 @@
 
         if (pTpl === "standard") {
           html +=
-            '<p class="p-lead">Reply YES and I\'ll send the agreement today. Limited spots available this month.</p>';
+            '<p class="p-lead">Reply YES and I\'ll send the agreement over today. I only have a few spots available this month.</p>';
         } else if (pTpl === "aggressive") {
           html +=
-            '<p class="p-lead">Let’s get this live by next week. Reply YES and I’ll send the link.</p>';
+            '<p class="p-lead">Let’s get this live by next week so we can start capturing this revenue. Reply YES and I’ll send the link.</p>';
         } else if (pTpl === "short") {
           html +=
-            '<p class="p-lead">Let me know if you want to proceed and I will send the next steps.</p>';
+            '<p class="p-lead">Let me know if you want to proceed and I\'ll send over the next steps.</p>';
         } else if (pTpl === "data_driven") {
           html +=
-            '<p class="p-lead">Please review the figures above. Let me know if you have any questions or are ready to proceed with the setup.</p>';
+            '<p class="p-lead">Please review the figures above and let me know if you have any questions or are ready to get started.</p>';
         } else if (pTpl === "concise") {
           html +=
-            '<p class="p-lead">If this sounds good, reply YES and we\'ll get started.</p>';
+            '<p class="p-lead">If this looks good, reply YES and I\'ll get the ball rolling.</p>';
         } else if (pTpl === "fomo") {
           html +=
-            '<p class="p-lead">Ready to stop losing this revenue to your competitors? Reply YES and we can start within 24 hours.</p>';
+            '<p class="p-lead">Ready to stop losing this revenue to your competitors? Reply YES and we can have this live for you within 24 hours.</p>';
         } else if (pTpl === "benefit") {
           html +=
-            '<p class="p-lead">Let\'s get started on enhancing your customer journey. Reply YES and I\'ll send over the agreement.</p>';
+            '<p class="p-lead">Let\'s get started on enhancing your customer journey. Reply YES and I\'ll send the formal agreement.</p>';
         } else if (pTpl === "quick_win") {
           html +=
-            '<p class="p-lead">Ready for an immediate lift? Reply YES and we will start the 48-hour launch sequence.</p>';
+            '<p class="p-lead">Ready for an immediate lift? Reply YES and I\'ll start the 48-hour launch sequence for you.</p>';
         }
 
         if (expiryLine)
@@ -4439,7 +4558,7 @@
             "</p>";
         if (rawYourName || rawYourName === "")
           html +=
-            '<p class="p-sig">— ' +
+            '<p class="p-sig">Best,<br>' +
             yourName +
             "</p>";
 
