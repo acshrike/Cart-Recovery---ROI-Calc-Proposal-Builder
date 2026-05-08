@@ -1,0 +1,117 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-bg: #111113;
+  --color-surface: #1a1a1c;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-accent: #f5f2ed;
+  --color-ink: #f5f2ed;
+  --color-green: #22c55e;
+  --color-amber: #f59e0b;
+  --color-red: #ef4444;
+  --color-gold: #fbbf24;
+}
+
+@layer base {
+  body {
+    @apply bg-bg text-ink font-sans antialiased;
+  }
+
+  details > summary {
+    list-style: none;
+  }
+  details > summary::-webkit-details-marker {
+    display: none;
+  }
+}
+
+@layer components {
+  .section-card {
+    @apply bg-surface border border-border rounded-xl p-5 sm:p-6;
+  }
+
+  .input-field {
+    @apply w-full bg-black/40 border border-border rounded-lg px-3 py-2 text-sm text-ink focus:border-white/20 focus:ring-1 focus:ring-white/10 outline-none transition-all disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  .input-field option {
+    background-color: #111113;
+    color: #f5f2ed;
+  }
+
+  .btn-primary {
+    @apply bg-accent text-bg px-5 py-2 rounded-lg font-bold text-sm hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-secondary {
+    @apply border border-border bg-white/5 px-5 py-2 rounded-lg font-bold text-sm hover:bg-white/10 transition-all active:scale-[0.98];
+  }
+
+  .label {
+    @apply block text-[10px] font-bold uppercase tracking-wider text-accent/50 mb-1.5;
+  }
+
+  .metric-val {
+    @apply text-xl font-bold tracking-tight text-accent;
+  }
+
+  .metric-label {
+    @apply text-[10px] text-accent/60 font-medium;
+  }
+}
+
+/* Modern Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+.markdown-body h3 {
+  @apply text-base font-bold text-accent mt-4 mb-2;
+}
+
+.markdown-body p {
+  @apply mb-4 leading-relaxed text-accent/90;
+}
+
+.proposal-placeholder {
+  @apply text-accent/40 italic;
+}
+
+.markdown-body ul {
+  @apply list-disc ml-5 mb-4;
+}
+
+.markdown-body li {
+  @apply mb-1;
+}
+
+.p-lead {
+  @apply text-lg font-semibold text-accent;
+}
+
+.p-price {
+  @apply font-bold text-xl mt-4;
+}
+
+.p-sig {
+  @apply mt-6 border-t border-border pt-4;
+}
