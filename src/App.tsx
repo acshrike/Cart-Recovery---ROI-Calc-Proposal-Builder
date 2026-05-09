@@ -251,12 +251,12 @@ const App: React.FC = () => {
     const hasVisitors = !!dataState.visitors && parseFloat(dataState.visitors) > 0;
 
     const wrapIfEmpty = (value: string | undefined, placeholder: string) => {
-      if (value && value.trim()) return value;
+      if (value && value.trim()) return `<strong>${value}</strong>`;
       return `<span class="proposal-placeholder">${placeholder}</span>`;
     };
 
     const wrapCalc = (value: string | number, placeholder: string) => {
-      if (hasVisitors) return value;
+      if (hasVisitors) return `<strong>${value}</strong>`;
       return `<span class="proposal-placeholder">${placeholder}</span>`;
     };
 
@@ -297,13 +297,13 @@ const App: React.FC = () => {
       html = `<p>Hey ${wrapIfEmpty(contact, 'Client Name')},</p>`;
       html += `<p>${hookText}</p>`;
       
-      html += `<p>Stores like yours typically recover <strong>${wrapIfEmpty(dataState.recovery, 'Recovery Rate')}%</strong> of that automatically, so that is <strong>${wrapCalc(formatCurrency(dataResults.recovered, dataState.currency), 'Target Recovery')}/month</strong> sitting on the table.</p>`;
+      html += `<p>${wrapIfEmpty(dataState.niche === 'homegood' ? 'Home Goods' : dataState.niche.charAt(0).toUpperCase() + dataState.niche.slice(1), 'Niche')} stores typically recover 8–12% of that automatically, that's ${wrapCalc(formatCurrency(dataResults.recovered, dataState.currency), 'Target Recovery')}/month sitting on the table.</p>`;
       
       html += `<p>Got 15 minutes this week? I'll show you exactly how.</p>`;
       
       if (dataState.testimonial && dataState.testimonial.trim()) {
         html += `<div style="border-left: 1px solid rgba(245,242,237,0.2); padding-left: 1rem; margin-bottom: 1.5rem; color: rgba(245,242,237,0.7);">
-          <p style="margin-bottom: 0;">${dataState.testimonial}</p>
+          <p style="margin-bottom: 0;"><strong>${dataState.testimonial}</strong></p>
         </div>`;
       }
       
@@ -744,9 +744,10 @@ const App: React.FC = () => {
                     onChange={e => handleInputChange('existingFlow', e.target.value)}
                     disabled={state.esp === 'none'}
                     options={[
-                      { label: 'None', value: 'no' },
-                      { label: 'Basic Flow', value: 'basic' },
-                      { label: 'Partial Opt.', value: 'partial' }
+                      { label: 'None (No Email/SMS)', value: 'no' },
+                      { label: 'Basic Flow (Simple Email)', value: 'basic' },
+                      { label: 'Partial Flow (Missing Key Flows)', value: 'partial' },
+                      { label: 'Complete Flow', value: 'complete' }
                     ]}
                   />
                   <InputField 
