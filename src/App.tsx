@@ -307,7 +307,7 @@ const App: React.FC = () => {
         </div>`;
       }
       
-      html += `<p><em>This proposal is valid until ${formatDate(dataState.expiry)}.</em></p>`;
+      // html += `<p><em>This proposal is valid until ${formatDate(dataState.expiry)}.</em></p>`;
       html += `<p>Best,<br>${wrapIfEmpty(yourName, 'Your Name')}</p>`;
     }
 
@@ -895,7 +895,8 @@ const App: React.FC = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4 sm:mb-6">
+                  <InputField label="Your Name (Proposal Sender)" value={state.yourName} onChange={e => handleInputChange('yourName', e.target.value)} />
                   <InputField 
                     label="Proposal Template" 
                     value={state.proposalTemplate} 
@@ -907,20 +908,9 @@ const App: React.FC = () => {
                       { label: '3rd Follow-up', value: 'followup3' }
                     ]}
                   />
-                  <InputField 
-                    label="Valid Until" 
-                    type="date" 
-                    value={state.expiry} 
-                    onChange={e => handleInputChange('expiry', e.target.value)} 
-                    onClick={(e) => {
-                      const input = (e.currentTarget as HTMLElement).querySelector('input');
-                      if (input) input.showPicker();
-                    }}
-                  />
               </div>
 
-              <div className="space-y-3 mb-4 sm:mb-6">
-                  <InputField label="Your Name (Proposal Sender)" value={state.yourName} onChange={e => handleInputChange('yourName', e.target.value)} />
+              <div className="grid grid-cols-1 md:grid-cols-1 gap-3 mb-4">
                   <InputField 
                     label="Case Study / Testimonial Quote" 
                     isTextArea 
