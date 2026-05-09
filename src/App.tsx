@@ -467,7 +467,7 @@ const App: React.FC = () => {
           </div>
         </header>
 
-        <div className="flex-1 lg:overflow-hidden flex flex-col lg:flex-row overflow-y-auto lg:overflow-y-visible custom-scrollbar pt-14 lg:pt-0">
+        <div className="flex-1 lg:overflow-hidden flex flex-col lg:flex-row overflow-y-auto lg:overflow-y-visible custom-scrollbar">
           
           {/* Left Column: Inputs */}
           <div 
